@@ -11,7 +11,7 @@ _my nixpkgs folder_
 curl -L https://nixos.org/nix/install | sh
 
 # configure nix to use more cpu/ram when building
-mkdir -p ~/.config/nix/
+mkdir -p ~/.config/nix/ ~/.config/nixpkgs/
 echo 'max-jobs = auto' >>~/.config/nix/nix.conf
 
 # Add necessary nix channels
