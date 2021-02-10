@@ -237,7 +237,6 @@ in with pkgs.hax; {
       # bash completions
       source <(kubectl completion bash)
       source ~/.nix-profile/etc/profile.d/bash_completion.sh
-      source ~/.nix-profile/etc/bash_completion.d/better-comma.sh
       source ~/.nix-profile/share/bash-completion/completions/git
       source ~/.nix-profile/share/bash-completion/completions/ssh
     '';
@@ -292,7 +291,6 @@ in with pkgs.hax; {
 
   programs.tmux = {
     enable = true;
-    tmuxp.enable = true;
     historyLimit = 500000;
     shortcut = "j";
     extraConfig = ''
