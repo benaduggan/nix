@@ -1,6 +1,6 @@
 { config, pkgs, lib, ... }:
 let
-  inherit (pkgs.hax) isDarwin fetchFromGitHub;
+  inherit (pkgs.hax) isDarwin isLinux fetchFromGitHub;
 
   personalEmail = "benaduggan@gmail.com";
   workEmail = "ben@hackerrank.com";
@@ -8,6 +8,7 @@ let
   lastName = "Duggan";
   home = (builtins.getEnv "HOME");
   username = (builtins.getEnv "USER");
+  symbol = if isDarwin then "ᛗ" else "ᛥ";
 
   # chief keefs stuff
   kwbauson-cfg = import <kwbauson-cfg>;
@@ -43,100 +44,106 @@ in with pkgs.hax; {
       BASH_SILENCE_DEPRECATION_WARNING = "1";
     };
 
-    packages = with lib; with pkgs; lib.flatten [
-      (lib.optional stdenv.isLinux ungoogled-chromium)
-      (python3.withPackages (pkgs: with pkgs; [ black mypy bpython ipdb ]))
-      amazon-ecr-credential-helper
-      atool
-      bash-completion
-      bashInteractive
-      bat
-      bc
-      bzip2
-      cachix
-      coreutils-full
-      cowsay
-      curl
-      deno
-      diffutils
-      dos2unix
-      ed
-      exa
-      fd
-      file
-      figlet
-      gawk
-      gitAndTools.delta
-      gnugrep
-      gnused
-      gnutar
-      gron
-      gzip
-      htop
-      jq
-      less
-      libarchive
-      libnotify
-      lolcat
-      loop
-      lsof
-      man-pages
-      moreutils
-      nano
-      ncdu
-      netcat-gnu
-      nix-direnv
-      nix-bash-completions
-      nix-index
-      nix-info
-      nix-prefetch-github
-      nix-prefetch-scripts
-      nix-tree
-      nixfmt
-      nmap
-      openssh
-      p7zip
-      patch
-      perl
-      php
-      pigz
-      pssh
-      procps
-      pv
-      ranger
-      re2c
-      ripgrep
-      ripgrep-all
-      rlwrap
-      rsync
-      scc
-      sd
-      shellcheck
-      shfmt
-      socat
-      sox
-      swaks
-      tealdeer
-      time
-      unzip
-      watch
-      watchexec
-      wget
-      which
-      xxd
-      zip
-      kwbauson-cfg.better-comma
-      kwbauson-cfg.nle
-      kwbauson-cfg.fordir
-      kwbauson-cfg.git-trim
-      (writeShellScriptBin "hms" ''
-        git -C ~/.config/nixpkgs/ pull origin main
-        home-manager switch
-      '')
-      (soundScript "coin" coinSound)
-      (soundScript "guh" guhSound)
-      (soundScript "bruh" bruhSound)
-    ];
+    packages = with lib;
+      with pkgs;
+      lib.flatten [
+        (lib.optional stdenv.isLinux ungoogled-chromium)
+        (python3.withPackages (pkgs: with pkgs; [ black mypy bpython ipdb ]))
+        amazon-ecr-credential-helper
+        atool
+        bash-completion
+        bashInteractive
+        bat
+        bc
+        bzip2
+        cachix
+        coreutils-full
+        cowsay
+        curl
+        deno
+        diffutils
+        dos2unix
+        ed
+        exa
+        fd
+        file
+        figlet
+        gawk
+        gcc
+        gitAndTools.delta
+        gnumake
+        gnugrep
+        gnused
+        gnutar
+        gron
+        gzip
+        htop
+        jq
+        less
+        libarchive
+        libnotify
+        lolcat
+        loop
+        lsof
+        man-pages
+        moreutils
+        nano
+        ncdu
+        netcat-gnu
+        nix-direnv
+        nix-bash-completions
+        nix-index
+        nix-info
+        nix-prefetch-github
+        nix-prefetch-scripts
+        nix-tree
+        nixfmt
+        nmap
+        openssh
+        p7zip
+        patch
+        perl
+        php
+        pigz
+        pssh
+        procps
+        pv
+        ranger
+        re2c
+        ripgrep
+        ripgrep-all
+        rlwrap
+        rsync
+        scc
+        sd
+        shellcheck
+        shfmt
+        socat
+        sox
+        swaks
+        tealdeer
+        time
+        unzip
+        vim
+        watch
+        watchexec
+        wget
+        which
+        xxd
+        zip
+        kwbauson-cfg.better-comma
+        kwbauson-cfg.nle
+        kwbauson-cfg.fordir
+        kwbauson-cfg.git-trim
+        (lib.optional isLinux [ binutils ])
+        (writeShellScriptBin "hms" ''
+          git -C ~/.config/nixpkgs/ pull origin main
+          home-manager switch
+        '')
+        (soundScript "coin" coinSound)
+        (soundScript "guh" guhSound)
+        (soundScript "bruh" bruhSound)
+      ];
 
     file.sqliterc = {
       target = ".sqliterc";
@@ -208,7 +215,8 @@ in with pkgs.hax; {
       #nix
       nixc = "cd ~/.config/nixpkgs";
 
-      stop-classroom = "docker kill  $(docker ps -a | grep class | awk '{print $1}') && docker kill  $(docker ps -a | grep integration | awk '{print $1}')";
+      stop-classroom =
+        "docker kill  $(docker ps -a | grep class | awk '{print $1}') && docker kill  $(docker ps -a | grep integration | awk '{print $1}')";
 
       fzfp = "fzf --preview 'bat --style=numbers --color=always {}'";
     };
@@ -244,7 +252,7 @@ in with pkgs.hax; {
 
   programs.direnv = {
     enable = true;
-    enableNixDirenvIntegration = true;
+    nix-direnv.enable = true;
   };
 
   programs.mcfly = {
@@ -263,7 +271,6 @@ in with pkgs.hax; {
   programs.starship.settings = {
     add_newline = false;
     character = rec {
-      symbol = if isDarwin then "ᛗ" else "ᛥ";
       success_symbol = "[${symbol}](bright-green)";
       error_symbol = "[${symbol}](bright-red)";
     };
