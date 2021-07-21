@@ -130,6 +130,7 @@ in with pkgs.hax; {
         wget
         which
         xxd
+        xz
         zip
         kwbauson-cfg.better-comma
         kwbauson-cfg.nle
@@ -230,20 +231,18 @@ in with pkgs.hax; {
       export MONOREPO_DIR="$HOME/mimir"
 
       # add local scripts to path
-      export PATH="$PATH:$HOME/.bin/:$HOME/.local/bin"
-
+      export PATH="$PATH:$HOME/.bin/:$HOME/.local/bin:$HOME/.local/bin/flutter/bin"
       # asdf and base nix
     '' + (if isDarwin then ''
-      source /usr/local/opt/asdf/asdf.sh
-      source /usr/local/opt/asdf/etc/bash_completion.d/asdf.bash
+      # source /usr/local/opt/asdf/asdf.sh
+      # source /usr/local/opt/asdf/etc/bash_completion.d/asdf.bash
     '' else ''
-      source $HOME/.asdf/asdf.sh
-      source $HOME/.asdf/completions/asdf.bash
+      # source $HOME/.asdf/asdf.sh
+      # source $HOME/.asdf/completions/asdf.bash
     '') + ''
       source ~/.nix-profile/etc/profile.d/nix.sh
 
       # bash completions
-      source <(kubectl completion bash)
       source ~/.nix-profile/etc/profile.d/bash_completion.sh
       source ~/.nix-profile/share/bash-completion/completions/git
       source ~/.nix-profile/share/bash-completion/completions/ssh
