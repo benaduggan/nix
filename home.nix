@@ -3,7 +3,7 @@ let
   inherit (pkgs.hax) isDarwin isLinux fetchFromGitHub;
 
   personalEmail = "benaduggan@gmail.com";
-  workEmail = "ben@hackerrank.com";
+  workEmail = "benduggan@readlee.com";
   firstName = "Ben";
   lastName = "Duggan";
   home = (builtins.getEnv "HOME");
@@ -26,7 +26,8 @@ let
     sha256 = "11n1a20a7fj80xgynfwiq3jaq1bhmpsdxyzbnmnvlsqfnsa30vy3";
   };
 
-in with pkgs.hax; {
+in
+with pkgs.hax; {
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
@@ -34,7 +35,7 @@ in with pkgs.hax; {
     username = username;
     homeDirectory = home;
 
-    stateVersion = "21.03";
+    stateVersion = "21.11";
 
     sessionVariables = {
       EDITOR = "vim";
@@ -77,7 +78,6 @@ in with pkgs.hax; {
         gnutar
         gron
         gzip
-        htop
         jq
         less
         libarchive
@@ -97,7 +97,7 @@ in with pkgs.hax; {
         nix-prefetch-github
         nix-prefetch-scripts
         nix-tree
-        nixfmt
+        nixpkgs-fmt
         nmap
         openssh
         p7zip
@@ -113,6 +113,7 @@ in with pkgs.hax; {
         ripgrep
         ripgrep-all
         rlwrap
+        rnix-lsp
         rsync
         scc
         sd
@@ -207,17 +208,8 @@ in with pkgs.hax; {
       space = "du -Sh | sort -rh | head -10";
       now = "date +%s";
 
-      # local_ops
-      local_ops = "nix-local-env -d $HOME/hr/local_ops run python dev.py";
-      lo = "local_ops";
-      lor = "lo run";
-      los = "lo status";
-
       #nix
       nixc = "cd ~/.config/nixpkgs";
-
-      stop-classroom =
-        "docker kill  $(docker ps -a | grep class | awk '{print $1}') && docker kill  $(docker ps -a | grep integration | awk '{print $1}')";
 
       fzfp = "fzf --preview 'bat --style=numbers --color=always {}'";
     };
@@ -232,6 +224,7 @@ in with pkgs.hax; {
 
       # add local scripts to path
       export PATH="$PATH:$HOME/.bin/:$HOME/.local/bin:$HOME/.local/bin/flutter/bin"
+
       # asdf and base nix
     '' + (if isDarwin then ''
       # source /usr/local/opt/asdf/asdf.sh
