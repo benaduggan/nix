@@ -337,7 +337,7 @@ with pkgs.hax; {
 
       # delete local branch and pull from remote
       fetchout =
-        "!f() { git co master; git branch -D $@; git fetch && git co $@; }; f";
+        "!f() { git co main; git branch -D $@; git fetch && git co $@; }; f";
       pufl = "!git push origin $(git branch-name) --force-with-lease";
       putf = "put --force-with-lease";
       shake = "remote prune origin";
