@@ -14,15 +14,15 @@ let
   kwbauson-cfg = import <kwbauson-cfg>;
 
   coinSound = pkgs.fetchurl {
-    url = "https://cobi.dev/sounds/coin.wav";
+    url = "https://hexa.dev/sounds/coin.wav";
     sha256 = "18c7dfhkaz9ybp3m52n1is9nmmkq18b1i82g6vgzy7cbr2y07h93";
   };
   guhSound = pkgs.fetchurl {
-    url = "https://cobi.dev/sounds/guh.wav";
+    url = "https://hexa.dev/sounds/guh.wav";
     sha256 = "1chr6fagj6sgwqphrgbg1bpmyfmcd94p39d34imq5n9ik674z9sa";
   };
   bruhSound = pkgs.fetchurl {
-    url = "https://cobi.dev/sounds/bruh.mp3";
+    url = "https://hexa.dev/sounds/bruh.mp3";
     sha256 = "11n1a20a7fj80xgynfwiq3jaq1bhmpsdxyzbnmnvlsqfnsa30vy3";
   };
 
