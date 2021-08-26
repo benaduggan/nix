@@ -180,6 +180,10 @@ with pkgs.hax; {
       ga = "g add -A .";
       cm = "g commit -m ";
 
+      hidden = "! git ls-files -v | grep '^S' | cut -c3-";
+      hide = ''! git add -N "$@" && git update-index --skip-worktree "$@"'';
+      unhide = "update-index --no-skip-worktree";
+
       # docker
       d = "docker";
       da = "docker ps -a";
