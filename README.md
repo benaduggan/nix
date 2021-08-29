@@ -21,14 +21,20 @@ nix-channel --add https://github.com/kwbauson/cfg/archive/main.tar.gz kwbauson-c
 nix-channel --update
 nix-shell '<home-manager>' -A install
 
-# pull repo into ~/.config/nixpkgs/
-cd ~/.config/nixpkgs
+# pull repo
+cd ~
 git clone git@github.com:benaduggan/nix.git .
+rm -rf /home/$USER/.config/nixpkgs
+ln -s /home/$USER/nixpkgs /home/$USER/.config/nixpkgs
 
 # move unneeded files
-mv ~/.profile ~/.profile.old
-mv ~/.bashrc ~/.bashrc.old
+mv ~/.bash_history ~/.bash_history.old
 mv ~/.bash_profile ~/.bash_profile.old
+mv ~/.bashrc ~/.bashrc.old
+mv ~/.dir_colors ~/.dir_colors.old
+mv ~/.nix-profile ~/.nix-profile.old
+mv ~/.profile ~/.profile.old
+mv ~/.sqliterc ~/.sqliterc.old
 mv ~/.gitconfig ~/.gitconfig.old
 mv ~/.tmux.conf ~/.tmux.conf.old
 

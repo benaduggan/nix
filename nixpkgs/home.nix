@@ -31,11 +31,15 @@ with pkgs.hax; {
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
+  imports = [
+    "${fetchTarball "https://github.com/msteen/nixos-vscode-server/tarball/master"}/modules/vscode-server/home.nix"
+  ];
+
   home = {
     username = username;
     homeDirectory = home;
 
-    stateVersion = "21.11";
+    stateVersion = "21.05";
 
     sessionVariables = {
       EDITOR = "vim";
@@ -248,7 +252,7 @@ with pkgs.hax; {
 
   programs.direnv = {
     enable = true;
-    nix-direnv.enable = true;
+    # nix-direnv.enable = true;
   };
 
   programs.mcfly = {
@@ -357,4 +361,6 @@ with pkgs.hax; {
       };
     };
   };
+
+  services.vscode-server.enable = true;
 }
