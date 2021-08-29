@@ -11,21 +11,22 @@ _my nixpkgs folder_
 curl -L https://nixos.org/nix/install | sh
 
 # configure nix to use more cpu/ram when building
-mkdir -p ~/.config/nix/ ~/.config/nixpkgs/
+mkdir -p ~/.config/nix/
 echo 'max-jobs = auto' >>~/.config/nix/nix.conf
 
-# Add necessary nix channels
+# Add nix channels
 nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs
 nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
 nix-channel --add https://github.com/kwbauson/cfg/archive/main.tar.gz kwbauson-cfg
 nix-channel --update
-nix-shell '<home-manager>' -A install
+nix-shell '<home-manager>' -A install # if not on nixos?
 
 # pull repo
 cd ~
-git clone git@github.com:benaduggan/nix.git .
+REPO_DIR="cfg"
+git clone git@github.com:benaduggan/nix.git "$REPO_DIR"
 rm -rf /home/$USER/.config/nixpkgs
-ln -s /home/$USER/nixpkgs /home/$USER/.config/nixpkgs
+ln -s /home/$USER/"$REPO_DIR"/nixpkgs /home/$USER/.config/nixpkgs
 
 # move unneeded files
 mv ~/.bash_history ~/.bash_history.old
