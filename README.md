@@ -33,7 +33,6 @@ mv ~/.bash_history ~/.bash_history.old
 mv ~/.bash_profile ~/.bash_profile.old
 mv ~/.bashrc ~/.bashrc.old
 mv ~/.dir_colors ~/.dir_colors.old
-mv ~/.nix-profile ~/.nix-profile.old
 mv ~/.profile ~/.profile.old
 mv ~/.sqliterc ~/.sqliterc.old
 mv ~/.gitconfig ~/.gitconfig.old

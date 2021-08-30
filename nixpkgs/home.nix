@@ -215,10 +215,6 @@ with pkgs.hax; {
       rot13 = "tr 'A-Za-z' 'N-ZA-Mn-za-m'";
       space = "du -Sh | sort -rh | head -10";
       now = "date +%s";
-
-      #nix
-      nixc = "cd ~/.config/nixpkgs";
-
       fzfp = "fzf --preview 'bat --style=numbers --color=always {}'";
     };
 
@@ -233,14 +229,6 @@ with pkgs.hax; {
       # add local scripts to path
       export PATH="$PATH:$HOME/.bin/:$HOME/.local/bin:$HOME/.local/bin/flutter/bin"
 
-      # asdf and base nix
-    '' + (if isDarwin then ''
-      # source /usr/local/opt/asdf/asdf.sh
-      # source /usr/local/opt/asdf/etc/bash_completion.d/asdf.bash
-    '' else ''
-      # source $HOME/.asdf/asdf.sh
-      # source $HOME/.asdf/completions/asdf.bash
-    '') + ''
       source ~/.nix-profile/etc/profile.d/nix.sh
 
       # bash completions
@@ -252,7 +240,6 @@ with pkgs.hax; {
 
   programs.direnv = {
     enable = true;
-    # nix-direnv.enable = true;
   };
 
   programs.mcfly = {
@@ -362,5 +349,5 @@ with pkgs.hax; {
     };
   };
 
-  services.vscode-server.enable = true;
+  services.vscode-server.enable = builtins.pathExists "/etc/nixos";
 }
