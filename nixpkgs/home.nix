@@ -1,6 +1,6 @@
 { config, pkgs, lib, ... }:
 let
-  inherit (pkgs.hax) isDarwin isLinux fetchFromGitHub;
+  inherit (pkgs.hax) fetchFromGitHub;
 
   personalEmail = "benaduggan@gmail.com";
   workEmail = "benduggan@readlee.com";
@@ -8,7 +8,7 @@ let
   lastName = "Duggan";
   home = (builtins.getEnv "HOME");
   username = (builtins.getEnv "USER");
-  symbol = if isDarwin then "ᛗ" else "ᛥ";
+  symbol = "ᛥ";
 
   # chief keefs stuff
   kwbauson-cfg = import <kwbauson-cfg>;
@@ -31,10 +31,6 @@ with pkgs.hax; {
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
-  imports = [
-    "${fetchTarball "https://github.com/msteen/nixos-vscode-server/tarball/master"}/modules/vscode-server/home.nix"
-  ];
-
   home = {
     username = username;
     homeDirectory = home;
@@ -42,7 +38,7 @@ with pkgs.hax; {
     stateVersion = "21.05";
 
     sessionVariables = {
-      EDITOR = "vim";
+      EDITOR = "nano";
       HISTCONTROL = "ignoreboth";
       PAGER = "less";
       LESS = "-iR";
@@ -52,7 +48,7 @@ with pkgs.hax; {
     packages = with lib;
       with pkgs;
       lib.flatten [
-        (lib.optional stdenv.isLinux ungoogled-chromium)
+        ungoogled-chromium
         (python3.withPackages (pkgs: with pkgs; [ black mypy bpython ipdb ]))
         amazon-ecr-credential-helper
         atool
@@ -141,7 +137,7 @@ with pkgs.hax; {
         kwbauson-cfg.nle
         kwbauson-cfg.fordir
         kwbauson-cfg.git-trim
-        (lib.optional isLinux [ binutils ])
+        binutils
         (writeShellScriptBin "hms" ''
           git -C ~/.config/nixpkgs/ pull origin main
           home-manager switch
@@ -184,9 +180,9 @@ with pkgs.hax; {
       ga = "g add -A .";
       cm = "g commit -m ";
 
-      hidden = "! git ls-files -v | grep '^S' | cut -c3-";
-      hide = ''! git add -N "$@" && git update-index --skip-worktree "$@"'';
-      unhide = "update-index --no-skip-worktree";
+      hidden = "g ls-files -v | grep '^S' | cut -c3-";
+      hide = ''g update-index --skip-worktree "$@"'';
+      unhide = "g update-index --no-skip-worktree";
 
       # docker
       d = "docker";
@@ -254,33 +250,35 @@ with pkgs.hax; {
     defaultOptions = words "--ansi --reverse --multi --filepath-word";
   };
 
-  programs.starship.enable = true;
-  programs.starship.settings = {
-    add_newline = false;
-    character = rec {
-      success_symbol = "[${symbol}](bright-green)";
-      error_symbol = "[${symbol}](bright-red)";
-    };
-    golang = {
-      style = "fg:#00ADD8";
-      symbol = "go ";
-    };
-    directory.style = "fg:#d442f5";
-    nix_shell = {
-      pure_msg = "";
-      impure_msg = "";
-      format = "via [$symbol$state]($style) ";
-    };
-    kubernetes = {
-      disabled = false;
-      style = "fg:#326ce5";
-    };
+  programs.starship = {
+    enable = true;
+    settings = {
+      add_newline = false;
+      character = rec {
+        success_symbol = "[${symbol}](bright-green)";
+        error_symbol = "[${symbol}](bright-red)";
+      };
+      golang = {
+        style = "fg:#00ADD8";
+        symbol = "go ";
+      };
+      directory.style = "fg:#d442f5";
+      nix_shell = {
+        pure_msg = "";
+        impure_msg = "";
+        format = "via [$symbol$state]($style) ";
+      };
+      kubernetes = {
+        disabled = false;
+        style = "fg:#326ce5";
+      };
 
-    # disabled plugins
-    aws.disabled = true;
-    cmd_duration.disabled = true;
-    gcloud.disabled = true;
-    package.disabled = true;
+      # disabled plugins
+      aws.disabled = true;
+      cmd_duration.disabled = true;
+      gcloud.disabled = true;
+      package.disabled = true;
+    };
   };
 
   programs.tmux = {
@@ -343,11 +341,15 @@ with pkgs.hax; {
       push.default = "simple";
       pull.ff = "only";
       core = {
-        editor = if isDarwin then "code --wait" else "vim";
+        editor = "nano";
         pager = "delta --dark";
       };
     };
   };
 
+
+  imports = [
+    "${fetchTarball "https://github.com/msteen/nixos-vscode-server/tarball/master"}/modules/vscode-server/home.nix"
+  ];
   services.vscode-server.enable = builtins.pathExists "/etc/nixos";
 }
