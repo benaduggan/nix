@@ -40,7 +40,4 @@ with builtins; [
   (self: super:
     with super;
     mapAttrs (n: v: hax.fakePlatform v) { inherit gixy; })
-  (self: super: {
-    mcfly = (import (fetchTarball { url = "https://github.com/NixOS/nixpkgs/archive/c7c8126c15b142c4c8bf0df62404cf2e95ef3d28.tar.gz"; }) {overlays = [];}).mcfly;
-  })
 ]
