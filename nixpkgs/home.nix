@@ -13,19 +13,15 @@ let
   # chief keefs stuff
   kwbauson-cfg = import <kwbauson-cfg>;
 
-  coinSound = pkgs.fetchurl {
-    url = "https://hexa.dev/static/sounds/coin.wav";
-    sha256 = "18c7dfhkaz9ybp3m52n1is9nmmkq18b1i82g6vgzy7cbr2y07h93";
-  };
-  guhSound = pkgs.fetchurl {
-    url = "https://hexa.dev/static/sounds/guh.wav";
-    sha256 = "1chr6fagj6sgwqphrgbg1bpmyfmcd94p39d34imq5n9ik674z9sa";
-  };
-  bruhSound = pkgs.fetchurl {
-    url = "https://hexa.dev/static/sounds/bruh.mp3";
-    sha256 = "11n1a20a7fj80xgynfwiq3jaq1bhmpsdxyzbnmnvlsqfnsa30vy3";
-  };
-
+  # cobi's stuff
+  jacobi = import (
+    pkgs.fetchFromGitHub {
+      owner = "jpetrucciani";
+      repo = "nix";
+      rev = "9f4c761a6fb58f513a82455a0a39e5b6fbfb463f";
+      sha256 = "13zzkq8zmdd07v014z5v0ik5smvqn89vxr5h61qnpnm625gn0kiw";
+    }
+  );
 in
 with pkgs.hax; {
   # Let Home Manager install and manage itself.
@@ -133,18 +129,18 @@ with pkgs.hax; {
         xxd
         xz
         zip
+        binutils
+
+        # chief keef's stuff
         kwbauson-cfg.better-comma
         kwbauson-cfg.nle
         kwbauson-cfg.fordir
         kwbauson-cfg.git-trim
-        binutils
-        (writeShellScriptBin "hms" ''
-          git -C ~/.config/nixpkgs/ pull origin main
-          home-manager switch
-        '')
-        (soundScript "coin" coinSound)
-        (soundScript "guh" guhSound)
-        (soundScript "bruh" bruhSound)
+
+        # jacobi's stuff
+        jacobi.hax.meme_sounds
+        jacobi.hax.general_bash_scripts
+        jacobi.hax.aws_bash_scripts
       ];
 
     file.sqliterc = {
@@ -184,35 +180,12 @@ with pkgs.hax; {
       hide = ''g update-index --skip-worktree "$@"'';
       unhide = "g update-index --no-skip-worktree";
 
-      # docker
-      d = "docker";
-      da = "docker ps -a";
-      di = "docker images";
-      de = "docker exec -it";
-      dr = "docker run --rm -it";
-      daq = "docker ps -aq";
-      drma = "docker stop $(docker ps -aq) && docker rm -f $(docker ps -aq)";
-      drmi = "di | grep none | awk '{print $3}' | sponge | xargs docker rmi";
-      dc = "docker-compose";
-
-      # k8s
-      k = "kubectl";
-      kx = "kubectx";
-      ka = "k get pods";
-      kaw = "k get pods -o wide";
-      knuke = "k delete pods --grace-period=0 --force";
-      klist =
-        "k get pods --all-namespaces -o jsonpath='{..image}' | tr -s '[[:space:]]' '\\n' | sort | uniq -c";
-
-      # aws stuff
-      aws_id = "aws sts get-caller-identity --query Account --output text";
-
       # misc
       rot13 = "tr 'A-Za-z' 'N-ZA-Mn-za-m'";
       space = "du -Sh | sort -rh | head -10";
       now = "date +%s";
       fzfp = "fzf --preview 'bat --style=numbers --color=always {}'";
-    };
+    } // jacobi.hax.docker_aliases // jacobi.hax.kubernetes_aliases;
 
     initExtra = ''
       shopt -s histappend

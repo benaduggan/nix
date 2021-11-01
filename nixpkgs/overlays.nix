@@ -28,10 +28,6 @@ with builtins; [
           flatten x
         else
           flatten (mapAttrsToList (_: v: drvs v) x);
-      soundScript = x: y:
-        writeShellScriptBin x ''
-          ${sox}/bin/play --no-show-progress ${y}
-        '';
 
       drvsExcept = x: e:
         with { excludeNames = concatMap attrNames (attrValues e); };
