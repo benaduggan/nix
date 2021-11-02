@@ -49,7 +49,7 @@
   # replicates the default behaviour.
   networking.useDHCP = false;
   networking.networkmanager.enable = true;
-  networking.interfaces.enp0s13f0u1u1.useDHCP = true;
+  # networking.interfaces.enp0s13f0u1u1.useDHCP = true;
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
