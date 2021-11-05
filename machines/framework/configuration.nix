@@ -27,6 +27,11 @@
   environment.systemPackages = with pkgs; [
     home-manager
 
+    gnome.gnome-tweaks
+    gnomeExtensions.settingscenter
+    gnome.gnome-shell-extensions
+    font-manager
+
     zoom-us
     slack
     discord
