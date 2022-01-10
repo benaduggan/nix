@@ -281,7 +281,7 @@ with pkgs.hax; {
 
   programs.tmux = {
     enable = true;
-    tmuxp.enable = true;
+    # tmuxp.enable = true;
     historyLimit = 500000;
     shortcut = "j";
     extraConfig = ''
