@@ -1,34 +1,31 @@
 { config, pkgs, lib, ... }:
 let
-  inherit (pkgs.hax) fetchFromGitHub;
-
   personalEmail = "benaduggan@gmail.com";
   workEmail = "benduggan@readlee.com";
   firstName = "Ben";
   lastName = "Duggan";
-  home = (builtins.getEnv "HOME");
-  username = (builtins.getEnv "USER");
+  home = builtins.getEnv "HOME";
+  username = builtins.getEnv "USER";
   symbol = "ᛥ";
 
   # chief keefs stuff
   kwbauson-cfg = import <kwbauson-cfg>;
 
-  # cobi's stuff
-  jacobi = import (
-    pkgs.fetchFromGitHub {
-      owner = "jpetrucciani";
-      repo = "nix";
-      rev = "9f4c761a6fb58f513a82455a0a39e5b6fbfb463f";
-      sha256 = "13zzkq8zmdd07v014z5v0ik5smvqn89vxr5h61qnpnm625gn0kiw";
-    }
-  );
+  # jacobi's stuff
+  jacobi = import
+    (fetchTarball {
+      name = "jpetrucciani-2022-09-09";
+      url = "https://github.com/jpetrucciani/nix/archive/6ffe87e039544e8e8f204a930af94f609049fbc3.tar.gz";
+      sha256 = "04q1sql0br34541wasxjfazzs269klm5a6504fb6brgdb8vz3a4d";
+    })
+    { };
 in
 with pkgs.hax; {
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
   home = {
-    username = username;
+    inherit username;
     homeDirectory = home;
 
     stateVersion = "21.05";
@@ -132,15 +129,20 @@ with pkgs.hax; {
         binutils
 
         # chief keef's stuff
-        kwbauson-cfg.better-comma
-        kwbauson-cfg.nle
-        kwbauson-cfg.fordir
-        kwbauson-cfg.git-trim
+        (with kwbauson-cfg; [
+          better-comma
+          nle
+          fordir
+          git-trim
+        ])
 
         # jacobi's stuff
-        jacobi.hax.meme_sounds
-        jacobi.hax.general_bash_scripts
-        jacobi.hax.aws_bash_scripts
+        (with jacobi; [
+          meme_sounds
+          general_pog_scripts
+          aws_pog_scripts
+          nix_pog_scripts
+        ])
       ];
 
     file.sqliterc = {
