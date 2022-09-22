@@ -5,7 +5,7 @@ with builtins; [
     with builtins;
     lib // rec {
       inherit (pkgs) fetchFromGitHub;
-      mapAttrValues = f: mapAttrs (n: v: f v);
+      mapAttrValues = f: mapAttrs (n: f);
       fakePlatform = x:
         x.overrideAttrs (attrs: {
           meta = attrs.meta or { } // {
@@ -27,11 +27,7 @@ with builtins; [
         if isDerivation x || isList x then
           flatten x
         else
-          flatten (mapAttrsToList (_: v: drvs v) x);
-      soundScript = x: y:
-        writeShellScriptBin x ''
-          ${sox}/bin/play --no-show-progress ${y}
-        '';
+          flatten (mapAttrsToList (_: drvs) x);
 
       drvsExcept = x: e:
         with { excludeNames = concatMap attrNames (attrValues e); };
@@ -39,5 +35,5 @@ with builtins; [
     }))
   (self: super:
     with super;
-    mapAttrs (n: v: hax.fakePlatform v) { inherit gixy; })
+    mapAttrs (n: hax.fakePlatform) { inherit gixy; })
 ]
