@@ -28,7 +28,7 @@ with pkgs.hax; {
     inherit username;
     homeDirectory = home;
 
-    stateVersion = "21.05";
+    stateVersion = "22.11";
 
     sessionVariables = {
       EDITOR = "nano";
@@ -46,7 +46,7 @@ with pkgs.hax; {
         amazon-ecr-credential-helper
         atool
         bash-completion
-        bashInteractive_5
+        bashInteractive
         bat
         bc
         bzip2
@@ -84,7 +84,6 @@ with pkgs.hax; {
         ncdu
         netcat-gnu
         nix-direnv
-        nix-bash-completions
         nix-index
         nix-info
         nix-prefetch-github
@@ -209,12 +208,13 @@ with pkgs.hax; {
 
   programs.direnv = {
     enable = true;
+    # nix-direnv.enable = true;
   };
 
-  programs.mcfly = {
-    enable = true;
-    enableBashIntegration = true;
-  };
+  # programs.mcfly = {
+  #   enable = true;
+  #   enableBashIntegration = true;
+  # };
 
   programs.fzf = {
     enable = true;
@@ -256,7 +256,6 @@ with pkgs.hax; {
 
   programs.tmux = {
     enable = true;
-    # tmuxp.enable = true;
     historyLimit = 500000;
     shortcut = "j";
     extraConfig = ''
@@ -321,8 +320,8 @@ with pkgs.hax; {
   };
 
 
-  imports = [
-    "${fetchTarball "https://github.com/msteen/nixos-vscode-server/tarball/master"}/modules/vscode-server/home.nix"
-  ];
-  services.vscode-server.enable = builtins.pathExists "/etc/nixos";
+  # imports = [
+  #   "${fetchTarball "https://github.com/msteen/nixos-vscode-server/tarball/master"}/modules/vscode-server/home.nix"
+  # ];
+  # services.vscode-server.enable = builtins.pathExists "/etc/nixos";
 }
