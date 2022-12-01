@@ -14,9 +14,9 @@ let
   # jacobi's stuff
   jacobi = import
     (fetchTarball {
-      name = "jpetrucciani-2022-09-09";
-      url = "https://github.com/jpetrucciani/nix/archive/6ffe87e039544e8e8f204a930af94f609049fbc3.tar.gz";
-      sha256 = "04q1sql0br34541wasxjfazzs269klm5a6504fb6brgdb8vz3a4d";
+      name = "jpetrucciani-2022-12-01";
+      url = "https://github.com/jpetrucciani/nix/archive/9945abecd74cb4fd8eac371a1d71ca06fb8dd690.tar.gz";
+      sha256 = "1sa4m5sxvkg46bcmd1k5kl7r3jzlrbjfqbam3y7lc5a9n5nbhr3b";
     })
     { };
 in
@@ -137,10 +137,12 @@ with pkgs.hax; {
 
         # jacobi's stuff
         (with jacobi; [
+          devenv
           meme_sounds
           general_pog_scripts
           aws_pog_scripts
           nix_pog_scripts
+          docker_pog_scripts
         ])
       ];
 
