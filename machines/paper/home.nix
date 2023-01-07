@@ -9,26 +9,23 @@ let
   username = builtins.getEnv "USER";
   symbol = "ᛥ";
 
-  # chief keefs stuff
-  kwbauson-cfg = import <kwbauson-cfg>;
+  # # chief keefs stuff
+  # kwbauson-cfg = import <kwbauson-cfg>;
 
-  # jacobi's stuff
-  jacobi = import
-    (fetchTarball {
-      name = "jpetrucciani-2022-12-01";
-      url = "https://github.com/jpetrucciani/nix/archive/9945abecd74cb4fd8eac371a1d71ca06fb8dd690.tar.gz";
-      sha256 = "1sa4m5sxvkg46bcmd1k5kl7r3jzlrbjfqbam3y7lc5a9n5nbhr3b";
-    })
-    { };
+  # # jacobi's stuff
+  # jacobi = import
+  #   (fetchTarball {
+  #     name = "jpetrucciani-2022-12-01";
+  #     url = "https://github.com/jpetrucciani/nix/archive/9945abecd74cb4fd8eac371a1d71ca06fb8dd690.tar.gz";
+  #     sha256 = "1sa4m5sxvkg46bcmd1k5kl7r3jzlrbjfqbam3y7lc5a9n5nbhr3b";
+  #   })
+  #   { };
 in
 with pkgs.hax; {
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
   home = {
-    inherit username;
-    homeDirectory = home;
-
     stateVersion = "22.11";
 
     sessionVariables = {
@@ -84,7 +81,6 @@ with pkgs.hax; {
         nano
         netcat-gnu
         nix-direnv
-        nix-index
         nix-info
         nix-prefetch-github
         nix-prefetch-scripts
@@ -128,23 +124,23 @@ with pkgs.hax; {
         xz
         zip
 
-        # chief keef's stuff
-        (with kwbauson-cfg; [
-          better-comma
-          nle
-          fordir
-          git-trim
-        ])
+        # # chief keef's stuff
+        # (with kwbauson-cfg; [
+        #   better-comma
+        #   nle
+        #   fordir
+        #   git-trim
+        # ])
 
-        # jacobi's stuff
-        (with jacobi; [
-          devenv
-          meme_sounds
-          general_pog_scripts
-          aws_pog_scripts
-          nix_pog_scripts
-          docker_pog_scripts
-        ])
+        # # jacobi's stuff
+        # (with jacobi; [
+        #   devenv
+        #   meme_sounds
+        #   general_pog_scripts
+        #   aws_pog_scripts
+        #   nix_pog_scripts
+        #   docker_pog_scripts
+        # ])
       ];
 
     file.sqliterc = {
@@ -189,7 +185,7 @@ with pkgs.hax; {
       space = "du -Sh | sort -rh | head -10";
       now = "date +%s";
       fzfp = "fzf --preview 'bat --style=numbers --color=always {}'";
-    } // jacobi.hax.docker_aliases // jacobi.hax.kubernetes_aliases;
+    }; # // jacobi.hax.docker_aliases // jacobi.hax.kubernetes_aliases;
 
     initExtra = ''
       shopt -s histappend
@@ -221,12 +217,13 @@ with pkgs.hax; {
   #   enableBashIntegration = true;
   # };
 
-  programs.fzf = {
-    enable = true;
-    enableBashIntegration = false;
-    defaultCommand = "fd -tf -c always -H --ignore-file ${./ignore} -E .git";
-    defaultOptions = words "--ansi --reverse --multi --filepath-word";
-  };
+  # had to disable to build flake
+  # programs.fzf = {
+  #   enable = true;
+  #   enableBashIntegration = false;
+  #   defaultCommand = "fd -tf -c always -H --ignore-file ${./ignore} -E .git";
+  #   defaultOptions = words "--ansi --reverse --multi --filepath-word";
+  # };
 
   programs.starship = {
     enable = true;
