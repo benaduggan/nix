@@ -1,5 +1,6 @@
 { config, pkgs, lib, ... }:
 let
+  inherit (pkgs.stdenv) isLinux;
   personalEmail = "benaduggan@gmail.com";
   workEmail = "benduggan@readlee.com";
   firstName = "Ben";
@@ -41,8 +42,8 @@ with pkgs.hax; {
     packages = with lib;
       with pkgs;
       lib.flatten [
-        ungoogled-chromium
-        (python3.withPackages (pkgs: with pkgs; [ black mypy bpython ipdb ]))
+        (if isLinux then [ ungoogled-chromium binutils ncdu ] else [ ])
+        (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
         amazon-ecr-credential-helper
         atool
         bash-completion
@@ -81,7 +82,6 @@ with pkgs.hax; {
         man-pages
         moreutils
         nano
-        ncdu
         netcat-gnu
         nix-direnv
         nix-index
@@ -108,6 +108,7 @@ with pkgs.hax; {
         rnix-lsp
         rsync
         scc
+        screen
         sd
         shellcheck
         shfmt
@@ -122,10 +123,10 @@ with pkgs.hax; {
         watchexec
         wget
         which
+        xterm
         xxd
         xz
         zip
-        binutils
 
         # chief keef's stuff
         (with kwbauson-cfg; [
@@ -195,11 +196,13 @@ with pkgs.hax; {
       set +h
 
       export DO_NOT_TRACK=1
+      export LC_ALL=en_US.UTF-8
+      export LANG=en_US.UTF-8
 
       # add local scripts to path
       export PATH="$PATH:$HOME/.bin/:$HOME/.local/bin:$HOME/.local/bin/flutter/bin"
 
-      source ~/.nix-profile/etc/profile.d/nix.sh
+      # source ~/.nix-profile/etc/profile.d/nix.sh
 
       # bash completions
       source ~/.nix-profile/etc/profile.d/bash_completion.sh
@@ -274,6 +277,8 @@ with pkgs.hax; {
       unbind %
 
       set-option -g mouse on
+      set -g default-terminal "xterm-256color"
+      set-window-option -q -g utf8 on
     '';
   };
 
