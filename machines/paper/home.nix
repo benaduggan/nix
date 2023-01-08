@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, ... }:
 let
   inherit (pkgs.stdenv) isLinux isDarwin;
   personalEmail = "benaduggan@gmail.com";
@@ -11,16 +11,12 @@ let
 
   # # chief keefs stuff
   # kwbauson-cfg = import <kwbauson-cfg>;
+  kwbauson = import inputs.nixpkgs { inherit (inputs.kwbauson) overlays; inherit (pkgs) system; };
 
   # # jacobi's stuff
-  # jacobi = import
-  #   (fetchTarball {
-  #     name = "jpetrucciani-2022-12-01";
-  #     url = "https://github.com/jpetrucciani/nix/archive/9945abecd74cb4fd8eac371a1d71ca06fb8dd690.tar.gz";
-  #     sha256 = "1sa4m5sxvkg46bcmd1k5kl7r3jzlrbjfqbam3y7lc5a9n5nbhr3b";
-  #   })
-  #   { };
-in {
+  jacobi = import inputs.jacobi { inherit (inputs) nixpkgs; inherit (pkgs) system; };
+in
+with jacobi.hax; {
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
@@ -39,7 +35,7 @@ in {
       with pkgs;
       lib.flatten [
         (if isLinux then [ ungoogled-chromium binutils ncdu ] else [ ])
-        (if isDarwin then [ m-cli prefmanager ] else [ ])
+        (if isDarwin then [ m-cli ] else [ ])
         (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
         amazon-ecr-credential-helper
         atool
@@ -125,22 +121,22 @@ in {
         zip
 
         # # chief keef's stuff
-        # (with kwbauson; [
-        #   better-comma
-        #   nle
-        #   fordir
-        #   git-trim
-        # ])
+        (with kwbauson; [
+          better-comma
+          nle
+          fordir
+          git-trim
+        ])
 
-        # # jacobi's stuff
-        # (with jacobi; [
-        #   devenv
-        #   meme_sounds
-        #   general_pog_scripts
-        #   aws_pog_scripts
-        #   nix_pog_scripts
-        #   docker_pog_scripts
-        # ])
+        # jacobi's stuff
+        (with jacobi; [
+          devenv
+          meme_sounds
+          general_pog_scripts
+          aws_pog_scripts
+          nix_pog_scripts
+          docker_pog_scripts
+        ])
       ];
 
     file.sqliterc = {
@@ -185,7 +181,7 @@ in {
       space = "du -Sh | sort -rh | head -10";
       now = "date +%s";
       fzfp = "fzf --preview 'bat --style=numbers --color=always {}'";
-    }; # // jacobi.hax.docker_aliases // jacobi.hax.kubernetes_aliases;
+    } // jacobi.hax.docker_aliases // jacobi.hax.kubernetes_aliases;
 
     initExtra = ''
       shopt -s histappend
