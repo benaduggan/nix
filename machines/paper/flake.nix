@@ -49,7 +49,7 @@
           home-manager.darwinModules.home-manager
           {
             nixpkgs = nixpkgsConfig;
-            
+
             # `home-manager` config
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
@@ -61,6 +61,14 @@
 
     # Overlays --------------------------------------------------------------- {{{
     overlays = {
+      # jacobi = final: prev: {
+      #     jacobi = import inputs.jacobi { inherit (prev) pkgs; };
+      #   };
+
+      # kwbauson = final: prev: {
+      #     kwbauson = import inputs.kwbauson { inherit (prev) pkgs; };
+      #   };
+
       # Overlay useful on Macs with Apple Silicon
         apple-silicon = final: prev: optionalAttrs (prev.stdenv.system == "aarch64-darwin") {
           # Add access to x86 packages system is running Apple Silicon

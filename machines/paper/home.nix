@@ -1,6 +1,6 @@
 { config, pkgs, lib, ... }:
 let
-  inherit (pkgs.stdenv) isLinux;
+  inherit (pkgs.stdenv) isLinux isDarwin;
   personalEmail = "benaduggan@gmail.com";
   workEmail = "benduggan@readlee.com";
   firstName = "Ben";
@@ -20,8 +20,7 @@ let
   #     sha256 = "1sa4m5sxvkg46bcmd1k5kl7r3jzlrbjfqbam3y7lc5a9n5nbhr3b";
   #   })
   #   { };
-in
-with pkgs.hax; {
+in {
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
@@ -40,6 +39,7 @@ with pkgs.hax; {
       with pkgs;
       lib.flatten [
         (if isLinux then [ ungoogled-chromium binutils ncdu ] else [ ])
+        (if isDarwin then [ m-cli prefmanager ] else [ ])
         (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
         amazon-ecr-credential-helper
         atool
@@ -125,7 +125,7 @@ with pkgs.hax; {
         zip
 
         # # chief keef's stuff
-        # (with kwbauson-cfg; [
+        # (with kwbauson; [
         #   better-comma
         #   nle
         #   fordir

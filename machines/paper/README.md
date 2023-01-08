@@ -15,3 +15,16 @@ To update the system, run
 ```
 darwin-rebuild switch --flake ~/cfg/machines/paper/
 ```
+
+# Things to remember
+
+The interesting thing about this setup so far is the building of the flake and switching to the flake seems to get rid of a lot of the steps in the overall readme about making the nixpkgs directory and symlinking it and stuff? I don't fully understand it still, but I like it.
+
+Also got rid of ~/.config/nix cause that's managed in darwin-configuration.nix
+
+
+# TODO
+
+* Figure out how to import stuff back from Keith / Cobi
+* Figure out how to not duplicate home.nix memes
+* Learn flakes for real
