@@ -105,7 +105,7 @@ with pkgs.hax; {
         ripgrep
         ripgrep-all
         rlwrap
-        rnix-lsp
+        nil
         rsync
         scc
         screen
