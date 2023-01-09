@@ -76,6 +76,7 @@ with jacobi.hax; {
         moreutils
         nano
         netcat-gnu
+        nil
         nix-direnv
         nix-info
         nix-prefetch-github
@@ -97,7 +98,6 @@ with jacobi.hax; {
         ripgrep
         ripgrep-all
         rlwrap
-        rnix-lsp
         rsync
         scc
         screen
@@ -193,13 +193,6 @@ with jacobi.hax; {
 
       # add local scripts to path
       export PATH="$PATH:$HOME/.bin/:$HOME/.local/bin"
-
-      # source ~/.nix-profile/etc/profile.d/nix.sh
-
-      # bash completions
-      source ~/.nix-profile/etc/profile.d/bash_completion.sh
-      source ~/.nix-profile/share/bash-completion/completions/git
-      source ~/.nix-profile/share/bash-completion/completions/ssh
     '';
   };
 

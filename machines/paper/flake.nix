@@ -25,20 +25,14 @@
       };
     in
     {
-      # My `nix-darwin` configs
-      darwinModules = { };
       darwinConfigurations = rec {
-        Benjamins-MacBook-Pro = darwinSystem {
+        ben-mbp = darwinSystem {
           system = "aarch64-darwin";
-          modules = attrValues self.darwinModules ++ [
-            # Main `nix-darwin` config
+          modules = [
             ./darwin-configuration.nix
-            # `home-manager` module
             home-manager.darwinModules.home-manager
             {
               nixpkgs = nixpkgsConfig;
-
-              # `home-manager` config
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
               home-manager.users.bduggan = {
@@ -52,19 +46,10 @@
         };
       };
 
-      # Overlays --------------------------------------------------------------- {{{
       overlays = {
-        # jacobi = final: prev: {
-        #     jacobi = import inputs.jacobi { inherit (prev) pkgs; };
-        #   };
-
-        # kwbauson = final: prev: {
-        #     kwbauson = import inputs.kwbauson { inherit (prev) pkgs; };
-        #   };
-
-        # Overlay useful on Macs with Apple Silicon
         apple-silicon = final: prev: optionalAttrs (prev.stdenv.system == "aarch64-darwin") {
-          # Add access to x86 packages system is running Apple Silicon
+          # Useful on Macs with Apple Silicon
+          # Adds access to x86 packages system is running Apple Silicon
           pkgs-x86 = import nixpkgs {
             system = "x86_64-darwin";
             inherit (nixpkgsConfig) config;

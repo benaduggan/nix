@@ -22,9 +22,8 @@ The interesting thing about this setup so far is the building of the flake and s
 
 Also got rid of ~/.config/nix cause that's managed in darwin-configuration.nix
 
-
 # TODO
 
-* Figure out how to import stuff back from Keith / Cobi
-* Figure out how to not duplicate home.nix memes
-* Learn flakes for real
+- Figure out how to not duplicate home.nix memes
+- Figure out how to manage homebrew with nix
+- Learn flakes for real
