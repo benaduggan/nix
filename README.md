@@ -41,3 +41,13 @@ mv ~/.tmux.conf ~/.tmux.conf.old
 # enable home-manager and build packages
 home-manager switch
 ```
+
+# Homebrew
+
+nix darwin does not install homebrew, you gotta do that yourself still!
+
+this is what you'd need to do to get the brew command added to your path, but idk if you want to do that since you'd want everything to be managed by nix anyway?
+
+```
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/bduggan/.bash_profile
+```

@@ -45,5 +45,50 @@
 
   # not sure if it works yet
   # security.pam.enableSudoTouchIdAuth = true;
+
+  homebrew = {
+    enable = true;
+    onActivation = {
+      autoUpdate = true;
+      cleanup = "zap";
+      upgrade = true;
+    };
+
+    brews = [ "readline" "qemu" ];
+
+    taps = [
+      "homebrew/cask"
+      "homebrew/cask-drivers"
+      "homebrew/cask-fonts"
+      "homebrew/cask-versions"
+      "homebrew/core"
+      "homebrew/services"
+    ];
+
+    casks = [
+      "font-fira-code-nerd-font"
+      "epic-games"
+      "spotify"
+      "steam"
+      "discord"
+      "slack"
+      "docker"
+      "karabiner-elements"
+      "macfuse"
+      "notion"
+      "parsec"
+      "qlvideo"
+      "raycast"
+      "rectangle"
+      "firefox"
+      "google-chrome"
+      "visual-studio-code"
+      "vlc"
+    ];
+
+    # These appear to be gated by having "purchased" the thing
+    # even if it's free per apple id
+    masApps = { Wireguard = 1451685025; };
+  };
 }
 
