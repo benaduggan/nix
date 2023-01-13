@@ -66,6 +66,7 @@
     ];
 
     casks = [
+      "authy"
       "font-fira-code-nerd-font"
       "epic-games"
       "spotify"
