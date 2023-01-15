@@ -10,7 +10,7 @@
   outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi }:
     let
       inherit (nix-darwin.lib) darwinSystem;
-      inherit (nixpkgs.lib) attrValues makeOverridable optionalAttrs singleton;
+      inherit (nixpkgs.lib) attrValues optionalAttrs singleton;
 
       # Configuration for `nixpkgs`
       nixpkgsConfig = {
@@ -26,7 +26,7 @@
       };
     in
     {
-      darwinConfigurations = rec {
+      darwinConfigurations = {
         us-mbp-bduggan = darwinSystem {
           system = "aarch64-darwin";
           modules = [
