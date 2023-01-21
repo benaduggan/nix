@@ -32,3 +32,4 @@ Also got rid of ~/.config/nix cause that's managed in darwin-configuration.nix
 - Figure out how to not duplicate home.nix memes
 - Figure out how to manage homebrew with nix
 - Learn flakes for real
+- disable check for slack bolt by overlaying on top of Cobi's package thing with `pythonPackageOverlay`

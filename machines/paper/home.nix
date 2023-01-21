@@ -16,7 +16,7 @@ let
   # # jacobi's stuff
   jacobi = import inputs.jacobi { inherit (inputs) nixpkgs; inherit (pkgs) system; };
 in
-with jacobi.hax; {
+{
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
@@ -36,7 +36,6 @@ with jacobi.hax; {
       lib.flatten [
         (if isLinux then [ ungoogled-chromium binutils ncdu ] else [ ])
         (if isDarwin then [ m-cli ] else [ ])
-        (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
         amazon-ecr-credential-helper
         atool
         bash-completion
@@ -45,6 +44,7 @@ with jacobi.hax; {
         bc
         bzip2
         cachix
+        clang
         coreutils-full
         cowsay
         curl
@@ -57,7 +57,7 @@ with jacobi.hax; {
         file
         figlet
         gawk
-        gcc
+        google-cloud-sdk
         gitAndTools.delta
         gnumake
         gnugrep
@@ -84,6 +84,7 @@ with jacobi.hax; {
         nix-tree
         nixpkgs-fmt
         nmap
+        nodejs
         openssh
         p7zip
         patch
@@ -136,6 +137,8 @@ with jacobi.hax; {
           aws_pog_scripts
           nix_pog_scripts
           docker_pog_scripts
+          (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
+          # (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb slack-bolt ]))
         ])
       ];
 
