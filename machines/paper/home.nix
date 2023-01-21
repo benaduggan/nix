@@ -1,12 +1,9 @@
 { config, pkgs, lib, inputs, ... }:
 let
   inherit (pkgs.stdenv) isLinux isDarwin;
-  personalEmail = "benaduggan@gmail.com";
-  workEmail = "benduggan@readlee.com";
+  email = "benaduggan@gmail.com";
   firstName = "Ben";
   lastName = "Duggan";
-  home = builtins.getEnv "HOME";
-  username = builtins.getEnv "USER";
   symbol = "ᛥ";
 
   # # chief keefs stuff
@@ -204,24 +201,24 @@ in
     # nix-direnv.enable = true;
   };
 
-  # programs.mcfly = {
-  #   enable = true;
-  #   enableBashIntegration = true;
-  # };
+  programs.mcfly = {
+    enable = true;
+    enableBashIntegration = true;
+  };
 
   # had to disable to build flake
-  # programs.fzf = {
-  #   enable = true;
-  #   enableBashIntegration = false;
-  #   defaultCommand = "fd -tf -c always -H --ignore-file ${./ignore} -E .git";
-  #   defaultOptions = words "--ansi --reverse --multi --filepath-word";
-  # };
+  programs.fzf = {
+    enable = true;
+    enableBashIntegration = false;
+    defaultCommand = "fd -tf -c always -H --ignore-file ${./ignore} -E .git";
+    defaultOptions = jacobi.hax.words "--ansi --reverse --multi --filepath-word";
+  };
 
   programs.starship = {
     enable = true;
     settings = {
       add_newline = false;
-      character = rec {
+      character = {
         success_symbol = "[${symbol}](bright-green)";
         error_symbol = "[${symbol}](bright-red)";
       };
@@ -278,7 +275,7 @@ in
     enable = true;
     package = pkgs.gitAndTools.gitFull;
     userName = "${firstName} ${lastName}";
-    userEmail = personalEmail;
+    userEmail = email;
     aliases = {
       co = "checkout";
       cam = "commit -am";
