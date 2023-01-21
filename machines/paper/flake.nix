@@ -4,6 +4,7 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     kwbauson.url = "github:kwbauson/cfg";
     jacobi.url = "github:jpetrucciani/nix";
+    jacobi.flake = false;
   };
 
   outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi }:
@@ -26,7 +27,7 @@
     in
     {
       darwinConfigurations = rec {
-        ben-mbp = darwinSystem {
+        us-mbp-bduggan = darwinSystem {
           system = "aarch64-darwin";
           modules = [
             ./darwin-configuration.nix
