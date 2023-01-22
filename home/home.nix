@@ -1,34 +1,12 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, common, ... }:
 let
-  inherit (pkgs.stdenv) isLinux;
-  personalEmail = "benaduggan@gmail.com";
-  workEmail = "benduggan@readlee.com";
-  firstName = "Ben";
-  lastName = "Duggan";
-  home = builtins.getEnv "HOME";
-  username = builtins.getEnv "USER";
-  symbol = "ᛥ";
-
-  # chief keefs stuff
-  kwbauson-cfg = import <kwbauson-cfg>;
-
-  # jacobi's stuff
-  jacobi = import
-    (fetchTarball {
-      name = "jpetrucciani-2022-12-01";
-      url = "https://github.com/jpetrucciani/nix/archive/9945abecd74cb4fd8eac371a1d71ca06fb8dd690.tar.gz";
-      sha256 = "1sa4m5sxvkg46bcmd1k5kl7r3jzlrbjfqbam3y7lc5a9n5nbhr3b";
-    })
-    { };
+  inherit (common) isLinux isDarwin kwbauson jacobi;
 in
-with pkgs.hax; {
+{
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
   home = {
-    inherit username;
-    homeDirectory = home;
-
     stateVersion = "22.11";
 
     sessionVariables = {
@@ -43,7 +21,7 @@ with pkgs.hax; {
       with pkgs;
       lib.flatten [
         (if isLinux then [ ungoogled-chromium binutils ncdu ] else [ ])
-        (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
+        (if isDarwin then [ m-cli ] else [ ])
         amazon-ecr-credential-helper
         atool
         bash-completion
@@ -64,7 +42,7 @@ with pkgs.hax; {
         file
         figlet
         gawk
-        gcc
+        google-cloud-sdk
         gitAndTools.delta
         gnumake
         gnugrep
@@ -83,14 +61,15 @@ with pkgs.hax; {
         moreutils
         nano
         netcat-gnu
+        nil
         nix-direnv
-        nix-index
         nix-info
         nix-prefetch-github
         nix-prefetch-scripts
         nix-tree
         nixpkgs-fmt
         nmap
+        nodejs
         openssh
         p7zip
         patch
@@ -105,7 +84,6 @@ with pkgs.hax; {
         ripgrep
         ripgrep-all
         rlwrap
-        nil
         rsync
         scc
         screen
@@ -128,8 +106,8 @@ with pkgs.hax; {
         xz
         zip
 
-        # chief keef's stuff
-        (with kwbauson-cfg; [
+        # # chief keef's stuff
+        (with kwbauson; [
           better-comma
           nle
           fordir
@@ -144,6 +122,8 @@ with pkgs.hax; {
           aws_pog_scripts
           nix_pog_scripts
           docker_pog_scripts
+          (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
+          # (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb slack-bolt ]))
         ])
       ];
 
@@ -189,7 +169,7 @@ with pkgs.hax; {
       space = "du -Sh | sort -rh | head -10";
       now = "date +%s";
       fzfp = "fzf --preview 'bat --style=numbers --color=always {}'";
-    } // jacobi.hax.docker_aliases // jacobi.hax.kubernetes_aliases;
+    } // common.jacobi.hax.docker_aliases // common.jacobi.hax.kubernetes_aliases;
 
     initExtra = ''
       shopt -s histappend
@@ -201,13 +181,6 @@ with pkgs.hax; {
 
       # add local scripts to path
       export PATH="$PATH:$HOME/.bin/:$HOME/.local/bin"
-
-      # source ~/.nix-profile/etc/profile.d/nix.sh
-
-      # bash completions
-      source ~/.nix-profile/etc/profile.d/bash_completion.sh
-      source ~/.nix-profile/share/bash-completion/completions/git
-      source ~/.nix-profile/share/bash-completion/completions/ssh
     '';
   };
 
@@ -216,25 +189,26 @@ with pkgs.hax; {
     # nix-direnv.enable = true;
   };
 
-  # programs.mcfly = {
-  #   enable = true;
-  #   enableBashIntegration = true;
-  # };
+  programs.mcfly = {
+    enable = true;
+    enableBashIntegration = true;
+  };
 
+  # had to disable to build flake
   programs.fzf = {
     enable = true;
     enableBashIntegration = false;
     defaultCommand = "fd -tf -c always -H --ignore-file ${./ignore} -E .git";
-    defaultOptions = words "--ansi --reverse --multi --filepath-word";
+    defaultOptions = common.jacobi.hax.words "--ansi --reverse --multi --filepath-word";
   };
 
   programs.starship = {
     enable = true;
     settings = {
       add_newline = false;
-      character = rec {
-        success_symbol = "[${symbol}](bright-green)";
-        error_symbol = "[${symbol}](bright-red)";
+      character = {
+        success_symbol = "[${common.symbol}](bright-green)";
+        error_symbol = "[${common.symbol}](bright-red)";
       };
       golang = {
         style = "fg:#00ADD8";
@@ -284,51 +258,4 @@ with pkgs.hax; {
 
   programs.htop.enable = true;
   programs.dircolors.enable = true;
-
-  programs.git = {
-    enable = true;
-    package = pkgs.gitAndTools.gitFull;
-    userName = "${firstName} ${lastName}";
-    userEmail = personalEmail;
-    aliases = {
-      co = "checkout";
-      cam = "commit -am";
-      ca = "commit -a";
-      cm = "commit -m";
-      st = "status";
-      br = "branch -v";
-      branch-name = "!git rev-parse --abbrev-ref HEAD";
-      # Push current branch
-      put = "!git push origin $(git branch-name)";
-      # Pull without merging
-      get = "!git pull origin $(git branch-name) --ff-only";
-      # Pull Master without switching branches
-      got =
-        "!f() { CURRENT_BRANCH=$(git branch-name) && git checkout $1 && git pull origin $1 --ff-only && git checkout $CURRENT_BRANCH;  }; f";
-      lol = "log --graph --decorate --pretty=oneline --abbrev-commit";
-      lola = "log --graph --decorate --pretty=oneline --abbrev-commit --all";
-
-      # delete local branch and pull from remote
-      fetchout =
-        "!f() { git co main; git branch -D $@; git fetch && git co $@; }; f";
-      pufl = "!git push origin $(git branch-name) --force-with-lease";
-      putf = "put --force-with-lease";
-      shake = "remote prune origin";
-    };
-    extraConfig = {
-      color.ui = true;
-      push.default = "simple";
-      pull.ff = "only";
-      core = {
-        editor = "nano";
-        pager = "delta --dark";
-      };
-    };
-  };
-
-
-  # imports = [
-  #   "${fetchTarball "https://github.com/msteen/nixos-vscode-server/tarball/master"}/modules/vscode-server/home.nix"
-  # ];
-  # services.vscode-server.enable = builtins.pathExists "/etc/nixos";
 }

@@ -1,13 +1,15 @@
 {
   inputs = {
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     kwbauson.url = "github:kwbauson/cfg";
     jacobi.url = "github:jpetrucciani/nix";
     jacobi.flake = false;
+    vscode-server.url = "github:msteen/nixos-vscode-server";
   };
 
-  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi }:
+  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi, nixos-hardware, vscode-server }:
     let
       inherit (nix-darwin.lib) darwinSystem;
       inherit (nixpkgs.lib) attrValues optionalAttrs singleton;
@@ -22,15 +24,17 @@
             inherit (final.pkgs-x86)
               purescript;
           })
-        ) ++ import ../../nixpkgs/overlays.nix;
+        ) ++ import ./overlays.nix;
       };
+
+      default_module = { imports = [ ./common.nix ]; _module.args = { inherit inputs; }; };
     in
     {
       darwinConfigurations = {
         us-mbp-bduggan = darwinSystem {
           system = "aarch64-darwin";
           modules = [
-            ./darwin-configuration.nix
+            ./machines/paper/darwin-configuration.nix
             home-manager.darwinModules.home-manager
             {
               nixpkgs = nixpkgsConfig;
@@ -38,13 +42,35 @@
               home-manager.useUserPackages = true;
               home-manager.users.bduggan = {
                 imports = [
-                  { _module.args = { inherit inputs; }; }
-                  ./home.nix
+                  default_module
+                  ./home
                 ];
               };
             }
           ];
         };
+      };
+
+      nixosConfigurations.bduggan-framework = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./machines/framework/configuration.nix
+          nixos-hardware.nixosModules.framework
+          vscode-server.nixosModule
+          ({ config, pkgs, ... }: {
+            services.vscode-server.enable = true;
+          })
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useUserPackages = true;
+            home-manager.users.bduggan = {
+              imports = [
+                default_module
+                ./home
+              ];
+            };
+          }
+        ];
       };
 
       overlays = {

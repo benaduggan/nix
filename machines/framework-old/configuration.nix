@@ -7,7 +7,6 @@
 {
   imports =
     [
-      # Include the results of the hardware scan.
       ./hardware-configuration.nix
     ];
 
@@ -17,12 +16,34 @@
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
     };
+    kernelPackages = pkgs.linuxPackages_latest;
     kernel.sysctl = {
       "fs.inotify.max_user_watches" = "1048576";
     };
   };
 
-  networking.hostName = "nixos"; # Define your hostname.
+  nixpkgs.config.allowUnfree = true;
+
+  environment.systemPackages = with pkgs; [
+    home-manager
+
+    gnome.gnome-tweaks
+    gnomeExtensions.settingscenter
+    gnome.gnome-shell-extensions
+    font-manager
+
+    zoom-us
+    slack
+    discord
+    signal-desktop
+    whatsapp-for-linux
+
+    steam
+    spotify
+    google-chrome
+  ];
+
+  networking.hostName = "bduggan-framework"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Set your time zone.
@@ -32,7 +53,8 @@
   # Per-interface useDHCP will be mandatory in the future, so this generated config
   # replicates the default behaviour.
   networking.useDHCP = false;
-  networking.interfaces.eth0.useDHCP = true;
+  networking.networkmanager.enable = true;
+  # networking.interfaces.enp0s13f0u1u1.useDHCP = true;
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -45,10 +67,18 @@
   #   keyMap = "us";
   # };
 
+  # fingerprint reader
+  services.fprintd.enable = true;
+
   # Enable the X11 windowing system.
-  # services.xserver.enable = true;
+  services.xserver.enable = true;
 
 
+  # Enable the plasma Desktop Environment.
+  services.xserver.dpi = 160;
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.displayManager.gdm.wayland = true;
+  services.xserver.desktopManager.gnome.enable = true;
 
 
   # Configure keymap in X11
@@ -56,14 +86,14 @@
   # services.xserver.xkbOptions = "eurosign:e";
 
   # Enable CUPS to print documents.
-  # services.printing.enable = true;
+  services.printing.enable = true;
 
   # Enable sound.
-  # sound.enable = true;
-  # hardware.pulseaudio.enable = true;
+  sound.enable = true;
+  hardware.pulseaudio.enable = true;
 
   # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
+  services.xserver.libinput.enable = true;
 
   users.mutableUsers = false;
   users.users.bduggan = {
@@ -72,24 +102,22 @@
     passwordFile = "/etc/passwordFile-bduggan";
   };
 
-  zramSwap = {
-    enable = true;
-    memoryPercent = 100;
-  };
-
   # Disable password-based login for root.
   users.users.root.hashedPassword = "!";
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [ home-manager ];
 
   # Configure swap file. Sizes are in megabytes. Default swap is
   # max(1GB, sqrt(RAM)) = 1024. If you want to use hibernation with this device
   # (eg suspending a laptop), then it's recommended that you use
-  # RAM + max(1GB, sqrt(RAM)) = 17038.
+  # RAM + max(1GB, sqrt(RAM)) = 32929.
   swapDevices = [{ device = "/swapfile"; size = 1024; }];
 
+  zramSwap = {
+    enable = true;
+    memoryPercent = 100;
+  };
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -101,15 +129,13 @@
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
-  services = {
-    openssh.enable = true;
-  };
+  services.openssh.enable = true;
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  networking.firewall.enable = false;
+  # networking.firewall.enable = false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
