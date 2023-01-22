@@ -141,49 +141,6 @@ in
     };
   };
 
-  programs.bash = {
-    enable = true;
-    inherit (config.home) sessionVariables;
-    historyFileSize = -1;
-    historySize = -1;
-    shellAliases = {
-      ls = "ls --color=auto";
-      l = "exa -alFT -L 1";
-      ll = "ls -ahlFG";
-      mkdir = "mkdir -pv";
-      hm = "home-manager";
-      wrun =
-        "watchexec --debounce 50 --no-shell --clear --restart --signal SIGTERM -- ";
-
-      # git
-      g = "git";
-      ga = "g add -A .";
-      cm = "g commit -m ";
-
-      hidden = "g ls-files -v | grep '^S' | cut -c3-";
-      hide = ''g update-index --skip-worktree "$@"'';
-      unhide = "g update-index --no-skip-worktree";
-
-      # misc
-      rot13 = "tr 'A-Za-z' 'N-ZA-Mn-za-m'";
-      space = "du -Sh | sort -rh | head -10";
-      now = "date +%s";
-      fzfp = "fzf --preview 'bat --style=numbers --color=always {}'";
-    } // common.jacobi.hax.docker_aliases // common.jacobi.hax.kubernetes_aliases;
-
-    initExtra = ''
-      shopt -s histappend
-      set +h
-
-      export DO_NOT_TRACK=1
-      export LC_ALL=en_US.UTF-8
-      export LANG=en_US.UTF-8
-
-      # add local scripts to path
-      export PATH="$PATH:$HOME/.bin/:$HOME/.local/bin"
-    '';
-  };
-
   programs.direnv = {
     enable = true;
     # nix-direnv.enable = true;
@@ -200,60 +157,6 @@ in
     enableBashIntegration = false;
     defaultCommand = "fd -tf -c always -H --ignore-file ${./ignore} -E .git";
     defaultOptions = common.jacobi.hax.words "--ansi --reverse --multi --filepath-word";
-  };
-
-  programs.starship = {
-    enable = true;
-    settings = {
-      add_newline = false;
-      character = {
-        success_symbol = "[${common.symbol}](bright-green)";
-        error_symbol = "[${common.symbol}](bright-red)";
-      };
-      golang = {
-        style = "fg:#00ADD8";
-        symbol = "go ";
-      };
-      directory.style = "fg:#d442f5";
-      nix_shell = {
-        pure_msg = "";
-        impure_msg = "";
-        format = "via [$symbol$state]($style) ";
-      };
-      kubernetes = {
-        disabled = false;
-        style = "fg:#326ce5";
-      };
-
-      # disabled plugins
-      aws.disabled = true;
-      cmd_duration.disabled = true;
-      gcloud.disabled = true;
-      package.disabled = true;
-    };
-  };
-
-  programs.tmux = {
-    enable = true;
-    historyLimit = 500000;
-    shortcut = "j";
-    extraConfig = ''
-      # ijkl arrow key style pane selection
-      bind -n M-j select-pane -L
-      bind -n M-i select-pane -U
-      bind -n M-k select-pane -D
-      bind -n M-l select-pane -R
-
-      # split panes using | and -
-      bind | split-window -h
-      bind - split-window -v
-      unbind '"'
-      unbind %
-
-      set-option -g mouse on
-      set -g default-terminal "xterm-256color"
-      set-window-option -q -g utf8 on
-    '';
   };
 
   programs.htop.enable = true;
