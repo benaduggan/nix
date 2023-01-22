@@ -12,34 +12,34 @@
   boot.initrd.availableKernelModules = [ "xhci_pci" "thunderbolt" "nvme" "usb_storage" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
-  boot.kernelParams = [ "mem_sleep_default=deep" ];
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
     {
-      device = "/dev/disk/by-uuid/8c27fe42-7e54-4081-adc3-05eacfe78392";
+      device = "/dev/disk/by-uuid/e01e8253-01a6-4c56-87a2-d70392511fe8";
       fsType = "ext4";
     };
 
-  fileSystems."/boot" =
+  fileSystems."/boot/efi" =
     {
-      device = "/dev/disk/by-uuid/2603-8663";
+      device = "/dev/disk/by-uuid/E7A6-DDAD";
       fsType = "vfat";
     };
 
-  swapDevices = [ ];
+  swapDevices =
+    [{ device = "/dev/disk/by-uuid/4519c712-647f-4436-9563-087f97cb8a4a"; }];
 
+  # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
+  # (the default) this is the recommended approach. When using systemd-networkd it's
+  # still possible to use this option, but it's recommended to use it in conjunction
+  # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
+  networking.useDHCP = lib.mkDefault true;
+  # networking.interfaces.enp0s13f0u2.useDHCP = lib.mkDefault true;
+  # networking.interfaces.wlp170s0.useDHCP = lib.mkDefault true;
+
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
+  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
   # high-resolution display
   hardware.video.hidpi.enable = lib.mkDefault true;
-  hardware.bluetooth.enable = true;
-  hardware.pulseaudio.enable = true;
-
-  hardware.opengl.extraPackages = with pkgs; [
-    mesa_drivers
-    vaapiIntel
-    vaapiVdpau
-    libvdpau-va-gl
-    intel-media-driver
-  ];
 }
