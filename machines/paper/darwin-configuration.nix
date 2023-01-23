@@ -8,6 +8,8 @@
     "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
   ];
 
+  documentation.enable = true;
+
   # Use a custom configuration.nix location.
   # how I currently build and switch the system:
   # darwin-rebuild switch --flake ~/cfg/machines/paper/
@@ -44,13 +46,15 @@
         NSNavPanelExpandedStateForSaveMode = true;
         NSNavPanelExpandedStateForSaveMode2 = true;
         _HIHideMenuBar = false;
+
+        "com.apple.keyboard.fnState" = true;
       };
 
       screencapture.location = "/tmp";
       dock = {
         autohide = true;
         mru-spaces = false;
-        orientation = "left";
+        orientation = "bottom";
         showhidden = true;
       };
 
