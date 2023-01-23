@@ -7,26 +7,22 @@ _my nixpkgs folder_
 ## install
 
 ```bash
-# install nix
+# install nix if not nixos
 curl -L https://nixos.org/nix/install | sh
 
-# configure nix to use more cpu/ram when building
+# configure nix to use more cpu/ram when building and enable flakes
 mkdir -p ~/.config/nix/
 echo 'max-jobs = auto' >>~/.config/nix/nix.conf
+echo 'experimental-features = nix-command flakes' >>~/.config/nix/nix.conf
 
-# Add nix channels
-nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs
-nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-nix-channel --add https://github.com/kwbauson/cfg/archive/main.tar.gz kwbauson-cfg
-nix-channel --update
-nix-shell '<home-manager>' -A install # if not on nixos?
+# install git if it's not installed
 
 # pull repo
 cd ~
 REPO_DIR="cfg"
 git clone git@github.com:benaduggan/nix.git "$REPO_DIR"
-rm -rf /home/$USER/.config/nixpkgs
-ln -s /home/$USER/"$REPO_DIR"/nixpkgs /home/$USER/.config/nixpkgs
+
+# uninstall git because we'll install it with home-manager
 
 # move unneeded files
 mv ~/.bash_history ~/.bash_history.old
@@ -37,6 +33,7 @@ mv ~/.profile ~/.profile.old
 mv ~/.sqliterc ~/.sqliterc.old
 mv ~/.gitconfig ~/.gitconfig.old
 mv ~/.tmux.conf ~/.tmux.conf.old
+
 
 # enable home-manager and build packages
 home-manager switch
@@ -51,3 +48,15 @@ this is what you'd need to do to get the brew command added to your path, but id
 ```
 echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/bduggan/.bash_profile
 ```
+
+# SSH Keys
+
+All my important public keys are associated with my github, so you can pull them by curling them to the right file
+
+```bash
+curl https://github.com/benaduggan.keys -o ~/.ssh/authorized_keys
+```
+
+# Flake Way
+
+

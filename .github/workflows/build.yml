@@ -1,0 +1,19 @@
+name: build
+on: { workflow_dispatch, push: { branches: [main] }, pull_request }
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-22.04
+          - macos-12
+    name: nix (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3.3.0
+      - uses: cachix/install-nix-action@v18
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - run: nix -vL --show-trace build .

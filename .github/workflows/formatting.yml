@@ -1,0 +1,23 @@
+name: formatting
+on: { workflow_dispatch, push: { branches: [main] }, pull_request }
+jobs:
+  prettier:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3.3.0
+      - uses: cachix/install-nix-action@v18
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - run: nix-env -iA nixpkgs.nodePackages.prettier
+      - run: prettier --check .
+  nixpkgs-fmt:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3.3.0
+      - uses: cachix/install-nix-action@v18
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - run: nix-env -iA nixpkgs.nixpkgs-fmt
+      - run: nixpkgs-fmt --check .
