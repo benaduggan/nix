@@ -10,36 +10,28 @@ _my nixpkgs folder_
 # install nix
 curl -L https://nixos.org/nix/install | sh
 
+install git
+generate ssh key and add it to your profile
+
 # configure nix to use more cpu/ram when building
 mkdir -p ~/.config/nix/
 echo 'max-jobs = auto' >>~/.config/nix/nix.conf
+TODO: add nix flakes command meme
 
-# Add nix channels
-nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs
-nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-nix-channel --add https://github.com/kwbauson/cfg/archive/main.tar.gz kwbauson-cfg
-nix-channel --update
-nix-shell '<home-manager>' -A install # if not on nixos?
 
 # pull repo
 cd ~
 REPO_DIR="cfg"
 git clone git@github.com:benaduggan/nix.git "$REPO_DIR"
-rm -rf /home/$USER/.config/nixpkgs
-ln -s /home/$USER/"$REPO_DIR"/nixpkgs /home/$USER/.config/nixpkgs
 
-# move unneeded files
-mv ~/.bash_history ~/.bash_history.old
-mv ~/.bash_profile ~/.bash_profile.old
-mv ~/.bashrc ~/.bashrc.old
-mv ~/.dir_colors ~/.dir_colors.old
-mv ~/.profile ~/.profile.old
-mv ~/.sqliterc ~/.sqliterc.old
-mv ~/.gitconfig ~/.gitconfig.old
-mv ~/.tmux.conf ~/.tmux.conf.old
+make a new dir in the machines for the new setup
+do the things it needs for configuring
 
-# enable home-manager and build packages
-home-manager switch
+make a new block in flake.nix for the new machine
+
+nixos-rebuild build --flake .#{new machine}
+if it works, switch!
+
 ```
 
 # Homebrew

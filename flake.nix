@@ -73,6 +73,27 @@
         ];
       };
 
+      nixosConfigurations.bduggan-desktop = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./machines/desktop/configuration.nix
+          vscode-server.nixosModule
+          ({ config, pkgs, ... }: {
+            services.vscode-server.enable = true;
+          })
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useUserPackages = true;
+            home-manager.users.bduggan = {
+              imports = [
+                default_module
+                ./home
+              ];
+            };
+          }
+        ];
+      };
+
       overlays = {
         apple-silicon = final: prev: optionalAttrs (prev.stdenv.system == "aarch64-darwin") {
           # Useful on Macs with Apple Silicon
