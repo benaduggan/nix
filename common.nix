@@ -1,7 +1,8 @@
-{ pkgs, inputs, ... }:
+{ pkgs, inputs, isGraphical, ... }:
 {
   _module.args.common = {
     inherit (pkgs.stdenv) isLinux isDarwin;
+    inherit isGraphical;
     email = "benaduggan@gmail.com";
     firstName = "Ben";
     lastName = "Duggan";

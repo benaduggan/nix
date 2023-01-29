@@ -1,6 +1,6 @@
 { config, pkgs, lib, inputs, common, ... }:
 let
-  inherit (common) isLinux isDarwin kwbauson jacobi;
+  inherit (common) isLinux isDarwin kwbauson jacobi isGraphical;
 in
 {
   # Let Home Manager install and manage itself.
@@ -20,6 +20,7 @@ in
     packages = with lib;
       with pkgs;
       lib.flatten [
+        (if isGraphical then [ firefox ] else [ ])
         (if isLinux then [ ungoogled-chromium binutils ncdu ] else [ ])
         (if isDarwin then [ m-cli ] else [ ])
         amazon-ecr-credential-helper
