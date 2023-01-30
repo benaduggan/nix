@@ -159,7 +159,7 @@ in
     defaultCommand = "fd -tf -c always -H --ignore-file ${./ignore} -E .git";
     defaultOptions = common.jacobi.hax.words "--ansi --reverse --multi --filepath-word";
   };
-
+  programs.vscode.enable = true;
   programs.htop.enable = true;
   programs.dircolors.enable = true;
 }
