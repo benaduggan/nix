@@ -1,6 +1,6 @@
 { config, pkgs, lib, inputs, common, ... }:
 let
-  inherit (common) isLinux isDarwin kwbauson jacobi;
+  inherit (common) isLinux isDarwin kwbauson jacobi isGraphical;
 in
 {
   # Let Home Manager install and manage itself.
@@ -20,6 +20,7 @@ in
     packages = with lib;
       with pkgs;
       lib.flatten [
+        (if isLinux && isGraphical then [ parsec-bin vlc tailscale authy firefox discord spotify ] else [ ])
         (if isLinux then [ ungoogled-chromium binutils ncdu ] else [ ])
         (if isDarwin then [ m-cli ] else [ ])
         amazon-ecr-credential-helper
@@ -158,7 +159,7 @@ in
     defaultCommand = "fd -tf -c always -H --ignore-file ${./ignore} -E .git";
     defaultOptions = common.jacobi.hax.words "--ansi --reverse --multi --filepath-word";
   };
-
+  programs.vscode.enable = isGraphical && !isDarwin;
   programs.htop.enable = true;
   programs.dircolors.enable = true;
 }
