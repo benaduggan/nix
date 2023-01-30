@@ -105,6 +105,7 @@
       "macfuse"
       "notion"
       "parsec"
+      "postman"
       "qlvideo"
       "raycast"
       "rectangle"
