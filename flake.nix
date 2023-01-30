@@ -27,7 +27,7 @@
         ) ++ import ./overlays.nix;
       };
 
-      default_module ={isGraphical }: { imports = [ ./common.nix ]; _module.args = { inherit inputs; isGraphical = isGraphical; }; };
+      default_module = { isGraphical }: { imports = [ ./common.nix ]; _module.args = { inherit inputs; isGraphical = isGraphical; }; };
     in
     {
       darwinConfigurations = {
@@ -42,7 +42,7 @@
               home-manager.useUserPackages = true;
               home-manager.users.bduggan = {
                 imports = [
-                  ( default_module { isGraphical = true; } )
+                  (default_module { isGraphical = true; })
                   ./home
                 ];
               };
@@ -66,7 +66,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.users.bduggan = {
               imports = [
-                ( default_module { isGraphical = true; } )
+                (default_module { isGraphical = true; })
                 ./home
               ];
             };

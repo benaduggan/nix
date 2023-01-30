@@ -20,7 +20,7 @@ in
     packages = with lib;
       with pkgs;
       lib.flatten [
-        (if isGraphical then [ firefox ] else [ ])
+        (if isLinux && isGraphical then [ parsec-bin vlc tailscale authy firefox discord spotify ] else [ ])
         (if isLinux then [ ungoogled-chromium binutils ncdu ] else [ ])
         (if isDarwin then [ m-cli ] else [ ])
         amazon-ecr-credential-helper
@@ -159,7 +159,7 @@ in
     defaultCommand = "fd -tf -c always -H --ignore-file ${./ignore} -E .git";
     defaultOptions = common.jacobi.hax.words "--ansi --reverse --multi --filepath-word";
   };
-  programs.vscode.enable = true;
+  programs.vscode.enable = isGraphical && !isDarwin;
   programs.htop.enable = true;
   programs.dircolors.enable = true;
 }
