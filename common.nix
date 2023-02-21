@@ -7,7 +7,7 @@
     firstName = "Ben";
     lastName = "Duggan";
 
-    kwbauson = import inputs.nixpkgs { inherit (inputs.kwbauson) overlays; inherit (pkgs) system; };
+    kwbauson = import inputs.kwbauson { inherit (pkgs) system; };
     jacobi = import inputs.jacobi { inherit (inputs) nixpkgs; inherit (pkgs) system; };
   };
 }

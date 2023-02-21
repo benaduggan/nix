@@ -4,6 +4,7 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     kwbauson.url = "github:kwbauson/cfg";
+    kwbauson.flake = false;
     jacobi.url = "github:jpetrucciani/nix";
     jacobi.flake = false;
     vscode-server.url = "github:msteen/nixos-vscode-server";
