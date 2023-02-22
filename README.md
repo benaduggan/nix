@@ -16,7 +16,7 @@ generate ssh key and add it to your profile
 # configure nix to use more cpu/ram when building
 mkdir -p ~/.config/nix/
 echo 'max-jobs = auto' >>~/.config/nix/nix.conf
-TODO: add nix flakes command meme
+echo 'experimental-features = nix-command flakes' >>~/.config/nix/nix.conf
 
 
 # pull repo
@@ -24,8 +24,10 @@ cd ~
 REPO_DIR="cfg"
 git clone git@github.com:benaduggan/nix.git "$REPO_DIR"
 
-make a new dir in the machines for the new setup
+make a new dir in the machines for the new machine
 do the things it needs for configuring
+- cp the hardware config
+- edit some configs
 
 make a new block in flake.nix for the new machine
 
