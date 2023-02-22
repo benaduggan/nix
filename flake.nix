@@ -75,6 +75,28 @@
         ];
       };
 
+      nixosConfigurations.home-server = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./machines/home-server/configuration.nix
+          vscode-server.nixosModule
+          ({ config, pkgs, ... }: {
+            services.vscode-server.enable = true;
+          })
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useUserPackages = true;
+            home-manager.useGlobalPkgs = true;
+            home-manager.users.bduggan = {
+              imports = [
+                (default_module { isGraphical = false; })
+                ./home
+              ];
+            };
+          }
+        ];
+      };
+
       nixosConfigurations.bduggan-desktop = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
