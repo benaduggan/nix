@@ -129,7 +129,7 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   networking.firewall.enable = false;
-  networking.firewall.checkReversePath = "loose";
+
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -140,5 +140,10 @@
   system.stateVersion = "23.05"; # Did you read the comment?
 
 
+  # enable tailscale and use as exit node
   services.tailscale.enable = true;
+  services.tailscale.useRoutingFeatures = "both";
+  boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
+  boot.kernel.sysctl."net.ipv4.conf.all.forwarding" = 1;
+  boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
 }
