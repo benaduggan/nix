@@ -20,7 +20,7 @@ in
     packages = with lib;
       with pkgs;
       lib.flatten [
-        (if isLinux && isGraphical then [ parsec-bin vlc tailscale authy firefox discord spotify ] else [ ])
+        (if isLinux && isGraphical then [ parsec-bin vlc authy firefox discord spotify ] else [ ])
         (if isLinux then [ ungoogled-chromium binutils ncdu ] else [ ])
         (if isDarwin then [ m-cli ] else [ ])
         amazon-ecr-credential-helper
