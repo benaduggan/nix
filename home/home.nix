@@ -94,6 +94,7 @@ in
         socat
         sox
         swaks
+        tailscale
         tealdeer
         time
         unzip
