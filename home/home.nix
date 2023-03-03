@@ -22,7 +22,12 @@ in
       lib.flatten [
         (if isLinux && isGraphical then [ parsec-bin vlc authy firefox discord spotify ] else [ ])
         (if isLinux then [ ungoogled-chromium binutils ncdu ] else [ ])
-        (if isDarwin then [ m-cli ] else [ ])
+        (if isDarwin then [
+          m-cli
+          (writeShellScriptBin "open-docker" ''
+            open --hide --background -a Docker
+          '')
+        ] else [ ])
         amazon-ecr-credential-helper
         atool
         bash-completion
