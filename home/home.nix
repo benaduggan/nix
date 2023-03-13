@@ -122,6 +122,11 @@ in
 
         # jacobi's stuff
         (with jacobi; [
+          (if isDarwin then [
+            llama-cpp
+            whisper-cpp
+          ] else [ ])
+
           devenv
           meme_sounds
           general_pog_scripts
