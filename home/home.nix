@@ -40,6 +40,7 @@ in
         cowsay
         curl
         deno
+        inputs.devenv.packages.${system}.devenv
         diffutils
         dos2unix
         ed
@@ -127,7 +128,6 @@ in
             whisper-cpp
           ] else [ ])
 
-          devenv
           meme_sounds
           general_pog_scripts
           aws_pog_scripts

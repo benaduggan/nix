@@ -8,9 +8,10 @@
     jacobi.url = "github:jpetrucciani/nix";
     jacobi.flake = false;
     vscode-server.url = "github:msteen/nixos-vscode-server";
+    devenv.url = "github:cachix/devenv/latest";
   };
 
-  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi, nixos-hardware, vscode-server }:
+  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi, devenv, nixos-hardware, vscode-server }:
     let
       inherit (nix-darwin.lib) darwinSystem;
       inherit (nixpkgs.lib) attrValues optionalAttrs singleton;
