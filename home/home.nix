@@ -124,6 +124,7 @@ in
         # jacobi's stuff
         (with jacobi; [
           (if isDarwin then [
+            alpaca-cpp
             llama-cpp
             whisper-cpp
           ] else [ ])
