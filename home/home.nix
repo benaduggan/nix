@@ -134,7 +134,6 @@ in
           nix_pog_scripts
           docker_pog_scripts
           (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
-          # (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb slack-bolt ]))
         ])
       ];
 
