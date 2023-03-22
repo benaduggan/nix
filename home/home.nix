@@ -132,7 +132,10 @@ in
           general_pog_scripts
           aws_pog_scripts
           nix_pog_scripts
-          docker_pog_scripts
+          drm
+          drmi
+          dshell
+          _dex
           (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
         ])
       ];
