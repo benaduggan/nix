@@ -89,7 +89,6 @@ in
         ranger
         re2c
         ripgrep
-        ripgrep-all
         rlwrap
         rsync
         scc
