@@ -27,6 +27,7 @@
 
   # Enable networking
   networking.networkmanager.enable = true;
+  systemd.services.NetworkManager-wait-online.enable = false;
 
   # Set your time zone.
   time.timeZone = "America/Indiana/Indianapolis";
@@ -91,6 +92,27 @@
       #  firefox
       #  thunderbird
     ];
+  };
+
+  services.caddy = {
+    enable = true;
+    extraConfig = ''
+      :8000 {
+      	bind 0.0.0.0
+
+      	log {
+      		output {$CADDY_LOG:discard}
+      	}
+
+        encode gzip
+        file_server
+        root * ${
+          pkgs.runCommand "testdir" {} ''
+            mkdir "$out"
+            echo hello world > "$out/example.html"
+        ''}
+        }
+    '';
   };
 
   # Enable automatic login for the user.

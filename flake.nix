@@ -9,9 +9,14 @@
     jacobi.flake = false;
     vscode-server.url = "github:msteen/nixos-vscode-server";
     devenv.url = "github:cachix/devenv/latest";
+
+    nixos-generators = {
+      url = "github:nix-community/nixos-generators";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi, devenv, nixos-hardware, vscode-server }:
+  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi, devenv, nixos-hardware, vscode-server, nixos-generators }:
     let
       inherit (nix-darwin.lib) darwinSystem;
       inherit (nixpkgs.lib) attrValues optionalAttrs singleton;
@@ -29,7 +34,10 @@
         ) ++ import ./overlays.nix;
       };
 
-      default_module = { isGraphical }: { imports = [ ./common.nix ]; _module.args = { inherit inputs; isGraphical = isGraphical; }; };
+      default_module = { isGraphical, isMinimal }: {
+        imports = [ ./common.nix ];
+        _module.args = { inherit inputs; isGraphical = isGraphical; isMinimal = isMinimal; };
+      };
     in
     {
       darwinConfigurations = {
@@ -44,7 +52,7 @@
               home-manager.useUserPackages = true;
               home-manager.users.bduggan = {
                 imports = [
-                  (default_module { isGraphical = true; })
+                  (default_module { isGraphical = true; isMinimal = false; })
                   ./home
                 ];
               };
@@ -68,7 +76,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.users.bduggan = {
               imports = [
-                (default_module { isGraphical = true; })
+                (default_module { isGraphical = true; isMinimal = false; })
                 ./home
               ];
             };
@@ -90,7 +98,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.users.bduggan = {
               imports = [
-                (default_module { isGraphical = false; })
+                (default_module { isGraphical = false; isMinimal = false; })
                 ./home
               ];
             };
@@ -112,11 +120,37 @@
             home-manager.useGlobalPkgs = true;
             home-manager.users.bduggan = {
               imports = [
-                default_module
+                (default_module { isGraphical = true; isMinimal = false; })
                 ./home
               ];
             };
           }
+        ];
+      };
+
+      nixosConfigurations.digdugdev = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./machines/digdugdev/configuration.nix
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useUserPackages = true;
+            home-manager.useGlobalPkgs = true;
+            home-manager.users.bduggan = {
+              imports = [
+                (default_module { isGraphical = false; isMinimal = true; })
+                ./home
+              ];
+            };
+          }
+        ];
+      };
+
+      do-builder = nixos-generators.nixosGenerate {
+        system = "x86_64-linux";
+        format = "do";
+        modules = [
+          ./generators/do-builder/configuration.nix
         ];
       };
 

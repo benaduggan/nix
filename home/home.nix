@@ -1,6 +1,7 @@
 { config, pkgs, lib, inputs, common, ... }:
 let
-  inherit (common) isLinux isDarwin kwbauson jacobi isGraphical;
+  inherit (common) isLinux isDarwin kwbauson jacobi isGraphical isMinimal;
+  optList = conditional: list: if conditional then list else [ ];
 in
 {
   # Let Home Manager install and manage itself.
@@ -20,124 +21,145 @@ in
     packages = with lib;
       with pkgs;
       lib.flatten [
-        (if isLinux && isGraphical then [ parsec-bin vlc authy firefox discord spotify ] else [ ])
-        (if isLinux then [ ungoogled-chromium binutils ncdu ] else [ ])
-        (if isDarwin then [
-          m-cli
-          (writeShellScriptBin "open-docker" ''
-            open --hide --background -a Docker
-          '')
-        ] else [ ])
-        amazon-ecr-credential-helper
-        atool
-        bash-completion
         bashInteractive
-        bat
-        bc
-        bzip2
-        cachix
+        bash-completion
         coreutils-full
-        cowsay
         curl
-        deno
-        inputs.devenv.packages.${system}.devenv
-        diffutils
-        dos2unix
-        ed
-        exa
-        fd
-        file
-        figlet
-        gawk
-        google-cloud-sdk
-        gitAndTools.delta
-        gnumake
-        gnugrep
-        gnused
-        gnutar
-        gron
-        gzip
         jq
-        less
-        libarchive
-        libnotify
-        lolcat
-        loop
         lsof
-        man-pages
         moreutils
         nano
-        netcat-gnu
-        nil
-        nix-direnv
-        nix-info
-        nix-prefetch-github
-        nix-prefetch-scripts
-        nix-tree
-        nixpkgs-fmt
-        nmap
-        nodejs
-        openssh
-        p7zip
-        patch
-        perl
-        php
-        pigz
-        pssh
-        procps
-        pv
-        ranger
-        re2c
-        ripgrep
-        rlwrap
-        rsync
-        scc
-        screen
-        sd
-        shellcheck
-        shfmt
-        socat
-        sox
-        swaks
+        nix
+        q
         tealdeer
-        time
-        unzip
-        vim
-        watch
-        watchexec
         wget
-        which
-        xterm
-        xxd
-        xz
-        zip
+        yq-go
+        vim
+        gitAndTools.delta
 
-        # # chief keef's stuff
-        (with kwbauson; [
-          better-comma
-          nle
-          fordir
-          git-trim
+        (optList (!isMinimal) [
+          (optList (isLinux && isGraphical) [
+            parsec-bin
+            vlc
+            authy
+            firefox
+            discord
+            spotify
+            ungoogled-chromium
+          ])
+
+          (optList (isLinux) [
+            binutils
+            ncdu
+          ])
+
+          (optList (isDarwin) [
+            m-cli
+            (writeShellScriptBin "open-docker" ''
+              open --hide --background -a Docker
+            '')
+          ])
+
+          amazon-ecr-credential-helper
+          atool
+          bat
+          bc
+          bzip2
+          cachix
+          cowsay
+          deno
+          inputs.devenv.packages.${system}.devenv
+          diffutils
+          dos2unix
+          ed
+          exa
+          fd
+          file
+          figlet
+          gawk
+          google-cloud-sdk
+          gnumake
+          gnugrep
+          gnused
+          gnutar
+          gron
+          gzip
+          less
+          libarchive
+          libnotify
+          lolcat
+          loop
+          man-pages
+          netcat-gnu
+          nil
+          nix-direnv
+          nix-info
+          nix-prefetch-github
+          nix-prefetch-scripts
+          nix-tree
+          nixpkgs-fmt
+          nmap
+          nodejs
+          openssh
+          p7zip
+          patch
+          perl
+          php
+          pigz
+          pssh
+          procps
+          pv
+          ranger
+          re2c
+          ripgrep
+          rlwrap
+          rsync
+          scc
+          screen
+          sd
+          shellcheck
+          shfmt
+          socat
+          sox
+          swaks
+          time
+          unzip
+          watch
+          watchexec
+          which
+          xterm
+          xxd
+          xz
+          zip
+
+          # # chief keef's stuff
+          (with kwbauson; [
+            better-comma
+            nle
+            fordir
+            git-trim
+          ])
+
+          # jacobi's stuff
+          (with jacobi; [
+            (if isDarwin then [
+              alpaca-cpp
+              llama-cpp
+              whisper-cpp
+            ] else [ ])
+
+            meme_sounds
+            general_pog_scripts
+            aws_pog_scripts
+            nix_pog_scripts
+            drm
+            drmi
+            dshell
+            _dex
+            (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
+          ])
         ])
 
-        # jacobi's stuff
-        (with jacobi; [
-          (if isDarwin then [
-            alpaca-cpp
-            llama-cpp
-            whisper-cpp
-          ] else [ ])
-
-          meme_sounds
-          general_pog_scripts
-          aws_pog_scripts
-          nix_pog_scripts
-          drm
-          drmi
-          dshell
-          _dex
-          (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
-        ])
       ];
 
     file.sqliterc = {
@@ -155,16 +177,15 @@ in
   };
 
   programs.direnv = {
-    enable = true;
+    enable = !isMinimal;
     # nix-direnv.enable = true;
   };
 
   programs.mcfly = {
-    enable = true;
-    enableBashIntegration = true;
+    enable = !isMinimal;
+    enableBashIntegration = !isMinimal;
   };
 
-  # had to disable to build flake
   programs.fzf = {
     enable = true;
     enableBashIntegration = false;
