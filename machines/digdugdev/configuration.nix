@@ -74,7 +74,7 @@
   system.stateVersion = "23.05";
   programs.command-not-found.enable = false;
 
-  caddy = {
+  services.caddy = {
     enable = true;
     virtualHosts."digdug.dev".extraConfig = ''
       encode gzip
