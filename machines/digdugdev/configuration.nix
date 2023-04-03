@@ -1,5 +1,9 @@
-{ pkgs, ... }:
+{ pkgs, modulesPath, lib, ... }:
 {
+  imports = lib.optional (builtins.pathExists ./do-userdata.nix) ./do-userdata.nix ++ [
+    (modulesPath + "/virtualisation/digital-ocean-config.nix")
+  ];
+
   nix = {
     extraOptions = ''
       max-jobs = auto
@@ -40,6 +44,7 @@
   };
 
   networking.firewall.enable = false;
+  security.sudo.wheelNeedsPassword = false; 
   services = {
     openssh = {
       enable = true;
