@@ -44,7 +44,7 @@
   };
 
   networking.firewall.enable = false;
-  security.sudo.wheelNeedsPassword = false; 
+  security.sudo.wheelNeedsPassword = false;
   services = {
     openssh = {
       enable = true;
@@ -73,4 +73,25 @@
 
   system.stateVersion = "23.05";
   programs.command-not-found.enable = false;
+
+  services.caddy = {
+    enable = true;
+    extraConfig = ''
+      :8000 {
+      	bind 0.0.0.0
+
+      	log {
+      		output {$CADDY_LOG:discard}
+      	}
+
+        encode gzip
+        file_server
+        root * ${
+          pkgs.runCommand "testdir" {} ''
+            mkdir "$out"
+            echo hello world > "$out/example.html"
+        ''}
+        }
+    '';
+  };
 }
