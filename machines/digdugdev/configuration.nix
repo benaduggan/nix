@@ -74,24 +74,38 @@
   system.stateVersion = "23.05";
   programs.command-not-found.enable = false;
 
-  services.caddy = {
+  caddy = {
     enable = true;
-    extraConfig = ''
-      :8000 {
-      	bind 0.0.0.0
-
-      	log {
-      		output {$CADDY_LOG:discard}
-      	}
-
-        encode gzip
-        file_server
-        root * ${
-          pkgs.runCommand "testdir" {} ''
-            mkdir "$out"
-            echo hello world > "$out/example.html"
-        ''}
-        }
+    virtualHosts."digdug.dev".extraConfig = ''
+      encode gzip
+      file_server
+      root * ${
+        pkgs.runCommand "testdir" {} ''
+          mkdir "$out"
+          echo hello world > "$out/example.html"
+        ''
+      }
     '';
   };
+
+  # services.caddy = {
+  #   enable = true;
+  #   extraConfig = ''
+  #     :8000 {
+  #     	bind 0.0.0.0
+
+  #     	log {
+  #     		output {$CADDY_LOG:discard}
+  #     	}
+
+  #       encode gzip
+  #       file_server
+  #       root * ${
+  #         pkgs.runCommand "testdir" {} ''
+  #           mkdir "$out"
+  #           echo hello world > "$out/example.html"
+  #       ''}
+  #       }
+  #   '';
+  # };
 }
