@@ -45,6 +45,10 @@
 
   networking.firewall.enable = false;
   security.sudo.wheelNeedsPassword = false;
+  zramSwap = {
+    enable = true;
+    memoryPercent = 100;
+  };
   services = {
     openssh = {
       enable = true;
@@ -87,25 +91,4 @@
       }
     '';
   };
-
-  # services.caddy = {
-  #   enable = true;
-  #   extraConfig = ''
-  #     :8000 {
-  #     	bind 0.0.0.0
-
-  #     	log {
-  #     		output {$CADDY_LOG:discard}
-  #     	}
-
-  #       encode gzip
-  #       file_server
-  #       root * ${
-  #         pkgs.runCommand "testdir" {} ''
-  #           mkdir "$out"
-  #           echo hello world > "$out/example.html"
-  #       ''}
-  #       }
-  #   '';
-  # };
 }
