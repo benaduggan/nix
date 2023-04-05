@@ -43,7 +43,9 @@
     ];
   };
 
-  networking.firewall.enable = false;
+  networking.firewall.enable = true;
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
+
   security.sudo.wheelNeedsPassword = false;
   zramSwap = {
     enable = true;
