@@ -1,4 +1,7 @@
-{ pkgs, modulesPath, lib, ... }:
+{ inputs, pkgs, modulesPath, lib, ... }:
+let
+  jacobi = import inputs.jacobi { inherit (inputs) nixpkgs; inherit (pkgs) system; };
+in
 {
   imports = lib.optional (builtins.pathExists ./do-userdata.nix) ./do-userdata.nix ++ [
     (modulesPath + "/virtualisation/digital-ocean-config.nix")
@@ -82,6 +85,7 @@
 
   services.caddy = {
     enable = true;
+    package = jacobi.zaddy;
     virtualHosts."digdug.dev".extraConfig = ''
       encode gzip
       file_server
