@@ -109,11 +109,13 @@
       "qlvideo"
       "raycast"
       "rectangle"
+      "redisinsight"
       "firefox"
       "google-chrome"
       "visual-studio-code"
       "vlc"
       "zoom"
+      "insomnia"
     ];
 
     # These appear to be gated by having "purchased" the thing
