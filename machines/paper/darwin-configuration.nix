@@ -73,6 +73,7 @@
   security.pam.enableSudoTouchIdAuth = true;
 
   homebrew = {
+    global.autoUpdate = false;
     enable = true;
     onActivation = {
       autoUpdate = true;
@@ -91,7 +92,7 @@
       "homebrew/services"
     ];
 
-    casks = [
+    casks = map (name: { inherit name; greedy = true; }) [
       "authy"
       "font-fira-code-nerd-font"
       "epic-games"
@@ -116,6 +117,8 @@
       "vlc"
       "zoom"
       "insomnia"
+      "tabby"
+      "tailscale"
     ];
 
     # These appear to be gated by having "purchased" the thing
