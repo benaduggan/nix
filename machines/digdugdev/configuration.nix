@@ -85,6 +85,7 @@ in
 
   services.caddy = {
     enable = true;
+    email = "benaduggan@gmail.com";
     package = jacobi.zaddy;
     virtualHosts."digdug.dev".extraConfig = ''
       encode gzip
