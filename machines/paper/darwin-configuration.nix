@@ -1,12 +1,8 @@
-{ config, lib, pkgs, ... }:
-
+{ common, config, lib, pkgs, ... }:
 {
-  nix.settings.substituters = [
-    "https://cache.nixos.org/"
-  ];
-  nix.settings.trusted-public-keys = [
-    "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-  ];
+
+  nix.settings.substituters = common.cacheSubstituters;
+  nix.settings.trusted-public-keys = common.trustedPublicKeys;
 
   documentation.enable = true;
 

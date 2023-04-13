@@ -1,7 +1,4 @@
-{ inputs, pkgs, modulesPath, lib, ... }:
-let
-  jacobi = import inputs.jacobi { inherit (inputs) nixpkgs; inherit (pkgs) system; };
-in
+{ common, pkgs, modulesPath, lib, ... }:
 {
   imports = lib.optional (builtins.pathExists ./do-userdata.nix) ./do-userdata.nix ++ [
     (modulesPath + "/virtualisation/digital-ocean-config.nix")
@@ -37,13 +34,7 @@ in
     group = "users";
     extraGroups = [ "wheel" ];
     useDefaultShell = true;
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGaNQuSPDW/dsgptFTuuQmEtMQbYOpifcUmcq5jA0Sy8"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDAQ6BX5+xivdRw7p5jvXlnbgpVk4xqYazb+bN7tvPrq"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJDt0C828UN+hwHBinQUXtOiOBB4apm5bEDK1XUVXVlU"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMhq0qLYZCcWbgpRel02St/AxCsx7K9aufhiKXzkG3TM"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPBYRwtinqAt7J+VxULNTqWewFjG5P+ah1Sc8IvRqtnw"
-    ];
+    openssh.authorizedKeys.keys = common.authorizedKeys;
   };
 
   networking.firewall.enable = true;
@@ -86,7 +77,7 @@ in
   services.caddy = {
     enable = true;
     email = "benaduggan@gmail.com";
-    package = jacobi.zaddy;
+    package = common.jacobi.zaddy;
     virtualHosts."digdug.dev".extraConfig = ''
       encode gzip
       file_server

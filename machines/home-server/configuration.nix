@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ common, config, pkgs, ... }:
 
 {
   imports =
@@ -11,6 +11,8 @@
       ./hardware-configuration.nix
     ];
 
+  nix.settings.substituters = common.cacheSubstituters;
+  nix.settings.trusted-public-keys = common.trustedPublicKeys;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Bootloader.
@@ -88,6 +90,7 @@
     isNormalUser = true;
     description = "Benjamin Duggan";
     extraGroups = [ "networkmanager" "wheel" ];
+    openssh.authorizedKeys.keys = common.authorizedKeys;
     packages = with pkgs; [
       #  firefox
       #  thunderbird

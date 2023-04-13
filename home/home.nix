@@ -68,7 +68,6 @@ in
           cachix
           cowsay
           deno
-          inputs.devenv.packages.${system}.devenv
           diffutils
           dos2unix
           ed
@@ -131,6 +130,8 @@ in
           xxd
           xz
           zip
+
+          common.devenv
 
           # # chief keef's stuff
           (with kwbauson; [
