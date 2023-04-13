@@ -35,118 +35,134 @@
         ) ++ import ./overlays.nix;
       };
 
-      default_module = { isGraphical, isMinimal }: {
-        imports = [ ./common.nix ];
-        _module.args = { inherit inputs; isGraphical = isGraphical; isMinimal = isMinimal; };
-      };
     in
     {
-      darwinConfigurations = {
-        us-mbp-bduggan = darwinSystem {
-          system = "aarch64-darwin";
+      darwinConfigurations =
+        let
+          common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; };
+        in
+        {
+          us-mbp-bduggan = darwinSystem {
+            system = "aarch64-darwin";
+            modules = [
+              common
+              ./machines/paper/darwin-configuration.nix
+              home-manager.darwinModules.home-manager
+              {
+                nixpkgs = nixpkgsConfig;
+                home-manager.useGlobalPkgs = true;
+                home-manager.useUserPackages = true;
+                home-manager.users.bduggan = { imports = [ common ./home ]; };
+              }
+            ];
+          };
+        };
+
+      nixosConfigurations.bduggan-framework =
+        let
+          common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; };
+        in
+        nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
           modules = [
-            ./machines/paper/darwin-configuration.nix
-            home-manager.darwinModules.home-manager
+            common
+            ./machines/framework/configuration.nix
+            nixos-hardware.nixosModules.framework
+            vscode-server.nixosModule
+            ({ config, pkgs, ... }: {
+              services.vscode-server.enable = true;
+            })
+            home-manager.nixosModules.home-manager
             {
-              nixpkgs = nixpkgsConfig;
-              home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
+              home-manager.useGlobalPkgs = true;
               home-manager.users.bduggan = {
                 imports = [
-                  (default_module { isGraphical = true; isMinimal = false; })
+                  common
                   ./home
                 ];
               };
             }
           ];
         };
-      };
 
-      nixosConfigurations.bduggan-framework = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          ./machines/framework/configuration.nix
-          nixos-hardware.nixosModules.framework
-          vscode-server.nixosModule
-          ({ config, pkgs, ... }: {
-            services.vscode-server.enable = true;
-          })
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useUserPackages = true;
-            home-manager.useGlobalPkgs = true;
-            home-manager.users.bduggan = {
-              imports = [
-                (default_module { isGraphical = true; isMinimal = false; })
-                ./home
-              ];
-            };
-          }
-        ];
-      };
+      nixosConfigurations.home-server =
+        let
+          common = import ./common.nix { isGraphical = false; isMinimal = false;  inherit inputs; };
+        in
+        nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            common
+            ./machines/home-server/configuration.nix
+            vscode-server.nixosModule
+            ({ config, pkgs, ... }: {
+              services.vscode-server.enable = true;
+            })
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useUserPackages = true;
+              home-manager.useGlobalPkgs = true;
+              home-manager.users.bduggan = {
+                imports = [
+                  common
+                  ./home
+                ];
+              };
+            }
+          ];
+        };
 
-      nixosConfigurations.home-server = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          ./machines/home-server/configuration.nix
-          vscode-server.nixosModule
-          ({ config, pkgs, ... }: {
-            services.vscode-server.enable = true;
-          })
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useUserPackages = true;
-            home-manager.useGlobalPkgs = true;
-            home-manager.users.bduggan = {
-              imports = [
-                (default_module { isGraphical = false; isMinimal = false; })
-                ./home
-              ];
-            };
-          }
-        ];
-      };
+      nixosConfigurations.bduggan-desktop =
+        let
+          common = import ./common.nix { isGraphical = true; isMinimal = false;  inherit inputs; };
+        in
+        nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            common
+            ./machines/desktop/configuration.nix
+            vscode-server.nixosModule
+            ({ config, pkgs, ... }: {
+              services.vscode-server.enable = true;
+            })
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useUserPackages = true;
+              home-manager.useGlobalPkgs = true;
+              home-manager.users.bduggan = {
+                imports = [
+                  common
+                  ./home
+                ];
+              };
+            }
+          ];
+        };
 
-      nixosConfigurations.bduggan-desktop = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          ./machines/desktop/configuration.nix
-          vscode-server.nixosModule
-          ({ config, pkgs, ... }: {
-            services.vscode-server.enable = true;
-          })
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useUserPackages = true;
-            home-manager.useGlobalPkgs = true;
-            home-manager.users.bduggan = {
-              imports = [
-                (default_module { isGraphical = true; isMinimal = false; })
-                ./home
-              ];
-            };
-          }
-        ];
-      };
-
-      nixosConfigurations.digdugdev = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = { inherit inputs; };
-        modules = [
-          ./machines/digdugdev/configuration.nix
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useUserPackages = true;
-            home-manager.useGlobalPkgs = true;
-            home-manager.users.bduggan = {
-              imports = [
-                (default_module { isGraphical = false; isMinimal = true; })
-                ./home
-              ];
-            };
-          }
-        ];
-      };
+      nixosConfigurations.digdugdev =
+        let
+          common = import ./common.nix { isGraphical = false; isMinimal = true;  inherit inputs; };
+        in
+        nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs; };
+          modules = [
+            common
+            ./machines/digdugdev/configuration.nix
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useUserPackages = true;
+              home-manager.useGlobalPkgs = true;
+              home-manager.users.bduggan = {
+                imports = [
+                  common
+                  ./home
+                ];
+              };
+            }
+          ];
+        };
 
       do-builder = nixos-generators.nixosGenerate {
         system = "x86_64-linux";
