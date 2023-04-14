@@ -74,19 +74,44 @@
   system.stateVersion = "23.05";
   programs.command-not-found.enable = false;
 
-  services.caddy = {
-    enable = true;
-    email = "benaduggan@gmail.com";
-    package = common.jacobi.zaddy;
-    virtualHosts."digdug.dev".extraConfig = ''
-      encode gzip
-      file_server
-      root * ${
-        pkgs.runCommand "testdir" {} ''
-          mkdir "$out"
-          echo hello world > "$out/example.html"
-        ''
-      }
-    '';
-  };
+  services.caddy =
+    let
+      ts_reverse_proxy = location: {
+        extraConfig = ''
+          import TAILSCALE
+          reverse_proxy /* {
+            to ${location}
+          }
+        '';
+      };
+      reverse_proxy = location: {
+        extraConfig = ''
+          import GEOBLOCK
+          import SECURITY
+          reverse_proxy /* {
+            to ${location}
+          }
+        '';
+      };
+    in
+    {
+      enable = true;
+      email = "benaduggan@gmail.com";
+      package = common.jacobi.zaddy;
+      virtualHosts = {
+        "blog.digdug.dev" =
+          common.jacobi.zaddy.ts_reverse_proxy "home-server:1313/ben";
+
+        "digdug.dev".extraConfig = ''
+          encode gzip
+          file_server
+          root * ${
+            pkgs.runCommand "testdir" {} ''
+              mkdir "$out"
+              echo hello world > "$out/example.html"
+            ''
+          }
+        '';
+      };
+    };
 }
