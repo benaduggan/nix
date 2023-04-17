@@ -12,7 +12,7 @@
   outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi, nixos-hardware, vscode-server }:
     let
       inherit (nix-darwin.lib) darwinSystem;
-      inherit (nixpkgs.lib) attrValues optionalAttrs singleton;
+      inherit (nixpkgs.lib) attrValues optionalAttrs singleton genAttrs systems;
 
       # Configuration for `nixpkgs`
       nixpkgsConfig = {
@@ -30,6 +30,14 @@
       default_module = { imports = [ ./common.nix ]; _module.args = { inherit inputs; }; };
     in
     {
+
+      packages = genAttrs systems.flakeExposed (system: import nixpkgs nixpkgsConfig // {
+        default = {
+          x86_64-linux = self.nixosConfigurations.bduggan-framework.config.system.toplevel;
+          aarch64-darwin = self.darwinConfigurations.us-mbp-bduggan.system;
+        }.${system};
+      });
+
       darwinConfigurations = {
         us-mbp-bduggan = darwinSystem {
           system = "aarch64-darwin";
