@@ -1,5 +1,5 @@
 name: statix
-on: { workflow_dispatch, push: { branches: [main] }, pull_request }
+on: { workflow_dispatch, push, pull_request }
 jobs:
   statix:
     runs-on: ubuntu-22.04
