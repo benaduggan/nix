@@ -33,7 +33,7 @@
 
       packages = genAttrs systems.flakeExposed (system: import nixpkgs (nixpkgsConfig // { inherit system; }) // {
         default = {
-          x86_64-linux = self.nixosConfigurations.bduggan-framework.config.system.toplevel;
+          x86_64-linux = self.nixosConfigurations.bduggan-framework.config.system.build.toplevel;
           aarch64-darwin = self.darwinConfigurations.us-mbp-bduggan.system;
         }.${system};
       });
