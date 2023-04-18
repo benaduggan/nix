@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: cachix/install-nix-action@v20
       - run: nix profile install .#deadnix
-      - run: daednix -l .
+      - run: deadnix -l .
   prettier:
     runs-on: ubuntu-22.04
     steps:
