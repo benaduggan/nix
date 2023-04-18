@@ -17,26 +17,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: cachix/install-nix-action@v20
-      - run: nix profile install .#statix
-      - run: statix check
+      - run: nix run .#statix -- check
   deadnix:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - uses: cachix/install-nix-action@v20
-      - run: nix profile install .#deadnix
-      - run: deadnix -f .
+      - run: nix run .#deadnix -- -f .
   prettier:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - uses: cachix/install-nix-action@v20
-      - run: nix profile install .#nodePackages.prettier
-      - run: prettier --check .
+      - run: nix run .#nodePackages.prettier -- --check .
   nixpkgs-fmt:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - uses: cachix/install-nix-action@v20
-      - run: nix profile install .#nixpkgs-fmt
-      - run: nixpkgs-fmt --check .
+      - run: nix run .#nixpkgs-fmt -- --check .
