@@ -45,8 +45,8 @@
         pkgs // {
           default = {
             x86_64-linux = pkgs.linkFarmFromDrvs "build" (attrValues (mapAttrs (_: value: value.config.system.build.toplevel) self.nixosConfigurations));
-            x86_64-darwin = (self.darwinConfigurations.us-mpb-bduggan.override { system = "x86_64-darwin"; }).system;
-            aarch64-darwin = self.darwinConfigurations.us-mpb-bduggan.system;
+            x86_64-darwin = (self.darwinConfigurations.us-mbp-bduggan.override { system = "x86_64-darwin"; }).system;
+            aarch64-darwin = self.darwinConfigurations.us-mbp-bduggan.system;
           }.${system};
         }
       );
