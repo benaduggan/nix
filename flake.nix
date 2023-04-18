@@ -19,8 +19,9 @@
 
   outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi, devenv, nixos-hardware, vscode-server, nixos-generators }:
     let
+      inherit (nixpkgs) lib;
       inherit (nix-darwin.lib) darwinSystem;
-      inherit (nixpkgs.lib) attrValues optionalAttrs singleton;
+      inherit (nixpkgs.lib) mapAttrs attrValues optionalAttrs singleton;
 
       # Configuration for `nixpkgs`
       nixpkgsConfig = {
@@ -37,12 +38,25 @@
 
     in
     {
+      packages = lib.genAttrs lib.systems.flakeExposed (system:
+        let
+          pkgs = import nixpkgs (nixpkgsConfig // { inherit system; });
+        in
+        pkgs // {
+          default = {
+            x86_64-linux = pkgs.linkFarmFromDrvs "build" (attrValues (mapAttrs (_: value: value.config.system.build.toplevel) self.nixosConfigurations));
+            x86_64-darwin = (self.darwinConfigurations.us-mpb-bduggan.override { system = "x86_64-darwin"; }).system;
+            aarch64-darwin = self.darwinConfigurations.us-mpb-bduggan.system;
+          }.${system};
+        }
+      );
+
       darwinConfigurations =
         let
           common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; };
         in
         {
-          us-mbp-bduggan = darwinSystem {
+          us-mbp-bduggan = lib.makeOverridable darwinSystem {
             system = "aarch64-darwin";
             modules = [
               common
