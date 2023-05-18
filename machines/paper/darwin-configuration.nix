@@ -25,6 +25,12 @@
 
   services.nix-daemon.enable = true;
 
+  users.users.bduggan = {
+    name = common.username;
+    home = "/Users/${common.username}";
+    openssh.authorizedKeys.keys = common.authorizedKeys;
+  };
+
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog
   system.stateVersion = 4;
@@ -89,6 +95,7 @@
     ];
 
     casks = map (name: { inherit name; greedy = true; }) [
+      "android-studio"
       "authy"
       "font-fira-code-nerd-font"
       "epic-games"
@@ -119,7 +126,10 @@
 
     # These appear to be gated by having "purchased" the thing
     # even if it's free per apple id
-    masApps = { Wireguard = 1451685025; };
+    masApps = {
+      Wireguard = 1451685025;
+      Xcode = 497799835;
+    };
   };
 }
 

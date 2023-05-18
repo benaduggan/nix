@@ -8,6 +8,7 @@
     email = "benaduggan@gmail.com";
     firstName = "Ben";
     lastName = "Duggan";
+    username = "bduggan";
 
     kwbauson = import inputs.kwbauson { inherit (pkgs) system; };
     jacobi = import inputs.jacobi { inherit (inputs) nixpkgs; inherit (pkgs) system; };
