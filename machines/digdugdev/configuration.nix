@@ -74,19 +74,100 @@
   system.stateVersion = "23.05";
   programs.command-not-found.enable = false;
 
-  services.caddy = {
-    enable = true;
-    email = "benaduggan@gmail.com";
-    package = common.jacobi.zaddy;
-    virtualHosts."digdug.dev".extraConfig = ''
-      encode gzip
-      file_server
-      root * ${
-        pkgs.runCommand "testdir" {} ''
-          mkdir "$out"
-          echo hello world > "$out/example.html"
-        ''
+  services.caddy =
+  let
+    transformUser = email: extraConfig: ''
+      transform user {
+        match realm google
+        match email ${email}
+        ${extraConfig}
       }
     '';
-  };
+
+    vaultRole = "action add role vault_users\n";
+    adminRole = "action add role authp/admin\n";
+    buildUser = email: roles: transformUser email (lib.concatStrings roles);
+
+    ben = buildUser "benaduggan@gmail.com" [ vaultRole adminRole ];
+    brian = buildUser "bdugganrn@gmail.com" [ vaultRole ];
+    cobi = buildUser "godofjava@gmail.com" [ vaultRole ];
+    ellie = buildUser "elliemduggan@gmail.com" [ vaultRole ];
+  in
+    {
+      enable = true;
+      email = common.email;
+      package = common.jacobi.zaddy;
+      globalConfig = ''
+          order authenticate before respond
+          order authorize before basicauth
+
+          security {
+            oauth identity provider google {
+              realm google
+              driver google
+              client_id {env.GOOGLE_CLIENT_ID}.apps.googleusercontent.com
+              client_secret {env.GOOGLE_CLIENT_SECRET}
+              scopes openid email profile
+            }
+
+            authentication portal auth_portal {
+              crypto default token lifetime 3600
+              crypto key sign-verify {env.JWT_SHARED_KEY}
+              enable identity provider google
+              cookie domain digdug.dev
+              ui {
+                links {
+                  "My Identity" "/whoami" icon "las la-user"
+                  "Vault" "https://vault.digdug.dev" icon "las la-shield-alt"
+                }
+              }
+
+              transform user {
+                match realm google
+                action add role authp/user
+              }
+
+              ${ben}
+              ${brian}
+              ${cobi}
+              ${ellie}
+            }
+
+            authorization policy google_auth {
+              set auth url https://auth.digdug.dev/oauth2/google
+              crypto key verify {env.JWT_SHARED_KEY}
+              allow roles vault_users
+              validate bearer header
+              inject headers with claims
+            }
+          }
+      '';
+      virtualHosts = {
+        # "digdug.dev/blog" = reverse_proxy "home-server:9000";
+	      "vault.digdug.dev".extraConfig = ''
+            authorize with google_auth
+
+            reverse_proxy /* {
+              to home-server:8000
+            }
+        '';
+	      "auth.digdug.dev".extraConfig = ''
+            authenticate with auth_portal
+            encode gzip
+            file_server
+        '';
+
+        "digdug.dev".extraConfig = ''
+          encode gzip
+          file_server
+          root * ${
+            pkgs.runCommand "testdir" {} ''
+              mkdir "$out"
+              echo hello world > "$out/example.html"
+            ''
+          }
+        '';
+      };
+    };
 }
+

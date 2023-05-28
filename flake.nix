@@ -151,6 +151,10 @@
             common
             ./machines/digdugdev/configuration.nix
             home-manager.nixosModules.home-manager
+            vscode-server.nixosModule
+            ({ config, pkgs, ... }: {
+              services.vscode-server.enable = true;
+            })
             {
               home-manager.useUserPackages = true;
               home-manager.useGlobalPkgs = true;
