@@ -99,6 +99,8 @@
     cobi = buildUser "godofjava@gmail.com" [ vaultRole desktopRole ];
     kevin = buildUser "kwbauson@gmail.com" [ vaultRole desktopRole ];
     ellie = buildUser "elliemduggan@gmail.com" [ vaultRole desktopRole ];
+    jade = buildUser "fisherrjd@gmail.com" [ vaultRole desktopRole ];
+    ryguy = buildUser "rszemplinski22@gmail.com" [ vaultRole desktopRole ];
   in
     {
       enable = true;
@@ -144,6 +146,7 @@
               ${kristy}
               ${keri}
               ${anna}
+              ${ryguy}
             }
 
             authorization policy google_auth {
