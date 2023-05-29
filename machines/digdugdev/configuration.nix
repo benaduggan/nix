@@ -97,7 +97,7 @@
     kristy = buildUser "ktaduggan@gmail.com" [ vaultRole desktopRole ];
     anna = buildUser "aduggan077@gmail.com" [ vaultRole desktopRole ];
     cobi = buildUser "godofjava@gmail.com" [ vaultRole desktopRole ];
-    kevin = buildUser "godofjava@gmail.com" [ vaultRole desktopRole ];
+    kevin = buildUser "kwbauson@gmail.com" [ vaultRole desktopRole ];
     ellie = buildUser "elliemduggan@gmail.com" [ vaultRole desktopRole ];
   in
     {
