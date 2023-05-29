@@ -86,12 +86,19 @@
 
     vaultRole = "action add role vault_users\n";
     adminRole = "action add role authp/admin\n";
+    desktopRole = "action add role desktop\n";
     buildUser = email: roles: transformUser email (lib.concatStrings roles);
 
-    ben = buildUser "benaduggan@gmail.com" [ vaultRole adminRole ];
-    brian = buildUser "bdugganrn@gmail.com" [ vaultRole ];
-    cobi = buildUser "godofjava@gmail.com" [ vaultRole ];
-    ellie = buildUser "elliemduggan@gmail.com" [ vaultRole ];
+    ben = buildUser "benaduggan@gmail.com" [ vaultRole adminRole desktopRole ];
+    brian = buildUser "bdugganrn@gmail.com" [ vaultRole desktopRole ];
+    cathi = buildUser "cathirn@gmail.com" [ vaultRole desktopRole ];
+    keri = buildUser "kbduggan@gmail.com" [ vaultRole desktopRole ];
+    matt = buildUser "mjandar@gmail.com" [ vaultRole desktopRole ];
+    kristy = buildUser "ktaduggan@gmail.com" [ vaultRole desktopRole ];
+    anna = buildUser "aduggan077@gmail.com" [ vaultRole desktopRole ];
+    cobi = buildUser "godofjava@gmail.com" [ vaultRole desktopRole ];
+    kevin = buildUser "godofjava@gmail.com" [ vaultRole desktopRole ];
+    ellie = buildUser "elliemduggan@gmail.com" [ vaultRole desktopRole ];
   in
     {
       enable = true;
@@ -128,9 +135,15 @@
               }
 
               ${ben}
-              ${brian}
-              ${cobi}
               ${ellie}
+              ${kevin}
+              ${cobi}
+              ${brian}
+              ${cathi}
+              ${matt}
+              ${kristy}
+              ${keri}
+              ${anna}
             }
 
             authorization policy google_auth {
@@ -144,11 +157,21 @@
       '';
       virtualHosts = {
         # "digdug.dev/blog" = reverse_proxy "home-server:9000";
-	      "vault.digdug.dev".extraConfig = ''
+        "ai.digdug.dev".extraConfig = ''
             authorize with google_auth
 
             reverse_proxy /* {
+              to wsl:9090
+            }
+        '';
+
+	      "vault.digdug.dev".extraConfig = ''
+            reverse_proxy /* {
               to home-server:8000
+            }
+
+            reverse_proxy /notifications/hub {
+              to home-server:3012
             }
         '';
 	      "auth.digdug.dev".extraConfig = ''
