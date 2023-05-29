@@ -86,7 +86,7 @@
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.bduggan = {
+  users.users."${common.username}" = {
     isNormalUser = true;
     description = "Benjamin Duggan";
     extraGroups = [ "networkmanager" "wheel" ];
@@ -97,44 +97,9 @@
     ];
   };
 
-  services.caddy = {
-    enable = true;
-    extraConfig = ''
-      :8000 {
-      	bind 0.0.0.0
-
-      	log {
-      		output {$CADDY_LOG:discard}
-      	}
-
-        encode gzip
-        file_server
-        root * ${
-          pkgs.runCommand "testdir" {} ''
-            mkdir "$out"
-            echo hello world > "$out/example.html"
-        ''}
-        }
-    '';
-  };
-
-  # Enable automatic login for the user.
   services.xserver.displayManager.autoLogin.enable = true;
-  services.xserver.displayManager.autoLogin.user = "bduggan";
-
-  # Workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
-  systemd.services."getty@tty1".enable = false;
-  systemd.services."autovt@tty1".enable = false;
-
-  # Allow unfree packages
+  services.xserver.displayManager.autoLogin.user = common.username;
   nixpkgs.config.allowUnfree = true;
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    #  wget
-  ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -148,6 +113,30 @@
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
+
+  # Set up files/dirs for vaultwarden to work
+  systemd.tmpfiles.rules = [
+    "d /etc/vault 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
+    "f /etc/default/vaultwarden 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
+  ];
+
+  services.vaultwarden = {
+    enable = true;
+    environmentFile = "/etc/default/vaultwarden"; # extra secrets in here for email
+    config = {
+      ROCKET_ADDRESS = "0.0.0.0";
+      DOMAIN = "https://vault.digdug.dev";
+      SIGNUPS_ALLOWED = false;
+      SENDS_ALLOWED = true;
+      EMERGENCY_ACCESS_ALLOWED = true;
+      ORG_EVENTS_ENABLED = true;
+      SIGNUPS_VERIFY = true;
+      INVITATIONS_ALLOWED = true;
+      PASSWORD_ITERATIONS = 600000;
+      PASSWORD_HINTS_ALLOWED = false;
+      WEBSOCKET_ENABLED = false;
+    };
+  };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
@@ -171,4 +160,37 @@
   boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
   boot.kernel.sysctl."net.ipv4.conf.all.forwarding" = 1;
   boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
+
+  systemd.services = {
+    backup-vault = {
+      path = [ pkgs.gnutar pkgs.sqlite pkgs.gzip ];
+      script = ''
+        PREFIX=`date -u +%Y-%m-%d-%H-%M`
+        DATA_FOLDER=/var/lib/bitwarden_rs
+        BACKUP_FOLDER=/etc/vault/backups/staging
+        mkdir -p $BACKUP_FOLDER
+
+        if [[ ! -f "$DATA_FOLDER"/db.sqlite3 ]]; then
+          echo "Could not find SQLite database file '$DATA_FOLDER/db.sqlite3'" >&2
+          exit 1
+        fi
+
+        ${pkgs.sqlite}/bin/sqlite3 "$DATA_FOLDER"/db.sqlite3 ".backup '$BACKUP_FOLDER/db.sqlite3'"
+        cp -r "$DATA_FOLDER"/attachments "$BACKUP_FOLDER"
+        cp -r "$DATA_FOLDER"/sends "$BACKUP_FOLDER"
+        cp -r "$DATA_FOLDER"/icon_cache "$BACKUP_FOLDER"
+
+        # Used to sign JWTs of logged in users. Deleting logs out users
+        # cp "$DATA_FOLDER"/rsa_key.{der,pem,pub.der} "$BACKUP_FOLDER"
+
+        ${pkgs.gnutar}/bin/tar czf "/etc/vault/backups/$PREFIX-vault-backup.tar.gz" $BACKUP_FOLDER
+        rm -rf $BACKUP_FOLDER
+      '';
+      serviceConfig = {
+        User = config.systemd.services.vaultwarden.serviceConfig.User;
+        Type = "oneshot";
+      };
+      startAt = "*-*-* 02:00:00";
+    };
+  };
 }
