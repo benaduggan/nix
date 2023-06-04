@@ -9,6 +9,7 @@
     firstName = "Ben";
     lastName = "Duggan";
     username = "bduggan";
+    stateVersion = "23.05";
 
     kwbauson = import inputs.kwbauson { inherit (pkgs) system; };
     jacobi = import inputs.jacobi { inherit (inputs) nixpkgs; inherit (pkgs) system; };

@@ -8,8 +8,7 @@ in
   programs.home-manager.enable = true;
 
   home = {
-    stateVersion = "22.11";
-
+    stateVersion = common.stateVersion;
     sessionVariables = {
       EDITOR = "nano";
       HISTCONTROL = "ignoreboth";
