@@ -83,7 +83,7 @@
             ./machines/framework/configuration.nix
             nixos-hardware.nixosModules.framework
             vscode-server.nixosModule
-            ({ config, pkgs, ... }: {
+            (_: {
               services.vscode-server.enable = true;
             })
             home-manager.nixosModules.home-manager
@@ -110,7 +110,7 @@
             common
             ./machines/home-server/configuration.nix
             vscode-server.nixosModule
-            ({ config, pkgs, ... }: {
+            (_: {
               services.vscode-server.enable = true;
             })
             home-manager.nixosModules.home-manager
@@ -137,7 +137,7 @@
             common
             ./machines/desktop/configuration.nix
             vscode-server.nixosModule
-            ({ config, pkgs, ... }: {
+            (_: {
               services.vscode-server.enable = true;
             })
             home-manager.nixosModules.home-manager
@@ -166,7 +166,7 @@
             ./machines/digdugdev/configuration.nix
             home-manager.nixosModules.home-manager
             vscode-server.nixosModule
-            ({ config, pkgs, ... }: {
+            (_: {
               services.vscode-server.enable = true;
             })
             {
@@ -191,7 +191,7 @@
       };
 
       overlays = {
-        apple-silicon = final: prev: optionalAttrs (prev.stdenv.system == "aarch64-darwin") {
+        apple-silicon = _final: prev: optionalAttrs (prev.stdenv.system == "aarch64-darwin") {
           # Useful on Macs with Apple Silicon
           # Adds access to x86 packages system is running Apple Silicon
           pkgs-x86 = import nixpkgs {

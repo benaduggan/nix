@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, common, ... }:
+{ pkgs, lib, common, ... }:
 let
   inherit (common) isLinux isDarwin kwbauson jacobi isGraphical isMinimal;
   optList = conditional: list: if conditional then list else [ ];

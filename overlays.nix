@@ -1,11 +1,11 @@
 with builtins; [
-  (self: super:
+  (_self: super:
     (x: { hax = x; }) (with super;
     with lib;
     with builtins;
     lib // rec {
       inherit (pkgs) fetchFromGitHub;
-      mapAttrValues = f: mapAttrs (n: f);
+      mapAttrValues = f: mapAttrs (_n: f);
       fakePlatform = x:
         x.overrideAttrs (attrs: {
           meta = attrs.meta or { } // {
@@ -33,7 +33,7 @@ with builtins; [
         with { excludeNames = concatMap attrNames (attrValues e); };
         flatten (drvs (filterAttrsRecursive (n: _: !elem n excludeNames) x));
     }))
-  (self: super:
+  (_self: super:
     with super;
-    mapAttrs (n: hax.fakePlatform) { inherit gixy; })
+    mapAttrs (_n: hax.fakePlatform) { inherit gixy; })
 ]
