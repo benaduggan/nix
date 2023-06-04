@@ -3,6 +3,7 @@
 ## Vaultwarden
 
 ### Features
+
 - daily backups
 - supports websockets
 - supports emails

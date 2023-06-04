@@ -22,10 +22,10 @@ The interesting thing about this setup so far is the building of the flake and s
 
 Also got rid of ~/.config/nix cause that's managed in darwin-configuration.nix
 
-
 # Manual things
-* You have to install brew manually still
-* you have to install this `xcode-select --install`
+
+- You have to install brew manually still
+- you have to install this `xcode-select --install`
 
 # TODO
 
