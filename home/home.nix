@@ -8,7 +8,7 @@ in
   programs.home-manager.enable = true;
 
   home = {
-    stateVersion = common.stateVersion;
+    inherit (common) stateVersion;
     sessionVariables = {
       EDITOR = "nano";
       HISTCONTROL = "ignoreboth";
@@ -47,12 +47,12 @@ in
             ungoogled-chromium
           ])
 
-          (optList (isLinux) [
+          (optList isLinux [
             binutils
             ncdu
           ])
 
-          (optList (isDarwin) [
+          (optList isDarwin [
             m-cli
             (writeShellScriptBin "open-docker" ''
               open --hide --background -a Docker

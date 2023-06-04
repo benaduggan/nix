@@ -187,7 +187,7 @@
         rm -rf $BACKUP_FOLDER
       '';
       serviceConfig = {
-        User = config.systemd.services.vaultwarden.serviceConfig.User;
+        inherit (config.systemd.services.vaultwarden.serviceConfig) User;
         Type = "oneshot";
       };
       startAt = "*-*-* 02:00:00";

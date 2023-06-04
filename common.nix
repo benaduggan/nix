@@ -13,7 +13,7 @@
 
     kwbauson = import inputs.kwbauson { inherit (pkgs) system; };
     jacobi = import inputs.jacobi { inherit (inputs) nixpkgs; inherit (pkgs) system; };
-    devenv = inputs.devenv.packages.${pkgs.system}.devenv;
+    inherit (inputs.devenv.packages.${pkgs.system}) devenv;
 
     authorizedKeys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGaNQuSPDW/dsgptFTuuQmEtMQbYOpifcUmcq5jA0Sy8"

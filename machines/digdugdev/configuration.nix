@@ -104,7 +104,7 @@
     in
     {
       enable = true;
-      email = common.email;
+      inherit (common) email;
       package = common.jacobi.zaddy;
       globalConfig = ''
         order authenticate before respond
