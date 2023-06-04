@@ -53,7 +53,7 @@
 
       darwinConfigurations =
         let
-          common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; };
+          common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; inherit kwbauson; inherit jacobi; inherit devenv; };
         in
         {
           us-mbp-bduggan = lib.makeOverridable darwinSystem {
