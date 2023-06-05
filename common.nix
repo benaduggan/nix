@@ -1,4 +1,4 @@
-{ isGraphical, isMinimal, inputs }:
+{ isGraphical, isMinimal, inputs, kwbauson, jacobi, devenv }:
 { pkgs, ... }:
 {
   _module.args.common = {
@@ -9,10 +9,11 @@
     firstName = "Ben";
     lastName = "Duggan";
     username = "bduggan";
+    stateVersion = "23.05";
 
-    kwbauson = import inputs.kwbauson { inherit (pkgs) system; };
-    jacobi = import inputs.jacobi { inherit (inputs) nixpkgs; inherit (pkgs) system; };
-    devenv = inputs.devenv.packages.${pkgs.system}.devenv;
+    kwbauson = import kwbauson { inherit (pkgs) system; };
+    jacobi = import jacobi { inherit (inputs) nixpkgs; inherit (pkgs) system; };
+    inherit (devenv.packages.${pkgs.system}) devenv;
 
     authorizedKeys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGaNQuSPDW/dsgptFTuuQmEtMQbYOpifcUmcq5jA0Sy8"

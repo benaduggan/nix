@@ -1,4 +1,4 @@
-{ config, pkgs, common, ... }:
+{ config, common, ... }:
 let
   inherit (common) jacobi;
 in

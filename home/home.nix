@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, common, ... }:
+{ pkgs, lib, common, ... }:
 let
   inherit (common) isLinux isDarwin kwbauson jacobi isGraphical isMinimal;
   optList = conditional: list: if conditional then list else [ ];
@@ -8,8 +8,7 @@ in
   programs.home-manager.enable = true;
 
   home = {
-    stateVersion = "22.11";
-
+    inherit (common) stateVersion;
     sessionVariables = {
       EDITOR = "nano";
       HISTCONTROL = "ignoreboth";
@@ -48,12 +47,12 @@ in
             ungoogled-chromium
           ])
 
-          (optList (isLinux) [
+          (optList isLinux [
             binutils
             ncdu
           ])
 
-          (optList (isDarwin) [
+          (optList isDarwin [
             m-cli
             (writeShellScriptBin "open-docker" ''
               open --hide --background -a Docker

@@ -19,8 +19,9 @@
 
   outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi, devenv, nixos-hardware, vscode-server, nixos-generators }:
     let
+      inherit (nixpkgs) lib;
       inherit (nix-darwin.lib) darwinSystem;
-      inherit (nixpkgs.lib) attrValues optionalAttrs singleton;
+      inherit (nixpkgs.lib) mapAttrs attrValues optionalAttrs singleton;
 
       # Configuration for `nixpkgs`
       nixpkgsConfig = {
@@ -37,12 +38,25 @@
 
     in
     {
+      packages = lib.genAttrs lib.systems.flakeExposed (system:
+        let
+          pkgs = import nixpkgs (nixpkgsConfig // { inherit system; });
+        in
+        pkgs // {
+          default = {
+            x86_64-linux = pkgs.linkFarmFromDrvs "build" (attrValues (mapAttrs (_: value: value.config.system.build.toplevel) self.nixosConfigurations));
+            x86_64-darwin = (self.darwinConfigurations.us-mbp-bduggan.override { system = "x86_64-darwin"; }).system;
+            aarch64-darwin = self.darwinConfigurations.us-mbp-bduggan.system;
+          }.${system};
+        }
+      );
+
       darwinConfigurations =
         let
-          common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; };
+          common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; inherit kwbauson; inherit jacobi; inherit devenv; };
         in
         {
-          us-mbp-bduggan = darwinSystem {
+          us-mbp-bduggan = lib.makeOverridable darwinSystem {
             system = "aarch64-darwin";
             modules = [
               common
@@ -60,7 +74,7 @@
 
       nixosConfigurations.bduggan-framework =
         let
-          common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; };
+          common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; inherit kwbauson; inherit jacobi; inherit devenv; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -69,7 +83,7 @@
             ./machines/framework/configuration.nix
             nixos-hardware.nixosModules.framework
             vscode-server.nixosModule
-            ({ config, pkgs, ... }: {
+            (_: {
               services.vscode-server.enable = true;
             })
             home-manager.nixosModules.home-manager
@@ -88,7 +102,7 @@
 
       nixosConfigurations.home-server =
         let
-          common = import ./common.nix { isGraphical = false; isMinimal = false;  inherit inputs; };
+          common = import ./common.nix { isGraphical = false; isMinimal = false;  inherit inputs; inherit kwbauson; inherit jacobi; inherit devenv; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -96,7 +110,7 @@
             common
             ./machines/home-server/configuration.nix
             vscode-server.nixosModule
-            ({ config, pkgs, ... }: {
+            (_: {
               services.vscode-server.enable = true;
             })
             home-manager.nixosModules.home-manager
@@ -115,7 +129,7 @@
 
       nixosConfigurations.bduggan-desktop =
         let
-          common = import ./common.nix { isGraphical = true; isMinimal = false;  inherit inputs; };
+          common = import ./common.nix { isGraphical = true; isMinimal = false;  inherit inputs; inherit kwbauson; inherit jacobi; inherit devenv; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -123,7 +137,7 @@
             common
             ./machines/desktop/configuration.nix
             vscode-server.nixosModule
-            ({ config, pkgs, ... }: {
+            (_: {
               services.vscode-server.enable = true;
             })
             home-manager.nixosModules.home-manager
@@ -142,7 +156,7 @@
 
       nixosConfigurations.digdugdev =
         let
-          common = import ./common.nix { isGraphical = false; isMinimal = true;  inherit inputs; };
+          common = import ./common.nix { isGraphical = false; isMinimal = true;  inherit inputs; inherit kwbauson; inherit jacobi; inherit devenv; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -152,7 +166,7 @@
             ./machines/digdugdev/configuration.nix
             home-manager.nixosModules.home-manager
             vscode-server.nixosModule
-            ({ config, pkgs, ... }: {
+            (_: {
               services.vscode-server.enable = true;
             })
             {
@@ -177,7 +191,7 @@
       };
 
       overlays = {
-        apple-silicon = final: prev: optionalAttrs (prev.stdenv.system == "aarch64-darwin") {
+        apple-silicon = _final: prev: optionalAttrs (prev.stdenv.system == "aarch64-darwin") {
           # Useful on Macs with Apple Silicon
           # Adds access to x86 packages system is running Apple Silicon
           pkgs-x86 = import nixpkgs {

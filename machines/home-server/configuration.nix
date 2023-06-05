@@ -151,7 +151,7 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "23.05"; # Did you read the comment?
+  system.stateVersion = common.stateVersion;
 
 
   # enable tailscale and use as exit node
@@ -187,7 +187,7 @@
         rm -rf $BACKUP_FOLDER
       '';
       serviceConfig = {
-        User = config.systemd.services.vaultwarden.serviceConfig.User;
+        inherit (config.systemd.services.vaultwarden.serviceConfig) User;
         Type = "oneshot";
       };
       startAt = "*-*-* 02:00:00";
