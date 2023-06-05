@@ -74,7 +74,7 @@
 
       nixosConfigurations.bduggan-framework =
         let
-          common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; };
+          common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; inherit kwbauson; inherit jacobi; inherit devenv; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -102,7 +102,7 @@
 
       nixosConfigurations.home-server =
         let
-          common = import ./common.nix { isGraphical = false; isMinimal = false;  inherit inputs; };
+          common = import ./common.nix { isGraphical = false; isMinimal = false;  inherit inputs; inherit kwbauson; inherit jacobi; inherit devenv; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -129,7 +129,7 @@
 
       nixosConfigurations.bduggan-desktop =
         let
-          common = import ./common.nix { isGraphical = true; isMinimal = false;  inherit inputs; };
+          common = import ./common.nix { isGraphical = true; isMinimal = false;  inherit inputs; inherit kwbauson; inherit jacobi; inherit devenv; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -156,7 +156,7 @@
 
       nixosConfigurations.digdugdev =
         let
-          common = import ./common.nix { isGraphical = false; isMinimal = true;  inherit inputs; };
+          common = import ./common.nix { isGraphical = false; isMinimal = true;  inherit inputs; inherit kwbauson; inherit jacobi; inherit devenv; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
