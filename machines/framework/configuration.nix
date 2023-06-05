@@ -126,6 +126,13 @@
   services.openssh.enable = true;
   services.fprintd.enable = true;
 
+  services.tailscale.enable = true;
+  services.tailscale.useRoutingFeatures = "both";
+  boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
+  boot.kernel.sysctl."net.ipv4.conf.all.forwarding" = 1;
+  boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
+
+
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
