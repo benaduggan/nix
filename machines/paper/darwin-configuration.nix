@@ -103,7 +103,7 @@
       "steam"
       "discord"
       "slack"
-      "docker"
+      # "docker"
       "karabiner-elements"
       "macfuse"
       "microsoft-remote-desktop"
@@ -128,7 +128,7 @@
     # even if it's free per apple id
     masApps = {
       Wireguard = 1451685025;
-      Xcode = 497799835;
+      # Xcode = 497799835;
     };
   };
 }
