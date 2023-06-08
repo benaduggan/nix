@@ -133,8 +133,8 @@
       SIGNUPS_VERIFY = true;
       INVITATIONS_ALLOWED = true;
       PASSWORD_ITERATIONS = 600000;
-      PASSWORD_HINTS_ALLOWED = false;
-      WEBSOCKET_ENABLED = false;
+      PASSWORD_HINTS_ALLOWED = true;
+      WEBSOCKET_ENABLED = true;
     };
   };
 
