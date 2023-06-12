@@ -183,6 +183,14 @@
           file_server
         '';
 
+	      "garden.digdug.dev".extraConfig = ''
+            authorize with google_auth
+
+            reverse_proxy /* {
+              to nexus-6:8080
+            }
+        '';
+
         "digdug.dev".extraConfig = ''
           encode gzip
           file_server
