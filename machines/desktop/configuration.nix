@@ -14,7 +14,6 @@
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
   networking.hostName = "bduggan-desktop"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -119,6 +118,15 @@
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
+
+  networking.firewall.enable = false;
+
+  # enable tailscale and use as exit node
+  services.tailscale.enable = true;
+  services.tailscale.useRoutingFeatures = "both";
+  boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
+  boot.kernel.sysctl."net.ipv4.conf.all.forwarding" = 1;
+  boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
