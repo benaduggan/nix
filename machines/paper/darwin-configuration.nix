@@ -103,6 +103,7 @@
       "steam"
       "discord"
       "slack"
+      "obs"
       # "docker"
       "karabiner-elements"
       "macfuse"
