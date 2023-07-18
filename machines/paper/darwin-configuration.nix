@@ -123,6 +123,8 @@
       "insomnia"
       "tabby"
       "tailscale"
+      "macfuse"
+      "maccy"
     ];
 
     # These appear to be gated by having "purchased" the thing

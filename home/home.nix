@@ -119,6 +119,7 @@ in
           shfmt
           socat
           sox
+          spacer
           swaks
           time
           unzip
@@ -152,6 +153,7 @@ in
             general_pog_scripts
             aws_pog_scripts
             nix_pog_scripts
+            ffmpeg_pog_scripts
             drm
             drmi
             dshell

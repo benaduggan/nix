@@ -9,7 +9,7 @@ in
       add_newline = false;
       character = {
         success_symbol = "[${symbol}](bright-green)";
-        error_symbol = "[${symbol}](bright-red)";
+        error_symbol = "👀";
       };
       golang = {
         style = "fg:#00ADD8";
