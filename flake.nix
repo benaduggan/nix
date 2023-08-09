@@ -10,14 +10,14 @@
     jacobi.flake = false;
     vscode-server.url = "github:msteen/nixos-vscode-server";
     devenv.url = "github:cachix/devenv/latest";
-
+    nixos-wsl.url = "github:nix-community/NixOS-WSL";
     nixos-generators = {
       url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi, devenv, nixos-hardware, vscode-server, nixos-generators }:
+  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi, devenv, nixos-hardware, vscode-server, nixos-generators, nixos-wsl }:
     let
       inherit (nixpkgs) lib;
       inherit (nix-darwin.lib) darwinSystem;
@@ -138,6 +138,34 @@
             ./machines/desktop/configuration.nix
             vscode-server.nixosModule
             (_: {
+              services.vscode-server.enable = true;
+            })
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useUserPackages = true;
+              home-manager.useGlobalPkgs = true;
+              home-manager.users.bduggan = {
+                imports = [
+                  common
+                  ./home
+                ];
+              };
+            }
+          ];
+        };
+
+      nixosConfigurations.wsl =
+        let
+          common = import ./common.nix { isGraphical = false; isMinimal = true;  inherit inputs; };
+        in
+        nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs; };
+          modules = [
+            common
+            ./machines/wsl/configuration.nix
+            vscode-server.nixosModule
+            ({ config, pkgs, ... }: {
               services.vscode-server.enable = true;
             })
             home-manager.nixosModules.home-manager
