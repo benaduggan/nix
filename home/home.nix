@@ -70,7 +70,6 @@ in
           diffutils
           dos2unix
           ed
-          exa
           fd
           file
           figlet
@@ -197,4 +196,5 @@ in
   programs.vscode.enable = isGraphical && !isDarwin;
   programs.htop.enable = true;
   programs.dircolors.enable = true;
+  programs.lsd.enable = true;
 }

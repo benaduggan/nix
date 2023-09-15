@@ -10,7 +10,7 @@ in
     historySize = -1;
     shellAliases = {
       ls = "ls --color=auto";
-      l = "exa -alFT -L 1";
+      l = "lsd -lA --permission octal";
       ll = "ls -ahlFG";
       mkdir = "mkdir -pv";
       hm = "home-manager";
