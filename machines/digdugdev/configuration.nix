@@ -164,7 +164,7 @@
           authorize with google_auth
 
           reverse_proxy /* {
-            to wsl:9090
+            to wsl:7860
           }
         '';
 
