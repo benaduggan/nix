@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ common, config, pkgs, ... }:
+{ common, lib, pkgs, ... }:
 
 {
   imports =
@@ -133,9 +133,11 @@
   boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
 
 
+  systemd.services.NetworkManager-wait-online.enable = lib.mkForce false;
+  systemd.services.systemd-networkd-wait-online.enable = lib.mkForce false;
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
+  # networking.firewall.allowedUDPPorts = [ ...Q ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
