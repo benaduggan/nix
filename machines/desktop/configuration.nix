@@ -6,6 +6,8 @@
       ./hardware-configuration.nix
     ];
 
+  nix.settings.substituters = common.cacheSubstituters;
+  nix.settings.trusted-public-keys = common.trustedPublicKeys;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Bootloader.

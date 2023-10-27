@@ -1,4 +1,4 @@
-{ isGraphical, isMinimal, inputs, kwbauson, jacobi, devenv }:
+{ isGraphical, isMinimal, inputs, devenv }:
 { pkgs, ... }:
 {
   _module.args.common = {
@@ -11,8 +11,8 @@
     username = "bduggan";
     stateVersion = "23.05";
 
-    kwbauson = import kwbauson { inherit (pkgs) system; };
-    jacobi = import jacobi { inherit (inputs) nixpkgs; inherit (pkgs) system; };
+    jacobi = inputs.jacobi.packages.${pkgs.system};
+    kwbauson = inputs.kwbauson.packages.${pkgs.system};
     inherit (devenv.packages.${pkgs.system}) devenv;
 
     authorizedKeys = [
@@ -26,11 +26,13 @@
     cacheSubstituters = [
       "https://cache.nixos.org/"
       "https://devenv.cachix.org"
+      "https://jacobi.cachix.org"
     ];
 
     trustedPublicKeys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
+      "jacobi.cachix.org-1:JJghCz+ZD2hc9BHO94myjCzf4wS3DeBLKHOz3jCukMU="
     ];
   };
 }

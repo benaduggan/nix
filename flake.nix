@@ -1,13 +1,29 @@
 {
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
-    nixos-hardware.url = "github:NixOS/nixos-hardware";
+    nixos-hardware.flake = true;
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    kwbauson.url = "github:kwbauson/cfg";
-    kwbauson.flake = false;
-    jacobi.url = "github:jpetrucciani/nix";
-    jacobi.flake = false;
+    kwbauson = {
+      url = "github:kwbauson/cfg";
+      inputs = {
+        home-manager.follows = "home-manager";
+        nix-darwin.follows = "nix-darwin";
+        nixos-hardware.follows = "nixos-hardware";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
+
+    jacobi = {
+      url = "github:jpetrucciani/nix";
+      inputs = {
+        home-manager.follows = "home-manager";
+        nix-darwin.follows = "nix-darwin";
+        nixos-hardware.follows = "nixos-hardware";
+        # nixpkgs.follows = "nixpkgs";
+      };
+    };
+
     vscode-server.url = "github:msteen/nixos-vscode-server";
     devenv.url = "github:cachix/devenv/latest";
 
@@ -53,7 +69,7 @@
 
       darwinConfigurations =
         let
-          common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; inherit kwbauson; inherit jacobi; inherit devenv; };
+          common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; inherit devenv; };
         in
         {
           us-mbp-bduggan = lib.makeOverridable darwinSystem {
@@ -74,7 +90,7 @@
 
       nixosConfigurations.bduggan-framework =
         let
-          common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; inherit kwbauson; inherit jacobi; inherit devenv; };
+          common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; inherit devenv; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -102,7 +118,7 @@
 
       nixosConfigurations.home-server =
         let
-          common = import ./common.nix { isGraphical = false; isMinimal = false;  inherit inputs; inherit kwbauson; inherit jacobi; inherit devenv; };
+          common = import ./common.nix { isGraphical = false; isMinimal = false;  inherit inputs; inherit devenv; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -129,7 +145,7 @@
 
       nixosConfigurations.bduggan-desktop =
         let
-          common = import ./common.nix { isGraphical = false; isMinimal = false;  inherit inputs; inherit kwbauson; inherit jacobi; inherit devenv; };
+          common = import ./common.nix { isGraphical = false; isMinimal = false;  inherit inputs; inherit devenv; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -156,7 +172,7 @@
 
       nixosConfigurations.digdugdev =
         let
-          common = import ./common.nix { isGraphical = false; isMinimal = true;  inherit inputs; inherit kwbauson; inherit jacobi; inherit devenv; };
+          common = import ./common.nix { isGraphical = false; isMinimal = true;  inherit inputs; inherit devenv; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";

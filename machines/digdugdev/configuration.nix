@@ -9,7 +9,12 @@
       max-jobs = auto
       extra-experimental-features = nix-command flakes
     '';
+
+    settings.substituters = common.cacheSubstituters;
+    settings.trusted-public-keys = common.trustedPublicKeys;
+    settings.experimental-features = [ "nix-command" "flakes" ];
   };
+
   boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
   environment.systemPackages = with pkgs; [
     bashInteractive

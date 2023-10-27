@@ -143,11 +143,12 @@ in
           # jacobi's stuff
           (with jacobi; [
             (if isDarwin then [
-              alpaca-cpp
               llama-cpp
-              whisper-cpp
+              # whisper-cpp
             ] else [ ])
 
+            # llama-cpp
+            # comcast
             meme_sounds
             general_pog_scripts
             aws_pog_scripts
@@ -157,7 +158,7 @@ in
             drmi
             dshell
             _dex
-            (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
+            # (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
           ])
         ])
 
