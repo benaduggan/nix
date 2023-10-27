@@ -158,7 +158,8 @@ in
             drmi
             dshell
             _dex
-            # (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
+            nixup
+            (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
           ])
         ])
 
