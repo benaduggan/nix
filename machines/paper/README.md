@@ -1,4 +1,7 @@
+Now you don't have to do all the bootstrapping stuff. You can reference the nix-darwin github repo for more info [here](https://github.com/LnL7/nix-darwin#flakes-experimental)
+
 # Bootstrapping
+
 
 I didn't really do a good job of keeping track of what I did here, but I did follow this video
 https://www.youtube.com/watch?v=KJgN0lnA5mk
