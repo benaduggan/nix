@@ -1,5 +1,15 @@
 Now you don't have to do all the bootstrapping stuff. You can reference the nix-darwin github repo for more info [here](https://github.com/LnL7/nix-darwin#flakes-experimental)
 
+I can't remember the actual way to reference the flake configuration, but if you change your hostname to match the config, then you can just use .
+
+guh why is my username benduggan
+
+```
+# in the top level of the repo
+nix run nix-darwin -- switch --flake .
+```
+
+
 # Bootstrapping
 
 
