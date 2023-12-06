@@ -50,10 +50,12 @@ in
           (optList isLinux [
             binutils
             ncdu
+            figlet
           ])
 
           (optList isDarwin [
             m-cli
+            supabase-cli
             (writeShellScriptBin "open-docker" ''
               open --hide --background -a Docker
             '')
@@ -72,7 +74,6 @@ in
           ed
           fd
           file
-          figlet
           gawk
           google-cloud-sdk
           gnumake

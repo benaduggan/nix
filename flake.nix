@@ -61,8 +61,8 @@
         pkgs // {
           default = {
             x86_64-linux = pkgs.linkFarmFromDrvs "build" (attrValues (mapAttrs (_: value: value.config.system.build.toplevel) self.nixosConfigurations));
-            x86_64-darwin = (self.darwinConfigurations.us-mbp-bduggan.override { system = "x86_64-darwin"; }).system;
-            aarch64-darwin = self.darwinConfigurations.us-mbp-bduggan.system;
+            x86_64-darwin = (self.darwinConfigurations.us-mbp-benduggan.override { system = "x86_64-darwin"; }).system;
+            aarch64-darwin = self.darwinConfigurations.us-mbp-benduggan.system;
           }.${system};
         }
       );
@@ -72,7 +72,7 @@
           common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; inherit devenv; };
         in
         {
-          us-mbp-bduggan = lib.makeOverridable darwinSystem {
+          us-mbp-benduggan = lib.makeOverridable darwinSystem {
             system = "aarch64-darwin";
             modules = [
               common
@@ -82,7 +82,7 @@
                 nixpkgs = nixpkgsConfig;
                 home-manager.useGlobalPkgs = true;
                 home-manager.useUserPackages = true;
-                home-manager.users.bduggan = { imports = [ common ./home ]; };
+                home-manager.users.benduggan = { imports = [ common ./home ]; };
               }
             ];
           };

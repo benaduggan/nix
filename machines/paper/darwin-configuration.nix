@@ -25,9 +25,9 @@
 
   services.nix-daemon.enable = true;
 
-  users.users.bduggan = {
-    name = common.username;
-    home = "/Users/${common.username}";
+  users.users.benduggan = {
+    name = "benduggan";
+    home = "/Users/benduggan";
     openssh.authorizedKeys.keys = common.authorizedKeys;
   };
 
@@ -87,7 +87,6 @@
 
     taps = [
       "homebrew/cask"
-      "homebrew/cask-drivers"
       "homebrew/cask-fonts"
       "homebrew/cask-versions"
       "homebrew/core"
@@ -95,7 +94,7 @@
     ];
 
     casks = map (name: { inherit name; greedy = true; }) [
-      "android-studio"
+      # "android-studio"
       "authy"
       "font-fira-code-nerd-font"
       "epic-games"
@@ -106,15 +105,15 @@
       "obs"
       # "docker"
       "karabiner-elements"
-      "macfuse"
+      # "macfuse"
       "microsoft-remote-desktop"
-      "notion"
+      # "notion"
       "parsec"
-      "postman"
+      # "postman"
       "qlvideo"
       "raycast"
       "rectangle"
-      "redisinsight"
+      # "redisinsight"
       "firefox"
       "google-chrome"
       "visual-studio-code"
@@ -123,8 +122,8 @@
       "insomnia"
       "tabby"
       "tailscale"
-      "macfuse"
-      "maccy"
+      # "macfuse"
+      # "maccy"
     ];
 
     # These appear to be gated by having "purchased" the thing
