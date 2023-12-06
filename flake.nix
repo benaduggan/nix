@@ -97,7 +97,7 @@
           modules = [
             common
             ./machines/framework/configuration.nix
-            nixos-hardware.nixosModules.framework
+            nixos-hardware.nixosModules.framework-11th-gen-intel
             vscode-server.nixosModule
             (_: {
               services.vscode-server.enable = true;
