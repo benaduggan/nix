@@ -202,6 +202,8 @@
           file_server
         '';
         "sec-board.digdug.dev".extraConfig = ''
+          authorize with google_auth
+
           header {
             Cache-Control "no-cache, no-store, must-revalidate"
           }
