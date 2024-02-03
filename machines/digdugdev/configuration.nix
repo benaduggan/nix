@@ -224,20 +224,25 @@
   systemd.timers.update-quotes = {
     wantedBy = [ "timers.target" ];
     timerConfig = {
-      OnBootSec = "5m";
-      OnUnitActiveSec = "5m";
+      OnBootSec = "4m";
+      OnUnitActiveSec = "4m";
       Unit = "update-quotes.service";
     };
   };
 
   systemd.services = {
     update-quotes = {
-      path = [ pkgs.jq ];
+      path = [ pkgs.jq pkgs.gawk pkgs.gnused ];
       script = ''
-        HTML_PATH=/var/www/index.html
-        JSON_PATH=/var/www/quotes.json
+        HTML_OUTPUT_PATH=/var/www/index.html
+        QOUTES_PATH=/var/www/quotes.txt
+        RANDOM_LINE=$(shuf -n 1 "$QOUTES_PATH")
+        NAME=$(echo $RANDOM_LINE | awk '{print $1}')
+        QUOTE=$(echo $RANDOM_LINE | awk '{$1=""; print $0}' | sed 's/^[ \t]*//')
+        random_number=$(( RANDOM % 5 + 1 ))
+        IMG_PATH="imgs/$NAME/$NAME$random_number.png"
 
-        cat > $HTML_PATH << EOF
+        cat > $HTML_OUTPUT_PATH << EOF
         <!DOCTYPE html>
         <html lang="en">
           <head>
@@ -245,10 +250,39 @@
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <meta http-equiv="X-UA-Compatible" content="ie=edge">
             <title>Quote Board</title>
-            <link rel="stylesheet" href="styles.css">
+            <style>
+            * {
+              margin: 0;
+            }
+
+            body {
+              margin: 0;
+              max-width: 600px;
+              max-height: 800px;
+              width: 600px;
+              height: 800px;
+            }
+
+            .quote-text {
+              margin: 0 auto;
+              display: block;
+              font-size: 24px;
+              font-weight: bold;
+              max-width: 80%;
+              padding: 20px;
+              text-align: center;
+            }
+
+            .profile {
+              width: 100%;
+              max-width: 600px;
+              height: auto;
+            }
+            </style>
           </head>
           <body>
-            `cat $JSON_PATH | jq -r '.[] | "<div class=\"meme\"><p class=\"quote\">\(.quote)</p><img class=\"profile\" src=\"\(.person).png\" alt=\"\(.person)\"></div>"' | shuf`
+            <img class="profile" src="$IMG_PATH" />
+            <p class="quote-text">$QUOTE</p>
           </body>
         </html>
         EOF
