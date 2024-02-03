@@ -182,7 +182,7 @@ in
 
   programs.direnv = {
     enable = !isMinimal;
-    # nix-direnv.enable = true;
+    nix-direnv.enable = true;
   };
 
   programs.mcfly = {
