@@ -187,7 +187,6 @@
           encode gzip
           file_server
         '';
-
         "garden.digdug.dev".extraConfig = ''
           authorize with google_auth
 
@@ -195,7 +194,20 @@
             to nexus-6:8080
           }
         '';
-
+        "http://board.digdug.dev".extraConfig = ''
+          header {
+            Cache-Control "no-cache, no-store, must-revalidate"
+          }
+          root * /var/www
+          file_server
+        '';
+        "sec-board.digdug.dev".extraConfig = ''
+          header {
+            Cache-Control "no-cache, no-store, must-revalidate"
+          }
+          root * /var/www
+          file_server
+        '';
         "digdug.dev".extraConfig = ''
           encode gzip
           file_server
@@ -208,5 +220,45 @@
         '';
       };
     };
+
+  systemd.timers.update-quotes = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnBootSec = "5m";
+      OnUnitActiveSec = "5m";
+      Unit = "update-quotes.service";
+    };
+  };
+
+  systemd.services = {
+    update-quotes = {
+      path = [ pkgs.jq ];
+      script = ''
+        HTML_PATH=/var/www/index.html
+        JSON_PATH=/var/www/quotes.json
+
+        cat > $HTML_PATH << EOF
+        <!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta http-equiv="X-UA-Compatible" content="ie=edge">
+            <title>Quote Board</title>
+            <link rel="stylesheet" href="styles.css">
+          </head>
+          <body>
+            `cat $JSON_PATH | jq -r '.[] | "<div class=\"meme\"><p class=\"quote\">\(.quote)</p><img class=\"profile\" src=\"\(.person).png\" alt=\"\(.person)\"></div>"' | shuf`
+          </body>
+        </html>
+        EOF
+      '';
+      serviceConfig = {
+        User = "root";
+        Type = "oneshot";
+      };
+    };
+  };
+
 }
 

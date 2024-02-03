@@ -35,6 +35,8 @@ in
         yq-go
         vim
         gitAndTools.delta
+        nixpkgs-fmt
+        nil
 
         (optList (!isMinimal) [
           (optList (isLinux && isGraphical) [
@@ -89,13 +91,11 @@ in
           loop
           man-pages
           netcat-gnu
-          nil
           nix-direnv
           nix-info
           nix-prefetch-github
           nix-prefetch-scripts
           nix-tree
-          nixpkgs-fmt
           nmap
           nodejs
           openssh
