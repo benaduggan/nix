@@ -234,15 +234,20 @@
 
   systemd.services = {
     update-quotes = {
-      path = [ pkgs.jq pkgs.gawk pkgs.gnused ];
+      path = [ pkgs.jq pkgs.gawk pkgs.gnused pkgs.curlMinimal ];
       script = ''
         HTML_OUTPUT_PATH=/var/www/index.html
         QOUTES_PATH=/var/www/quotes.txt
+        GOOGLE_PUBLIC_URL="https://drive.usercontent.google.com/download?id=1LB3bMBYNTmwLrLqFg6qmnhCyDd1SWd2B&confirm=xxx"
+
+        # Fetch the latest quotes from google drive
+        curl -L $GOOGLE_PUBLIC_URL -o $QOUTES_PATH
+
         RANDOM_LINE=$(shuf -n 1 "$QOUTES_PATH")
         NAME=$(echo $RANDOM_LINE | awk '{print $1}')
         QUOTE=$(echo $RANDOM_LINE | awk '{$1=""; print $0}' | sed 's/^[ \t]*//')
-        random_number=$(( RANDOM % 5 + 1 ))
-        IMG_PATH="imgs/$NAME/$NAME$random_number.png"
+        RANDOM_PHOTO_INDEX=$(( RANDOM % 5 + 1 ))
+        IMG_PATH="imgs/$NAME/$NAME$RANDOM_PHOTO_INDEX.png"
 
         cat > $HTML_OUTPUT_PATH << EOF
         <!DOCTYPE html>
