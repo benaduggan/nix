@@ -246,7 +246,7 @@
         RANDOM_LINE=$(shuf -n 1 "$QOUTES_PATH")
         NAME=$(echo $RANDOM_LINE | awk '{print $1}')
         QUOTE=$(echo $RANDOM_LINE | awk '{$1=""; print $0}' | sed 's/^[ \t]*//')
-        RANDOM_PHOTO_INDEX=$(( RANDOM % 5 + 1 ))
+        RANDOM_PHOTO_INDEX=$(( RANDOM % 12 + 1 ))
         IMG_PATH="imgs/$NAME/$NAME$RANDOM_PHOTO_INDEX.png"
 
         cat > $HTML_OUTPUT_PATH << EOF
