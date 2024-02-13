@@ -241,12 +241,12 @@
         GOOGLE_PUBLIC_URL="https://drive.usercontent.google.com/download?id=1LB3bMBYNTmwLrLqFg6qmnhCyDd1SWd2B&confirm=xxx"
 
         # Fetch the latest quotes from google drive
-        curl -L $GOOGLE_PUBLIC_URL -o $QOUTES_PATH
+        # curl -L $GOOGLE_PUBLIC_URL -o $QOUTES_PATH
 
         RANDOM_LINE=$(shuf -n 1 "$QOUTES_PATH")
         NAME=$(echo $RANDOM_LINE | awk '{print $1}')
         QUOTE=$(echo $RANDOM_LINE | awk '{$1=""; print $0}' | sed 's/^[ \t]*//')
-        RANDOM_PHOTO_INDEX=$(( RANDOM % 12 + 1 ))
+        RANDOM_PHOTO_INDEX=$(( RANDOM % 11 + 1 ))
         IMG_PATH="imgs/$NAME/$NAME$RANDOM_PHOTO_INDEX.png"
 
         cat > $HTML_OUTPUT_PATH << EOF
