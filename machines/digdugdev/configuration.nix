@@ -238,10 +238,10 @@
       script = ''
         HTML_OUTPUT_PATH=/var/www/index.html
         QOUTES_PATH=/var/www/quotes.txt
-        GOOGLE_PUBLIC_URL="https://drive.usercontent.google.com/download?id=1LB3bMBYNTmwLrLqFg6qmnhCyDd1SWd2B&confirm=xxx"
+        GOOGLE_PUBLIC_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRhHICyPYgKftARlVQvVwd2HVFf7FyNXu7OcA7FLTcyGilGu_1p9tgN9msoH3D479tbT56VD864Whwl/pub?gid=1741542806&single=true&output=tsv"
 
         # Fetch the latest quotes from google drive
-        # curl -L $GOOGLE_PUBLIC_URL -o $QOUTES_PATH
+        curl -L $GOOGLE_PUBLIC_URL -o $QOUTES_PATH
 
         RANDOM_LINE=$(shuf -n 1 "$QOUTES_PATH")
         NAME=$(echo $RANDOM_LINE | awk '{print $1}')
