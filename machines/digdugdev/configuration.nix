@@ -182,6 +182,13 @@
             to home-server:3012
           }
         '';
+        "greenhouse.digdug.dev".extraConfig = ''
+          authorize with google_auth
+
+          reverse_proxy /* {
+            to home-server:7000
+          }
+        '';
         "auth.digdug.dev".extraConfig = ''
           authenticate with auth_portal
           encode gzip
