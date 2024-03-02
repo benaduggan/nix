@@ -194,5 +194,20 @@
       };
       startAt = "*-*-* 02:00:00";
     };
+    # greenhouse-service = {
+    #   wantedBy = [ "multi-user.target" ];
+    #   after = [ "network.target" ];
+    #   script = ''cd /home/bduggan/greenhouse-passthrough && direnv allow && python server.py'';
+    #   serviceConfig = {
+    #     User = "bduggan";
+    #     # Restart = "always";
+    #     # RestartSec = "10";
+    #     Type = "oneshot";
+    #   };
+    # };
   };
+
+  # docker stuff
+  virtualisation.docker.enable = true;
+  users.extraGroups.docker.members = [ common.username ];
 }
