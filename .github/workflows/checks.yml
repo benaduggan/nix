@@ -5,9 +5,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        system: [{ os: Linux, arch: X64 }, { os: macOS, arch: ARM64 }]
-    name: "${{ matrix.system.os }} ${{ matrix.system.arch }}"
-    runs-on: [nix, "${{ matrix.system.os }}", "${{ matrix.system.arch }}"]
+        os: [ubuntu-22.04, macos-12]
+    name: build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v23
