@@ -194,20 +194,67 @@
       };
       startAt = "*-*-* 02:00:00";
     };
-    # greenhouse-service = {
-    #   wantedBy = [ "multi-user.target" ];
-    #   after = [ "network.target" ];
-    #   script = ''cd /home/bduggan/greenhouse-passthrough && direnv allow && python server.py'';
-    #   serviceConfig = {
-    #     User = "bduggan";
-    #     # Restart = "always";
-    #     # RestartSec = "10";
-    #     Type = "oneshot";
-    #   };
-    # };
+
+    greenhouse-service =
+      let
+        myPython = pkgs.python311.withPackages (p: with p; [
+          requests
+        ]);
+      in
+      {
+        path = [ myPython ];
+        wantedBy = [ "multi-user.target" ];
+        script = ''python /home/bduggan/greenhouse-passthrough/server.py'';
+      };
   };
 
   # docker stuff
   virtualisation.docker.enable = true;
   users.extraGroups.docker.members = [ common.username ];
+  virtualisation.oci-containers = {
+    backend = "docker";
+
+    containers.homeassistant = {
+      volumes = [ "home-assistant:/config" ];
+      environment.TZ = "US/Eastern";
+      image = "ghcr.io/home-assistant/home-assistant:2024.3.0";
+      extraOptions = [
+        "--network=host"
+      ];
+    };
+  };
+
+  services.grafana = {
+    enable = true;
+    domain = "grafana.digdug.dev";
+    port = 2342;
+    addr = "0.0.0.0";
+  };
+
+  services.prometheus = {
+    enable = true;
+    port = 2343;
+    exporters = {
+      node = {
+        enable = true;
+        enabledCollectors = [ "systemd" ];
+        port = 9002;
+      };
+    };
+    scrapeConfigs = [
+      {
+        job_name = "chrysalis";
+        static_configs = [{
+          targets = [ "localhost:${toString config.services.prometheus.exporters.node.port}" ];
+        }];
+      }
+      {
+        job_name = "greenhouse";
+        scrape_interval = "60s";
+        static_configs = [{
+          targets = [ "localhost:7000" ];
+        }];
+      }
+    ];
+  };
 }
