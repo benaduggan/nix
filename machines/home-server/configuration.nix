@@ -224,11 +224,18 @@
     };
   };
 
+  systemd.services.grafana.serviceConfig.EnvironmentFile = "/etc/default/grafana";
   services.grafana = {
     enable = true;
-    domain = "grafana.digdug.dev";
-    port = 2342;
-    addr = "0.0.0.0";
+    settings = {
+      security.allow_embedding = true;
+      server = {
+        domain = "grafana.digdug.dev";
+        http_port = 2342;
+        http_addr = "0.0.0.0";
+      };
+      smtp.enabled = true;
+    };
   };
 
   services.prometheus = {

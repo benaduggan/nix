@@ -9,6 +9,7 @@
 - supports emails
 - invite only
 - paid features (orgs/OTP/etc)
+- secret config at `etc/default/vaultwarden`
 
 ### how to restore from backup
 
@@ -18,3 +19,13 @@
 - cp the tar for date you want to restore from: `/etc/vault/backups` -> `/var/lib/bitwarden_rs`
 - unzip and mv all files into the data directory
 - start the vaultwarden service and verify
+
+## Grafana
+
+Secret config at `etc/default/grafana`
+
+### features
+
+- alerting (email)
+- greenhouse metrics and alerts
+- memory usage alerts
