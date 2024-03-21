@@ -72,7 +72,7 @@
     };
   };
 
-  security.pam.enableSudoTouchIdAuth = true;
+  # security.pam.enableSudoTouchIdAuth = true;
 
   homebrew = {
     global.autoUpdate = false;

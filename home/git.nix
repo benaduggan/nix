@@ -33,13 +33,17 @@ in
       putf = "put --force-with-lease";
       shake = "remote prune origin";
     };
+    difftastic = {
+      enable = true;
+      background = "dark";
+    };
     extraConfig = {
       color.ui = true;
       push.default = "simple";
       pull.ff = "only";
       core = {
         editor = "nano";
-        pager = "delta --dark";
+        # pager = "delta --dark";
       };
     };
   };

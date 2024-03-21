@@ -37,6 +37,7 @@ in
         gitAndTools.delta
         nixpkgs-fmt
         nil
+        difftastic
 
         (optList (!isMinimal) [
           (optList (isLinux && isGraphical) [
