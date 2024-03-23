@@ -195,6 +195,26 @@
       startAt = "*-*-* 02:00:00";
     };
 
+    engineer-on-deck = {
+      path = [ pkgs.gawk pkgs.gnugrep pkgs.curlMinimal ];
+      script = ''
+        # pull the schedule from google sheets
+        GOOGLE_PUBLIC_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTXlWwkEriyQZsuM1KxiYib3VaGZllqEENcA271YAOvZ5oAMUztbdecIAsGORZs_zWbAL5wb266-sHA/pub?gid=0&single=true&output=csv"
+        TMP_PATH=schedule.csv
+        TODAY=`date +"%-m/%-d/%Y"` # get the date without leading 0s
+        curl -L $GOOGLE_PUBLIC_URL -o $TMP_PATH
+        SLACK_ID=`cat $TMP_PATH | grep $TODAY | awk -F, '{print $3}'` # get the slack id from todays row
+        JSON='{"slack_user_id": "'$SLACK_ID'"}'
+        rm $TMP_PATH
+        curl -X POST -H "Content-type: application/json" -d "$JSON" https://hooks.slack.com/triggers/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
+      '';
+      serviceConfig = {
+        User = "root";
+        Type = "oneshot";
+      };
+      startAt = "Mon..Fri 09:50";
+    };
+
     greenhouse-service =
       let
         myPython = pkgs.python311.withPackages (p: with p; [
