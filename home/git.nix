@@ -20,6 +20,7 @@ in
       put = "!git push origin $(git branch-name)";
       # Pull without merging
       get = "!git pull origin $(git branch-name) --ff-only";
+      getr = "!git pull origin $(git branch-name) --rebase";
       # Pull Master without switching branches
       got =
         "!f() { CURRENT_BRANCH=$(git branch-name) && git checkout $1 && git pull origin $1 --ff-only && git checkout $CURRENT_BRANCH;  }; f";
