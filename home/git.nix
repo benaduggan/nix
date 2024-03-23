@@ -42,6 +42,7 @@ in
       color.ui = true;
       push.default = "simple";
       pull.ff = "only";
+      init.defaultBranch = "main";
       core = {
         editor = "nano";
         # pager = "delta --dark";
