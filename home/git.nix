@@ -45,7 +45,7 @@ in
       init.defaultBranch = "main";
       core = {
         editor = "nano";
-        # pager = "delta --dark";
+        pager = "delta --dark";
       };
     };
   };
