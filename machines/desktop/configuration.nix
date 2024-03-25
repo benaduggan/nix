@@ -1,4 +1,4 @@
-{ common, config, pkgs, ... }:
+{ common, config, lib, pkgs, ... }:
 {
   imports =
     [
@@ -23,7 +23,9 @@
 
   # Enable networking
   networking.networkmanager.enable = true;
-
+  systemd.services.NetworkManager-wait-online.enable = lib.mkForce false;
+  systemd.services.systemd-networkd-wait-online.enable = lib.mkForce false;
+  
   # Set your time zone.
   time.timeZone = "America/Indiana/Indianapolis";
 
@@ -130,6 +132,21 @@
   boot.kernel.sysctl."net.ipv4.conf.all.forwarding" = 1;
   boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
 
+  systemd.services = {
+    unifi-manager-service =
+      let
+        myPython = pkgs.python311.withPackages (p: with p; [
+          pydantic
+          pyunifi
+        ]);
+      in
+      {
+        path = [ myPython ];
+        wantedBy = [ "multi-user.target" ];
+        script = ''python /home/bduggan/unifi-manager/main.py'';
+        startAt = "*-*-* *:*:00";
+      };
+  };
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];

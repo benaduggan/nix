@@ -29,6 +29,12 @@
   swapDevices =
     [{ device = "/dev/disk/by-uuid/df10fe81-b939-4bd1-802d-af7bc6afdc91"; }];
 
+  fileSystems."/mnt/bigboi" = {
+    device = "/dev/disk/by-uuid/bf12a23a-3fe5-4e48-a8eb-dacda2a51249";
+    fsType = "btrfs";
+    options = [ "defaults" "noatime" "nodiratime" ];
+  };
+
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
   # still possible to use this option, but it's recommended to use it in conjunction
