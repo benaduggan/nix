@@ -184,7 +184,7 @@
         # cp "$DATA_FOLDER"/rsa_key.{der,pem,pub.der} "$BACKUP_FOLDER"
 
         ${pkgs.gnutar}/bin/tar czf "/etc/vault/backups/$PREFIX-vault-backup.tar.gz" $BACKUP_FOLDER
-        ${pkgs.openssh}/bin/scp -o UserKnownHostsFile=/home/${common.username}/.ssh/known_hosts -i /home/${common.username}/.ssh/id_ed25519 "/etc/vault/backups/$PREFIX-vault-backup.tar.gz" ${common.username}@bduggan-desktop:/home/${common.username}/vault-backups/
+        ${pkgs.openssh}/bin/scp -o UserKnownHostsFile=/home/${common.username}/.ssh/known_hosts -i /home/${common.username}/.ssh/id_ed25519 "/etc/vault/backups/$PREFIX-vault-backup.tar.gz" ${common.username}@bduggan-desktop:/mnt/bigboi/vault-backups/
 
         rm -rf $BACKUP_FOLDER
       '';

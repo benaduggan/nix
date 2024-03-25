@@ -24,6 +24,7 @@ in
         bash-completion
         coreutils-full
         curl
+        jnv
         jq
         lsof
         moreutils
