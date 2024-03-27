@@ -143,16 +143,14 @@ in
             git-trim
           ])
 
+          # (if isDarwin then [
+          #   llama-cpp
+          # ] else [ ])
+
           # jacobi's stuff
           (with jacobi; [
-            (if isDarwin then [
-              llama-cpp
-              # whisper-cpp
-            ] else [ ])
-
-            # llama-cpp
             # comcast
-            meme_sounds
+            # meme_sounds
             general_pog_scripts
             aws_pog_scripts
             nix_pog_scripts

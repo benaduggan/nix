@@ -43,6 +43,25 @@ in
 
       # add local scripts to path
       export PATH="$PATH:$HOME/.bin/:$HOME/.local/bin"
+
+      gu() {
+        MSG="guh"
+        if [ $# -gt 0 ] ; then
+          MSG="$@"
+        fi
+        git add -A
+        git commit -nm "$MSG"
+      }
+
+      guh() {
+        MSG="guh"
+        if [ $# -gt 0 ] ; then
+          MSG="$@"
+        fi
+        git add -A
+        git commit -nm "$MSG"
+        git put
+      }
     '';
   };
 }
