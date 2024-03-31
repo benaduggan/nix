@@ -282,6 +282,13 @@
           targets = [ "localhost:7000" ];
         }];
       }
+      {
+        job_name = "circuit";
+        scrape_interval = "60s";
+        static_configs = [{
+          targets = [ "192.168.0.216" ];
+        }];
+      }
     ];
   };
 }
