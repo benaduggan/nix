@@ -11,7 +11,6 @@
       ./hardware-configuration.nix
     ];
 
-  programs.nix-ld.enable = true;
   nix.settings.substituters = common.cacheSubstituters;
   nix.settings.trusted-public-keys = common.trustedPublicKeys;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
