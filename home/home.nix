@@ -44,7 +44,7 @@ in
           (optList (isLinux && isGraphical) [
             parsec-bin
             vlc
-            authy
+            # authy
             firefox
             discord
             spotify
