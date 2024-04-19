@@ -167,14 +167,23 @@
       '';
       virtualHosts = {
         # "digdug.dev/blog" = reverse_proxy "home-server:9000";
+        "lake.ha.digdug.dev".extraConfig = ''
+          reverse_proxy /* {
+            to bduggan-desktop:8123
+          }
+        '';
+        "fishers.ha.digdug.dev".extraConfig = ''
+          reverse_proxy /* {
+            to home-server:8123
+          }
+        '';
         "ai.digdug.dev".extraConfig = ''
           authorize with google_auth
 
           reverse_proxy /* {
-            to wsl:7860
+            to desktop-5su64sl:9090
           }
         '';
-
         "vault.digdug.dev".extraConfig = ''
           reverse_proxy /* {
             to home-server:8000
@@ -182,6 +191,13 @@
 
           reverse_proxy /notifications/hub {
             to home-server:3012
+          }
+        '';
+        "grafana.digdug.dev".extraConfig = ''
+          authorize with google_auth
+
+          reverse_proxy /* {
+            to home-server:2342
           }
         '';
         "greenhouse.digdug.dev".extraConfig = ''

@@ -45,3 +45,8 @@ this is what you'd need to do to get the brew command added to your path, but id
 ```
 echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/bduggan/.bash_profile
 ```
+
+# Fun hacks:
+
+Pipe sockets through to anything on the tailnet
+, socat TCP-LISTEN:"2022",fork,reuseaddr TCP:bduggan-framework:"22"
