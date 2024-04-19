@@ -14,7 +14,7 @@
   nix.settings.substituters = common.cacheSubstituters;
   nix.settings.trusted-public-keys = common.trustedPublicKeys;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
+  programs.nix-ld.enable = true;
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -290,5 +290,13 @@
         }];
       }
     ];
+  };
+
+  services.github-runners.home-server = {
+    enable = true;
+    extraLabels = [ "nix" ];
+    extraPackages = [ pkgs.gh pkgs.cachix ];
+    tokenFile = "/etc/nixos/magic-school-github-runner-token";
+    url = "https://github.com/MagicSchoolAi/MagicSchoolAi/";
   };
 }

@@ -14,6 +14,7 @@
     settings.trusted-public-keys = common.trustedPublicKeys;
     settings.experimental-features = [ "nix-command" "flakes" ];
   };
+  programs.nix-ld.enable = true;
 
   boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
   environment.systemPackages = with pkgs; [
