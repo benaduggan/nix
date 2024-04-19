@@ -9,9 +9,7 @@ guh why is my username benduggan
 nix run nix-darwin -- switch --flake .
 ```
 
-
 # Bootstrapping
-
 
 I didn't really do a good job of keeping track of what I did here, but I did follow this video
 https://www.youtube.com/watch?v=KJgN0lnA5mk

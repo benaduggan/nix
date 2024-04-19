@@ -17,7 +17,7 @@
   programs.nix-ld.enable = true;
 
   boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
-  boot.loader.grub.devices = ["/dev/vda"];
+  boot.loader.grub.devices = [ "/dev/vda" ];
   environment.systemPackages = with pkgs; [
     bashInteractive
     bash-completion
