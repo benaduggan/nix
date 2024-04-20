@@ -39,6 +39,10 @@ in
         nixpkgs-fmt
         nil
         difftastic
+        (optList isLinux [
+          gnutar
+          man-pages
+        ])
 
         (optList (!isMinimal) [
           (optList (isLinux && isGraphical) [
@@ -80,7 +84,6 @@ in
           gnumake
           gnugrep
           gnused
-          gnutar
           gron
           gzip
           less
@@ -88,7 +91,6 @@ in
           libnotify
           lolcat
           loop
-          man-pages
           netcat-gnu
           nix-direnv
           nix-info
