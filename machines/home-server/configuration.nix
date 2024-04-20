@@ -292,11 +292,20 @@
     ];
   };
 
-  services.github-runners.home-server = {
-    enable = true;
-    extraLabels = [ "nix" ];
-    extraPackages = [ pkgs.gh pkgs.cachix ];
-    tokenFile = "/etc/nixos/magic-school-github-runner-token";
-    url = "https://github.com/MagicSchoolAi/MagicSchoolAi/";
+  services.github-runners = {
+    home-server = {
+      enable = true;
+      extraLabels = [ "nix" ];
+      extraPackages = with pkgs; [ gh cachix nodejs_20 corepack_20 gnused ];
+      tokenFile = "/etc/nixos/magic-school-github-runner-token";
+      url = "https://github.com/MagicSchoolAi/MagicSchoolAi/";
+    };
+    nix-repo = {
+      enable = true;
+      extraLabels = [ "nix" ];
+      extraPackages = with pkgs; [ gh cachix ];
+      tokenFile = "/etc/nixos/nix-repo-github-runner-token";
+      url = "https://github.com/benaduggan/nix";
+    };
   };
 }

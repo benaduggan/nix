@@ -34,6 +34,7 @@
     };
   };
 
+  # deadnix: skip
   outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi, devenv, nixos-hardware, vscode-server, nixos-generators }:
     let
       inherit (nixpkgs) lib;

@@ -1,0 +1,26 @@
+name: build
+on: { workflow_dispatch, push }
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        system: [{ os: Linux, arch: X64 }, { os: macOS, arch: ARM64 }]
+    name: "${{ matrix.system.os }} ${{ matrix.system.arch }}"
+    runs-on: [nix, "${{ matrix.system.os }}", "${{ matrix.system.arch }}"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v26
+      - run: nix -L --show-trace build
+      # figure this out in the future
+      # - run: nix -L build .#checks.default
+      # - run: ./result/bin/checks
+      - name: "cachix only on main"
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cachix authtoken '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          cachix push benaduggan ./result
+          cd ./result/builds
+          for build in *;do
+            cachix pin benaduggan $GITHUB_SHA-$build $(realpath $build) --keep-days 3
+          done
