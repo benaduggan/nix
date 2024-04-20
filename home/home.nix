@@ -59,7 +59,6 @@ in
 
           (optList isDarwin [
             m-cli
-            supabase-cli
             (writeShellScriptBin "open-docker" ''
               open --hide --background -a Docker
             '')
@@ -71,8 +70,6 @@ in
           bc
           bzip2
           cachix
-          cowsay
-          deno
           diffutils
           dos2unix
           ed
@@ -132,13 +129,15 @@ in
           xxd
           xz
           zip
+          (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
 
-          common.devenv
+
+          # common.devenv
 
           # # chief keef's stuff
           (with kwbauson; [
             better-comma
-            nle
+            # nle
             fordir
             git-trim
           ])
@@ -149,8 +148,6 @@ in
 
           # jacobi's stuff
           (with jacobi; [
-            # comcast
-            # meme_sounds
             general_pog_scripts
             aws_pog_scripts
             nix_pog_scripts
@@ -160,7 +157,6 @@ in
             dshell
             _dex
             nixup
-            (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
           ])
         ])
 

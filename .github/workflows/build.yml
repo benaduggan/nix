@@ -24,7 +24,7 @@ jobs:
         run: |
           cachix authtoken '${{ secrets.CACHIX_AUTH_TOKEN }}'
           cachix push benaduggan ./result
-          cd ./result/builds
+          cd ./result
           for build in *;do
             cachix pin benaduggan $GITHUB_SHA-$build $(realpath $build) --keep-days 3
           done
