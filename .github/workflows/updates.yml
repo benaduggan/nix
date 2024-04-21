@@ -1,0 +1,26 @@
+name: updates
+on:
+  workflow_dispatch:
+    inputs:
+      source: { type: string }
+  schedule: [cron: "0 0 * * 0"]
+jobs:
+  updates:
+    runs-on: [nix, Linux, X64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v26
+        with:
+          extra_nix_config: |
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= benaduggan.cachix.org-1:BY2tmi++VqJD6My4kB/dXGfxT7nJqrOtRVNn9UhgrHE= devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw= jacobi.cachix.org-1:JJghCz+ZD2hc9BHO94myjCzf4wS3DeBLKHOz3jCukMU= kwbauson.cachix.org-1:a6RuFyeJKSShV8LAUw3Jx8z48luiCU755DkweAAkwX0=
+            substituters = https://cache.nixos.org/ https://benaduggan.cachix.org https://devenv.cachix.org https://jacobi.cachix.org https://kwbauson.cachix.org
+      - run: |
+          nix flake update
+          nix -L --show-trace build
+      - uses: peter-evans/create-pull-request@v6.0.4
+        with:
+          author: Ben Duggan <benaduggan@gmail.com>
+          title: "Flake update"
+          commit-message: "Update flake.lock"
+          branch: updates-all
+          token: ${{ secrets.PAT }}
