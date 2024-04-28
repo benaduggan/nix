@@ -97,8 +97,8 @@
     ];
   };
 
-  services.xserver.displayManager.autoLogin.enable = true;
-  services.xserver.displayManager.autoLogin.user = common.username;
+  services.displayManager.autoLogin.enable = true;
+  services.displayManager.autoLogin.user = common.username;
   nixpkgs.config.allowUnfree = true;
 
   # Some programs need SUID wrappers, can be configured further or are
