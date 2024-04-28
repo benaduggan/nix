@@ -19,8 +19,8 @@ jobs:
       # figure this out in the future
       # - run: nix -L build .#checks.default
       # - run: ./result/bin/checks
-      - name: "cachix only on main"
-        if: github.ref == 'refs/heads/main'
+      - name: "cachix only on main and updates-all branches"
+        if: github.ref == 'refs/heads/main' || github.base_ref == 'updates-all'
         run: |
           cachix authtoken '${{ secrets.CACHIX_AUTH_TOKEN }}'
           cachix push benaduggan ./result
