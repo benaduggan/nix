@@ -148,6 +148,22 @@
         startAt = "*-*-* *:*:00";
       };
   };
+
+  virtualisation.docker.enable = true;
+  users.extraGroups.docker.members = [ common.username ];
+  virtualisation.oci-containers = {
+    backend = "docker";
+
+    containers.homeassistant = {
+      volumes = [ "home-assistant:/config" ];
+      environment.TZ = "US/Eastern";
+      image = "ghcr.io/home-assistant/home-assistant:2024.3.0";
+      extraOptions = [
+        "--network=host"
+      ];
+    };
+  };
+
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
