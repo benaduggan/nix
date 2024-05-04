@@ -23,7 +23,7 @@
     secrets = {
       board.file = ../../secrets/board.age;
       caddy = {
-        file = ../../secrets/board.age;
+        file = ../../secrets/caddy.age;
         path = "/etc/default/caddy";
         owner = "root";
         group = "root";
