@@ -306,10 +306,11 @@
   };
 
   services.github-runners = {
-    home-server = {
+    magic = {
       enable = true;
       extraLabels = [ "nix" ];
       extraPackages = with pkgs; [ gh cachix nodejs_20 corepack_20 gnused ];
+      replace = true;
       tokenFile = "/etc/nixos/magic-school-github-runner-token";
       # tokenFile = config.age.secrets.magicRunnerToken.path;
       url = "https://github.com/MagicSchoolAi/MagicSchoolAi/";
@@ -318,6 +319,7 @@
       enable = true;
       extraLabels = [ "nix" ];
       extraPackages = with pkgs; [ gh cachix ];
+      replace = true;
       # tokenFile = config.age.secrets.homeRunnerToken.path;
       tokenFile = "/etc/nixos/nix-repo-github-runner-token";
       url = "https://github.com/benaduggan/nix";
