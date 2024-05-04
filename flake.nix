@@ -32,10 +32,15 @@
       url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   # deadnix: skip
-  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi, devenv, nixos-hardware, vscode-server, nixos-generators }:
+  outputs = inputs@{ self, agenix, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi, devenv, nixos-hardware, vscode-server, nixos-generators }:
     let
       inherit (nixpkgs) lib;
       inherit (nix-darwin.lib) darwinSystem;
@@ -126,6 +131,7 @@
           system = "x86_64-linux";
           modules = [
             common
+            agenix.nixosModules.default
             ./machines/home-server/configuration.nix
             vscode-server.nixosModule
             (_: {
@@ -153,6 +159,7 @@
           system = "x86_64-linux";
           modules = [
             common
+            agenix.nixosModules.default
             ./machines/desktop/configuration.nix
             vscode-server.nixosModule
             (_: {
@@ -181,6 +188,7 @@
           specialArgs = { inherit inputs; };
           modules = [
             common
+            agenix.nixosModules.default
             ./machines/digdugdev/configuration.nix
             home-manager.nixosModules.home-manager
             vscode-server.nixosModule

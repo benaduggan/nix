@@ -20,6 +20,7 @@ in
     packages = with lib;
       with pkgs;
       lib.flatten [
+        common.agenix
         bashInteractive
         bash-completion
         coreutils-full
