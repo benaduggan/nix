@@ -21,8 +21,9 @@
   age = {
     identityPaths = [ "/home/bduggan/.ssh/id_ed25519" ];
     secrets = {
-      board = {
-        file = ../../secrets/caddy.age;
+      board.file = ../../secrets/board.age;
+      caddy = {
+        file = ../../secrets/board.age;
         path = "/etc/default/caddy";
         owner = "root";
         group = "root";
