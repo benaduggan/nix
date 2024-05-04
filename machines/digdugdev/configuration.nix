@@ -1,4 +1,4 @@
-{ common, pkgs, modulesPath, lib, ... }:
+{ common, config, pkgs, modulesPath, lib, ... }:
 {
   imports = lib.optional (builtins.pathExists ./do-userdata.nix) ./do-userdata.nix ++ [
     (modulesPath + "/virtualisation/digital-ocean-config.nix")
@@ -17,6 +17,19 @@
   programs.nix-ld.enable = true;
 
   boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
+
+  age = {
+    identityPaths = [ "/home/bduggan/.ssh/id_ed25519" ];
+    secrets = {
+      board = {
+        file = ../../secrets/board.age;
+        path = "/etc/default/caddy";
+        owner = "root";
+        group = "root";
+        mode = "644";
+      };
+    };
+  };
 
   environment.systemPackages = with pkgs; [
     bashInteractive
@@ -263,7 +276,10 @@
       script = ''
         HTML_OUTPUT_PATH=/var/www/index.html
         QOUTES_PATH=/var/www/quotes.txt
-        GOOGLE_PUBLIC_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRhHICyPYgKftARlVQvVwd2HVFf7FyNXu7OcA7FLTcyGilGu_1p9tgN9msoH3D479tbT56VD864Whwl/pub?gid=1741542806&single=true&output=tsv"
+
+        # get the google sheet url from agenix secret
+        export $(${pkgs.gnugrep}/bin/grep -v '^#' ${config.age.secrets.board.path} | xargs)
+
 
         # Fetch the latest quotes from google drive
         curl -L $GOOGLE_PUBLIC_URL -o $QOUTES_PATH

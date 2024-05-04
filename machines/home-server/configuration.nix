@@ -21,6 +21,18 @@
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
   networking.hostName = "home-server"; # Define your hostname.
+
+  age = {
+    identityPaths = [ "/home/bduggan/.ssh/id_ed25519" ];
+    secrets = {
+      grafana.file = ../../secrets/grafana.age;
+      vaultwarden.file = ../../secrets/vaultwarden.age;
+      ondeck.file = ../../secrets/ondeck-vars.age;
+
+      magicRunnerToken.file = ../../secrets/home-magic-runner.age;
+      homeRunnerToken.file = ../../secrets/home-self-runner.age;
+    };
+  };
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -122,7 +134,7 @@
 
   services.vaultwarden = {
     enable = true;
-    environmentFile = "/etc/default/vaultwarden"; # extra secrets in here for email
+    environmentFile = config.age.secrets.vaultwarden.path; # extra secrets in here for email
     config = {
       ROCKET_ADDRESS = "0.0.0.0";
       DOMAIN = "https://vault.digdug.dev";
@@ -198,15 +210,16 @@
     engineer-on-deck = {
       path = [ pkgs.gawk pkgs.gnugrep pkgs.curlMinimal ];
       script = ''
-        # pull the schedule from google sheets
-        GOOGLE_PUBLIC_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTXlWwkEriyQZsuM1KxiYib3VaGZllqEENcA271YAOvZ5oAMUztbdecIAsGORZs_zWbAL5wb266-sHA/pub?gid=0&single=true&output=csv"
+        # get the google sheet url and slack webhook url from secrets
+        export $(${pkgs.gnugrep}/bin/grep -v '^#' ${config.age.secrets.ondeck.path} | xargs)
+
         TMP_PATH=schedule.csv
         TODAY=`date +"%-m/%-d/%Y"` # get the date without leading 0s
         curl -L $GOOGLE_PUBLIC_URL -o $TMP_PATH
         SLACK_ID=`cat $TMP_PATH | grep $TODAY | awk -F, '{print $3}'` # get the slack id from todays row
         JSON='{"slack_user_id": "'$SLACK_ID'"}'
         rm $TMP_PATH
-        curl -X POST -H "Content-type: application/json" -d "$JSON" https://hooks.slack.com/triggers/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
+        curl -X POST -H "Content-type: application/json" -d "$JSON" $SLACK_WEBHOOK_URL
       '';
       serviceConfig = {
         User = "root";
@@ -237,14 +250,14 @@
     containers.homeassistant = {
       volumes = [ "home-assistant:/config" ];
       environment.TZ = "US/Eastern";
-      image = "ghcr.io/home-assistant/home-assistant:2024.3.0";
+      image = "ghcr.io/home-assistant/home-assistant:2024.5.0";
       extraOptions = [
         "--network=host"
       ];
     };
   };
 
-  systemd.services.grafana.serviceConfig.EnvironmentFile = "/etc/default/grafana";
+  systemd.services.grafana.serviceConfig.EnvironmentFile = config.age.secrets.grafana.path;
   services.grafana = {
     enable = true;
     settings = {
@@ -298,12 +311,14 @@
       extraLabels = [ "nix" ];
       extraPackages = with pkgs; [ gh cachix nodejs_20 corepack_20 gnused ];
       tokenFile = "/etc/nixos/magic-school-github-runner-token";
+      # tokenFile = config.age.secrets.magicRunnerToken.path;
       url = "https://github.com/MagicSchoolAi/MagicSchoolAi/";
     };
     nix-repo = {
       enable = true;
       extraLabels = [ "nix" ];
       extraPackages = with pkgs; [ gh cachix ];
+      # tokenFile = config.age.secrets.homeRunnerToken.path;
       tokenFile = "/etc/nixos/nix-repo-github-runner-token";
       url = "https://github.com/benaduggan/nix";
     };
