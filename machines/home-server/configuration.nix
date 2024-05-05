@@ -29,8 +29,14 @@
       vaultwarden.file = ../../secrets/vaultwarden.age;
       ondeck.file = ../../secrets/ondeck-vars.age;
 
-      magicRunnerToken.file = ../../secrets/home-magic-runner.age;
-      homeRunnerToken.file = ../../secrets/home-self-runner.age;
+      magicRunnerToken = {
+        file = ../../secrets/home-magic-runner.age;
+        mode = "644";
+      };
+      homeRunnerToken = {
+        file = ../../secrets/home-self-runner.age;
+        mode = "644";
+      };
     };
   };
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -311,8 +317,7 @@
       extraLabels = [ "nix" ];
       extraPackages = with pkgs; [ gh cachix nodejs_20 corepack_20 gnused ];
       replace = true;
-      tokenFile = "/etc/nixos/magic-school-github-runner-token";
-      # tokenFile = config.age.secrets.magicRunnerToken.path;
+      tokenFile = config.age.secrets.magicRunnerToken.path;
       url = "https://github.com/MagicSchoolAi/MagicSchoolAi/";
     };
     nix-repo = {
@@ -320,8 +325,7 @@
       extraLabels = [ "nix" ];
       extraPackages = with pkgs; [ gh cachix ];
       replace = true;
-      # tokenFile = config.age.secrets.homeRunnerToken.path;
-      tokenFile = "/etc/nixos/nix-repo-github-runner-token";
+      tokenFile = config.age.secrets.homeRunnerToken.path;
       url = "https://github.com/benaduggan/nix";
     };
   };
