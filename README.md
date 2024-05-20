@@ -50,3 +50,5 @@ echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/bduggan/.bash_profile
 
 Pipe sockets through to anything on the tailnet
 , socat TCP-LISTEN:"2022",fork,reuseaddr TCP:bduggan-framework:"22"
+
+don't forget to make sure the port is open through the firewall!
