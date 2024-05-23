@@ -86,10 +86,10 @@
     brews = [ "readline" "qemu" ];
 
     taps = [
-      "homebrew/cask"
-      "homebrew/cask-fonts"
-      "homebrew/cask-versions"
-      "homebrew/core"
+      # "homebrew/cask"
+      # "homebrew/cask-fonts"
+      # "homebrew/cask-versions"
+      # "homebrew/core"
       "homebrew/services"
     ];
 
