@@ -93,6 +93,21 @@
               }
             ];
           };
+
+          magic-mbp = lib.makeOverridable darwinSystem {
+            system = "aarch64-darwin";
+            modules = [
+              common
+              ./machines/magic-mbp/darwin-configuration.nix
+              home-manager.darwinModules.home-manager
+              {
+                nixpkgs = nixpkgsConfig;
+                home-manager.useGlobalPkgs = true;
+                home-manager.useUserPackages = true;
+                home-manager.users.bduggan = { imports = [ common ./home ]; };
+              }
+            ];
+          };
         };
 
       nixosConfigurations.bduggan-framework =
