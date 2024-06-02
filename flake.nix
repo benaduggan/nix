@@ -76,20 +76,21 @@
 
       darwinConfigurations =
         let
-          common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; inherit devenv; };
+          commonMbp = import ./common.nix { machineName = "paper"; isGraphical = true; isMinimal = false; inherit inputs; inherit devenv; };
+          commonMagic = import ./common.nix { machineName = "magicMbp"; isGraphical = true; isMinimal = false; inherit inputs; inherit devenv; };
         in
         {
           us-mbp-benduggan = lib.makeOverridable darwinSystem {
             system = "aarch64-darwin";
             modules = [
-              common
+              commonMbp
               ./machines/paper/darwin-configuration.nix
               home-manager.darwinModules.home-manager
               {
                 nixpkgs = nixpkgsConfig;
                 home-manager.useGlobalPkgs = true;
                 home-manager.useUserPackages = true;
-                home-manager.users.benduggan = { imports = [ common ./home ]; };
+                home-manager.users.benduggan = { imports = [ commonMbp ./home ]; };
               }
             ];
           };
@@ -97,14 +98,14 @@
           magic-mbp = lib.makeOverridable darwinSystem {
             system = "aarch64-darwin";
             modules = [
-              common
+              commonMagic
               ./machines/magic-mbp/darwin-configuration.nix
               home-manager.darwinModules.home-manager
               {
                 nixpkgs = nixpkgsConfig;
                 home-manager.useGlobalPkgs = true;
                 home-manager.useUserPackages = true;
-                home-manager.users.bduggan = { imports = [ common ./home ]; };
+                home-manager.users.bduggan = { imports = [ commonMagic ./home ]; };
               }
             ];
           };
@@ -112,7 +113,7 @@
 
       nixosConfigurations.bduggan-framework =
         let
-          common = import ./common.nix { isGraphical = true; isMinimal = false; inherit inputs; inherit devenv; };
+          common = import ./common.nix { machineName = "framework"; isGraphical = true; isMinimal = false; inherit inputs; inherit devenv; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -140,7 +141,7 @@
 
       nixosConfigurations.home-server =
         let
-          common = import ./common.nix { isGraphical = false; isMinimal = false;  inherit inputs; inherit devenv; };
+          common = import ./common.nix { machineName = "homeServer"; isGraphical = false; isMinimal = false;  inherit inputs; inherit devenv; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -168,7 +169,7 @@
 
       nixosConfigurations.bduggan-desktop =
         let
-          common = import ./common.nix { isGraphical = false; isMinimal = false;  inherit inputs; inherit devenv; };
+          common = import ./common.nix { machineName = "lake"; isGraphical = false; isMinimal = false;  inherit inputs; inherit devenv; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -196,7 +197,7 @@
 
       nixosConfigurations.digdugdev =
         let
-          common = import ./common.nix { isGraphical = false; isMinimal = true;  inherit inputs; inherit devenv; };
+          common = import ./common.nix { machineName = "digdugdev"; isGraphical = false; isMinimal = true;  inherit inputs; inherit devenv; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";

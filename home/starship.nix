@@ -28,7 +28,6 @@ in
 
       # disabled plugins
       aws.disabled = true;
-      cmd_duration.disabled = true;
       gcloud.disabled = true;
       package.disabled = true;
     };
