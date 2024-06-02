@@ -13,7 +13,7 @@ in
     firstName = "Ben";
     lastName = "Duggan";
     username = "bduggan";
-    stateVersion = "23.05";
+    stateVersion = "24.05";
 
     jacobi = inputs.jacobi.packages.${pkgs.system};
     kwbauson = inputs.kwbauson.packages.${pkgs.system};
