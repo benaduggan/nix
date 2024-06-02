@@ -44,6 +44,9 @@ in
       # add local scripts to path
       export PATH="$PATH:$HOME/.bin/:$HOME/.local/bin"
 
+      mkdir -p $HOME/.completions
+      source $HOME/.completions/*
+
       gu() {
         MSG="guh"
         if [ $# -gt 0 ] ; then

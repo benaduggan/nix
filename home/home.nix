@@ -23,6 +23,7 @@ in
         common.agenix
         bashInteractive
         bash-completion
+        pnpm-shell-completion
         coreutils-full
         curl
         jnv
@@ -69,6 +70,7 @@ in
             '')
           ])
 
+          esbuild
           amazon-ecr-credential-helper
           atool
           bat
