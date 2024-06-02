@@ -68,6 +68,6 @@
     tailscale.enable = true;
   };
 
-  system.stateVersion = "23.05";
+  system.stateVersion = "24.05";
   programs.command-not-found.enable = false;
 }
