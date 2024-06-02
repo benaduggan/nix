@@ -1,14 +1,16 @@
-{ isGraphical, isMinimal, inputs, devenv }:
+{ machineName, isGraphical, isMinimal, inputs, devenv }:
 { pkgs, ... }:
 let
   constants = import ./constants.nix;
 in
 {
   _module.args.common = {
-    inherit (constants) authorizedKeys cacheSubstituters trustedPublicKeys;
+    inherit (constants) authorizedKeys authorizedKeysRec cacheSubstituters trustedPublicKeys;
     inherit (pkgs.stdenv) isLinux isDarwin;
     inherit isGraphical;
     inherit isMinimal;
+    inherit machineName;
+
     email = "benaduggan@gmail.com";
     firstName = "Ben";
     lastName = "Duggan";

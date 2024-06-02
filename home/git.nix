@@ -1,13 +1,17 @@
 { pkgs, common, ... }:
 let
-  inherit (common) firstName lastName email;
+  inherit (common) firstName lastName email authorizedKeysRec machineName;
 in
 {
+  home.file.".ssh/allowed_signers".text = "* ${authorizedKeysRec.${machineName}}";
   programs.git = {
     enable = true;
     package = pkgs.gitAndTools.gitFull;
     userName = "${firstName} ${lastName}";
     userEmail = email;
+    signing.signByDefault = true;
+    signing.key = "~/.ssh/id_ed25519.pub";
+
     aliases = {
       co = "checkout";
       cam = "commit -am";
@@ -47,6 +51,9 @@ in
         editor = "nano";
         pager = "delta --dark";
       };
+      commit.gpgsign = true;
+      gpg.format = "ssh";
+      gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
     };
   };
 }
