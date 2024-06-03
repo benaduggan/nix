@@ -188,7 +188,7 @@
         '';
         "fishers.ha.digdug.dev".extraConfig = ''
           reverse_proxy /* {
-            to home-server:8123
+            to home-server-1:8123
           }
         '';
         "ai.digdug.dev".extraConfig = ''
@@ -200,25 +200,25 @@
         '';
         "vault.digdug.dev".extraConfig = ''
           reverse_proxy /* {
-            to home-server:8000
+            to home-server-1:8000
           }
 
           reverse_proxy /notifications/hub {
-            to home-server:3012
+            to home-server-1:3012
           }
         '';
         "grafana.digdug.dev".extraConfig = ''
           authorize with google_auth
 
           reverse_proxy /* {
-            to home-server:2342
+            to home-server-1:2342
           }
         '';
         "greenhouse.digdug.dev".extraConfig = ''
           authorize with google_auth
 
           reverse_proxy /* {
-            to home-server:7000
+            to home-server-1:7000
           }
         '';
         "auth.digdug.dev".extraConfig = ''
