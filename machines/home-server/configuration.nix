@@ -18,7 +18,7 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.efi.efiSysMountPoint = "/boot/efi";
+  boot.loader.efi.efiSysMountPoint = "/boot";
 
   networking.hostName = "home-server"; # Define your hostname.
 
@@ -68,11 +68,11 @@
   };
 
   # Enable the X11 windowing system.
-  services.xserver.enable = true;
+  services.xserver.enable = false;
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.displayManager.gdm.enable = false;
+  services.xserver.desktopManager.gnome.enable = false;
 
   # Configure keymap in X11
   services.xserver = {
@@ -196,7 +196,6 @@
         ${pkgs.sqlite}/bin/sqlite3 "$DATA_FOLDER"/db.sqlite3 ".backup '$BACKUP_FOLDER/db.sqlite3'"
         cp -r "$DATA_FOLDER"/attachments "$BACKUP_FOLDER"
         cp -r "$DATA_FOLDER"/sends "$BACKUP_FOLDER"
-        cp -r "$DATA_FOLDER"/icon_cache "$BACKUP_FOLDER"
 
         # Used to sign JWTs of logged in users. Deleting logs out users
         # cp "$DATA_FOLDER"/rsa_key.{der,pem,pub.der} "$BACKUP_FOLDER"
