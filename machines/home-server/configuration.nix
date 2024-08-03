@@ -266,26 +266,50 @@
     enable = true;
     settings = {
       security.allow_embedding = true;
+      smtp.enabled = true;
       server = {
         domain = "grafana.digdug.dev";
-        http_port = 2342;
+        http_port = common.ports.grafana;
         http_addr = "0.0.0.0";
       };
-      smtp.enabled = true;
+    };
+    provision = {
+      enable = true;
+      datasources.settings.datasources = [
+        {
+          name = "Prometheus";
+          type = "prometheus";
+          access = "proxy";
+          url = "http://localhost:${toString common.ports.prometheus}";
+          isDefault = true;
+        }
+        {
+          name = "Loki";
+          type = "loki";
+          access = "proxy";
+          url = "http://localhost:${toString common.ports.loki}";
+        }
+      ];
     };
   };
 
   services.prometheus = {
     enable = true;
-    port = 2343;
+    port = common.ports.prometheus;
     exporters = {
       node = {
         enable = true;
         enabledCollectors = [ "systemd" ];
-        port = 9002;
+        port = common.ports.prometheus_node_exporter;
       };
     };
     scrapeConfigs = [
+      {
+        job_name = "Loki service";
+        static_configs = [{
+          targets = [ "127.0.0.1:${toString common.ports.loki}" ];
+        }];
+      }
       {
         job_name = "chrysalis";
         static_configs = [{
@@ -307,6 +331,74 @@
         }];
       }
     ];
+  };
+
+  services.loki = {
+    enable = true;
+    configuration = {
+      server.http_listen_port = common.ports.loki;
+      auth_enabled = false;
+      ingester = {
+        lifecycler = {
+          address = "127.0.0.1";
+          ring = {
+            kvstore = {
+              store = "inmemory";
+            };
+            replication_factor = 1;
+          };
+        };
+        chunk_idle_period = "1h";
+        max_chunk_age = "1h";
+        chunk_target_size = 999999;
+        chunk_retain_period = "30s";
+      };
+
+      schema_config = {
+        configs = [{
+          from = "2022-06-06";
+          store = "tsdb";
+          object_store = "filesystem";
+          schema = "v13";
+          index = {
+            prefix = "index_";
+            period = "24h";
+          };
+        }];
+      };
+
+      storage_config = {
+        tsdb_shipper = {
+          active_index_directory = "/var/lib/loki/tsdb-index";
+          cache_location = "/var/lib/loki/tsdb-cache";
+        };
+
+        filesystem = {
+          directory = "/var/lib/loki/chunks";
+        };
+      };
+
+      limits_config = {
+        reject_old_samples = true;
+        reject_old_samples_max_age = "168h";
+      };
+
+      table_manager = {
+        retention_deletes_enabled = false;
+        retention_period = "0s";
+      };
+
+      compactor = {
+        working_directory = "/var/lib/loki";
+        compactor_ring = {
+          kvstore = {
+            store = "inmemory";
+          };
+        };
+      };
+      query_scheduler.max_outstanding_requests_per_tenant = 32768;
+      querier.max_concurrent = 16;
+    };
   };
 
   services.github-runners = {

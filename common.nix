@@ -22,6 +22,18 @@ in
     inherit (devenv.packages.${pkgs.system}) devenv;
     agenix = inputs.agenix.packages.${pkgs.system}.default;
 
+    ports = {
+      ssh = 22;
+      http = 80;
+      https = 443;
+
+      grafana = 2342;
+      prometheus = 2343;
+      loki = 3100;
+      home-assistant = 8123;
+      prometheus_node_exporter = 9002;
+      promtail = 9080;
+    };
 
   };
 }
