@@ -151,7 +151,7 @@
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
-        ExecStart = ''/home/bduggan/unifi-manager/jsongorter -file /data.json -ignore name -prefix "unifi_manager"'';
+        ExecStart = ''/home/bduggan/unifi-manager/jsongorter -file /data.json -ignore name -prefix "unifi_manager_"'';
         Restart = "on-failure";
       };
     };
