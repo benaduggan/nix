@@ -311,6 +311,12 @@
         }];
       }
       {
+        job_name = "Unifi Manager";
+        static_configs = [{
+          targets = [ "bduggan-desktop:8080" ];
+        }];
+      }
+      {
         job_name = "chrysalis";
         static_configs = [{
           targets = [ "localhost:${toString config.services.prometheus.exporters.node.port}" ];
