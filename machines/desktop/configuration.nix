@@ -146,6 +146,15 @@
         script = ''python /home/bduggan/unifi-manager/main.py'';
         startAt = "*-*-* *:*:00";
       };
+
+    unifi-manager-exporter-service = {
+      after = [ "network.target" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        ExecStart = ''/home/bduggan/unifi-manager/jsongorter -file /data.json -ignore name -prefix "unifi_manager"'';
+        Restart = "on-failure";
+      };
+    };
   };
 
   virtualisation.docker.enable = true;
