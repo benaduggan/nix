@@ -181,6 +181,16 @@
       '';
       virtualHosts = {
         # "digdug.dev/blog" = reverse_proxy "home-server:9000";
+        "arden.ha.digdug.dev".extraConfig = ''
+          reverse_proxy /* {
+            to arden:8123
+          }
+        '';
+        "springfield.ha.digdug.dev".extraConfig = ''
+          reverse_proxy /* {
+            to springfield:8123
+          }
+        '';
         "lake.ha.digdug.dev".extraConfig = ''
           reverse_proxy /* {
             to bduggan-desktop:8123
