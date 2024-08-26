@@ -7,6 +7,7 @@ let
     magicMbp = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIArr/sVKrsd6nlkdsbsn759Tvzwnp5cnwDo70xgNB2bY";
     digdugdev = "omit-for-security";
     homeServer = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINVM1Pr/o+daMn1ElHm/A0gCyR6t85ZuP3LRkhIJFiF1";
+    springfield = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFulKxPMuKmSevjxb6rhhcxKP1tmbqD6tlS0eXE99JwU";
   };
 
   authorizedKeys = builtins.attrValues authorizedKeysRec;
