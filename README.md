@@ -31,6 +31,8 @@ do the things it needs for configuring
 
 make a new block in flake.nix for the new machine
 
+add a new ssh key for this machine's name
+
 nixos-rebuild build --flake .#{new machine}
 if it works, switch!
 
@@ -52,3 +54,12 @@ Pipe sockets through to anything on the tailnet
 , socat TCP-LISTEN:"2022",fork,reuseaddr TCP:bduggan-framework:"22"
 
 don't forget to make sure the port is open through the firewall!
+
+
+# Preconfigure wifi networks
+
+```bash
+nmcli connection add type wifi ifname wlp3s0 con-name "SSID" ssid "SSID" -- wifi.hidden yes
+nmcli connection modify "SSID" wifi-sec.key-mgmt wpa-psk
+nmcli connection modify "SSID" wifi-sec.psk "password"
+```
