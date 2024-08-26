@@ -1,5 +1,6 @@
 let
   authorizedKeysRec = {
+    arden = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMWjeSxvFWsw1nBAPIVY1cGMEcCpPdUIysmy0u4ZVYOK";
     desktop = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDAQ6BX5+xivdRw7p5jvXlnbgpVk4xqYazb+bN7tvPrq";
     framework = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJDt0C828UN+hwHBinQUXtOiOBB4apm5bEDK1XUVXVlU";
     lake = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMhq0qLYZCcWbgpRel02St/AxCsx7K9aufhiKXzkG3TM";
@@ -7,6 +8,7 @@ let
     magicMbp = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIArr/sVKrsd6nlkdsbsn759Tvzwnp5cnwDo70xgNB2bY";
     digdugdev = "omit-for-security";
     homeServer = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINVM1Pr/o+daMn1ElHm/A0gCyR6t85ZuP3LRkhIJFiF1";
+    springfield = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFulKxPMuKmSevjxb6rhhcxKP1tmbqD6tlS0eXE99JwU";
   };
 
   authorizedKeys = builtins.attrValues authorizedKeysRec;

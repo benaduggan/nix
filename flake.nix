@@ -195,6 +195,62 @@
           ];
         };
 
+      nixosConfigurations.arden =
+        let
+          common = import ./common.nix { machineName = "arden"; isGraphical = false; isMinimal = false;  inherit inputs; inherit devenv; };
+        in
+        nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            common
+            agenix.nixosModules.default
+            ./machines/arden/configuration.nix
+            vscode-server.nixosModule
+            (_: {
+              services.vscode-server.enable = true;
+            })
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useUserPackages = true;
+              home-manager.useGlobalPkgs = true;
+              home-manager.users.bduggan = {
+                imports = [
+                  common
+                  ./home
+                ];
+              };
+            }
+          ];
+        };
+
+      nixosConfigurations.springfield =
+        let
+          common = import ./common.nix { machineName = "springfield"; isGraphical = false; isMinimal = false;  inherit inputs; inherit devenv; };
+        in
+        nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            common
+            agenix.nixosModules.default
+            ./machines/springfield/configuration.nix
+            vscode-server.nixosModule
+            (_: {
+              services.vscode-server.enable = true;
+            })
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useUserPackages = true;
+              home-manager.useGlobalPkgs = true;
+              home-manager.users.bduggan = {
+                imports = [
+                  common
+                  ./home
+                ];
+              };
+            }
+          ];
+        };
+
       nixosConfigurations.digdugdev =
         let
           common = import ./common.nix { machineName = "digdugdev"; isGraphical = false; isMinimal = true;  inherit inputs; inherit devenv; };
