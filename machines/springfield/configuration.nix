@@ -1,4 +1,7 @@
-{ common, config, lib, pkgs, ... }:
+{ common, config, lib, ... }:
+let
+  hostName = common.machineName;
+in
 {
   imports =
     [
@@ -13,10 +16,10 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.efi.efiSysMountPoint = "/boot/efi";
+  boot.loader.efi.efiSysMountPoint = "/boot";
   programs.nix-ld.enable = true;
 
-  networking.hostName = "bduggan-desktop"; # Define your hostname.
+  networking.hostName = hostName; # Define your hostname.
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -85,10 +88,10 @@
     description = "Benjamin Duggan";
     extraGroups = [ "networkmanager" "wheel" ];
     openssh.authorizedKeys.keys = common.authorizedKeys;
-    packages = with pkgs; [
-      #  firefox
-      #  thunderbird
-    ];
+    # packages = with pkgs; [
+    #  firefox
+    #  thunderbird
+    # ];
   };
 
   # Enable automatic login for the user.
@@ -104,10 +107,10 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    #  wget
-  ];
+  # environment.systemPackages = with pkgs; [
+  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+  #  wget
+  # ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -122,7 +125,6 @@
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 
-  networking.firewall.enable = false;
 
   # enable tailscale and use as exit node
   services.tailscale.enable = true;
@@ -130,32 +132,6 @@
   boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
   boot.kernel.sysctl."net.ipv4.conf.all.forwarding" = 1;
   boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
-
-  systemd.services = {
-    unifi-manager-service =
-      let
-        myPython = pkgs.python311.withPackages (p: with p; [
-          pydantic
-          pyunifi
-          systemd
-        ]);
-      in
-      {
-        path = [ myPython ];
-        wantedBy = [ "multi-user.target" ];
-        script = ''python /home/bduggan/unifi-manager/main.py'';
-        startAt = "*-*-* *:*:00";
-      };
-
-    unifi-manager-exporter-service = {
-      after = [ "network.target" ];
-      wantedBy = [ "multi-user.target" ];
-      serviceConfig = {
-        ExecStart = ''/home/bduggan/unifi-manager/jsongorter -file /data.json -ignore name -prefix "unifi_manager_"'';
-        Restart = "on-failure";
-      };
-    };
-  };
 
   virtualisation.docker.enable = true;
   users.extraGroups.docker.members = [ common.username ];
@@ -190,7 +166,7 @@
             max_age = "12h";
             labels = {
               job = "systemd-journal";
-              host = "lakehouse";
+              host = hostName;
             };
           };
           relabel_configs = [{
@@ -206,7 +182,7 @@
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  networking.firewall.enable = false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
