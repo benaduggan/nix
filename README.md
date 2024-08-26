@@ -55,7 +55,6 @@ Pipe sockets through to anything on the tailnet
 
 don't forget to make sure the port is open through the firewall!
 
-
 # Preconfigure wifi networks
 
 ```bash
