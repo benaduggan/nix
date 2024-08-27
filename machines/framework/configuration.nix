@@ -90,6 +90,7 @@
     extraGroups = [ "networkmanager" "wheel" ];
     openssh.authorizedKeys.keys = common.authorizedKeys;
     packages = with pkgs; [
+      remmina
       #  firefox
       #  thunderbird
     ];
