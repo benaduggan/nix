@@ -180,6 +180,11 @@
         }
       '';
       virtualHosts = {
+        "sink.digdug.dev".extraConfig = ''
+          reverse_proxy /* {
+            to localhost:8080
+          }
+        '';
         # "digdug.dev/blog" = reverse_proxy "home-server:9000";
         "arden.ha.digdug.dev".extraConfig = ''
           reverse_proxy /* {

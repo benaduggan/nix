@@ -153,6 +153,7 @@ in
 
           # jacobi's stuff
           (with jacobi; [
+            argus
             general_pog_scripts
             aws_pog_scripts
             nix_pog_scripts
