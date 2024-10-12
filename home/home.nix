@@ -41,6 +41,7 @@ in
         nixpkgs-fmt
         nil
         difftastic
+        docker-client
         (optList isLinux [
           gnutar
           man-pages

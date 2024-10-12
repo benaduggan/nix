@@ -47,6 +47,14 @@ in
       mkdir -p $HOME/.completions
       source $HOME/.completions/*
 
+      # source ~/.nix-profile/etc/profile.d/bash_completion.sh
+      source /etc/profiles/per-user/benduggan/share/bash-completion/completions/git
+      source /etc/profiles/per-user/benduggan/share/bash-completion/completions/ssh
+      complete -o bashdefault -o default -o nospace -F __git_wrap__git_main g
+      complete -F __start_kubectl k
+      source /etc/profiles/per-user/benduggan/share/bash-completion/completions/docker
+      complete -F _docker d
+
       gu() {
         MSG="guh"
         if [ $# -gt 0 ] ; then
