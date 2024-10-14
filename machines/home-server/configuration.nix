@@ -132,13 +132,13 @@
   services.openssh.enable = true;
 
   # Set up files/dirs for vaultwarden to work
-  systemd.tmpfiles.rules = [
-    "d /etc/vault 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
-    "f /etc/default/vaultwarden 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
-  ];
+  # systemd.tmpfiles.rules = [
+  #   "d /etc/vault 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
+  #   "f /etc/default/vaultwarden 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
+  # ];
 
   services.vaultwarden = {
-    enable = true;
+    enable = false;
     environmentFile = config.age.secrets.vaultwarden.path; # extra secrets in here for email
     config = {
       ROCKET_ADDRESS = "0.0.0.0";
@@ -179,37 +179,37 @@
   boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
 
   systemd.services = {
-    backup-vault = {
-      path = [ pkgs.gnutar pkgs.sqlite pkgs.gzip ];
-      script = ''
-        PREFIX=`date -u +%Y-%m-%d-%H-%M`
-        DATA_FOLDER=/var/lib/bitwarden_rs
-        BACKUP_FOLDER=/etc/vault/backups/staging
-        mkdir -p $BACKUP_FOLDER
+    # backup-vault = {
+    #   path = [ pkgs.gnutar pkgs.sqlite pkgs.gzip ];
+    #   script = ''
+    #     PREFIX=`date -u +%Y-%m-%d-%H-%M`
+    #     DATA_FOLDER=/var/lib/bitwarden_rs
+    #     BACKUP_FOLDER=/etc/vault/backups/staging
+    #     mkdir -p $BACKUP_FOLDER
 
-        if [[ ! -f "$DATA_FOLDER"/db.sqlite3 ]]; then
-          echo "Could not find SQLite database file '$DATA_FOLDER/db.sqlite3'" >&2
-          exit 1
-        fi
+    #     if [[ ! -f "$DATA_FOLDER"/db.sqlite3 ]]; then
+    #       echo "Could not find SQLite database file '$DATA_FOLDER/db.sqlite3'" >&2
+    #       exit 1
+    #     fi
 
-        ${pkgs.sqlite}/bin/sqlite3 "$DATA_FOLDER"/db.sqlite3 ".backup '$BACKUP_FOLDER/db.sqlite3'"
-        cp -r "$DATA_FOLDER"/attachments "$BACKUP_FOLDER"
-        cp -r "$DATA_FOLDER"/sends "$BACKUP_FOLDER"
+    #     ${pkgs.sqlite}/bin/sqlite3 "$DATA_FOLDER"/db.sqlite3 ".backup '$BACKUP_FOLDER/db.sqlite3'"
+    #     cp -r "$DATA_FOLDER"/attachments "$BACKUP_FOLDER"
+    #     cp -r "$DATA_FOLDER"/sends "$BACKUP_FOLDER"
 
-        # Used to sign JWTs of logged in users. Deleting logs out users
-        # cp "$DATA_FOLDER"/rsa_key.{der,pem,pub.der} "$BACKUP_FOLDER"
+    #     # Used to sign JWTs of logged in users. Deleting logs out users
+    #     # cp "$DATA_FOLDER"/rsa_key.{der,pem,pub.der} "$BACKUP_FOLDER"
 
-        ${pkgs.gnutar}/bin/tar czf "/etc/vault/backups/$PREFIX-vault-backup.tar.gz" $BACKUP_FOLDER
-        ${pkgs.openssh}/bin/scp -o UserKnownHostsFile=/home/${common.username}/.ssh/known_hosts -i /home/${common.username}/.ssh/id_ed25519 "/etc/vault/backups/$PREFIX-vault-backup.tar.gz" ${common.username}@bduggan-desktop:/mnt/bigboi/vault-backups/
+    #     ${pkgs.gnutar}/bin/tar czf "/etc/vault/backups/$PREFIX-vault-backup.tar.gz" $BACKUP_FOLDER
+    #     ${pkgs.openssh}/bin/scp -o UserKnownHostsFile=/home/${common.username}/.ssh/known_hosts -i /home/${common.username}/.ssh/id_ed25519 "/etc/vault/backups/$PREFIX-vault-backup.tar.gz" ${common.username}@bduggan-desktop:/mnt/bigboi/vault-backups/
 
-        rm -rf $BACKUP_FOLDER
-      '';
-      serviceConfig = {
-        User = "root";
-        Type = "oneshot";
-      };
-      startAt = "*-*-* 02:00:00";
-    };
+    #     rm -rf $BACKUP_FOLDER
+    #   '';
+    #   serviceConfig = {
+    #     User = "root";
+    #     Type = "oneshot";
+    #   };
+    #   startAt = "*-*-* 02:00:00";
+    # };
 
     engineer-on-deck = {
       path = [ pkgs.gawk pkgs.gnugrep pkgs.curlMinimal ];
