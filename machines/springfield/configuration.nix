@@ -191,4 +191,37 @@ in
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = common.stateVersion;
+
+
+  # migration vaultwarden to springfield while we move
+  age = {
+    identityPaths = [ "/home/bduggan/.ssh/id_ed25519" ];
+    secrets = {
+      vaultwarden.file = ../../secrets/vaultwarden.age;
+    };
+  };
+
+  # Set up files/dirs for vaultwarden to work
+  systemd.tmpfiles.rules = [
+    "d /etc/vault 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
+    "f /etc/default/vaultwarden 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
+  ];
+
+  services.vaultwarden = {
+    enable = true;
+    environmentFile = config.age.secrets.vaultwarden.path; # extra secrets in here for email
+    config = {
+      ROCKET_ADDRESS = "0.0.0.0";
+      DOMAIN = "https://vault.digdug.dev";
+      SIGNUPS_ALLOWED = false;
+      SENDS_ALLOWED = true;
+      EMERGENCY_ACCESS_ALLOWED = true;
+      ORG_EVENTS_ENABLED = true;
+      SIGNUPS_VERIFY = true;
+      INVITATIONS_ALLOWED = true;
+      PASSWORD_ITERATIONS = 600000;
+      PASSWORD_HINTS_ALLOWED = true;
+      WEBSOCKET_ENABLED = true;
+    };
+  };
 }
