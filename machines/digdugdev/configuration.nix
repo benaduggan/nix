@@ -215,11 +215,11 @@
         '';
         "vault.digdug.dev".extraConfig = ''
           reverse_proxy /* {
-            to home-server-1:8000
+            to springfield:8000
           }
 
           reverse_proxy /notifications/hub {
-            to home-server-1:3012
+            to springfield:3012
           }
         '';
         "grafana.digdug.dev".extraConfig = ''

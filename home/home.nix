@@ -47,6 +47,11 @@ in
           man-pages
         ])
 
+        (with jacobi; [
+          argus
+          nixup
+        ])
+
         (optList (!isMinimal) [
           (optList (isLinux && isGraphical) [
             parsec-bin
