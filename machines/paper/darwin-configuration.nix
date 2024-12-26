@@ -20,7 +20,7 @@
 
   programs.zsh.enable = true;
   programs.bash.enable = true;
-  programs.bash.enableCompletion = true;
+  programs.bash.completion.enable = true;
   programs.nix-index.enable = true;
 
   services.nix-daemon.enable = true;
@@ -38,7 +38,7 @@
     defaults = {
       NSGlobalDomain = {
         InitialKeyRepeat = 5;
-        KeyRepeat = 6;
+        KeyRepeat = 5;
         NSAutomaticCapitalizationEnabled = false;
         NSAutomaticDashSubstitutionEnabled = false;
         NSAutomaticPeriodSubstitutionEnabled = false;
