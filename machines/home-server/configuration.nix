@@ -21,6 +21,8 @@
   boot.loader.efi.efiSysMountPoint = "/boot";
 
   networking.hostName = "home-server"; # Define your hostname.
+  networking.nameservers = [ "1.1.1.1" "1.0.0.1" ];
+
 
   age = {
     identityPaths = [ "/home/bduggan/.ssh/id_ed25519" ];
