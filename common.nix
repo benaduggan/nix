@@ -5,7 +5,7 @@ let
 in
 {
   _module.args.common = {
-    inherit (constants) authorizedKeys authorizedKeysRec cacheSubstituters trustedPublicKeys;
+    inherit (constants) authorizedKeys authorizedKeysRec cacheSubstituters trustedPublicKeys magicSubstituters magicTrustedPublicKeys;
     inherit (pkgs.stdenv) isLinux isDarwin;
     inherit isGraphical;
     inherit isMinimal;

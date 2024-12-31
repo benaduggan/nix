@@ -29,4 +29,13 @@ in
     "jacobi.cachix.org-1:JJghCz+ZD2hc9BHO94myjCzf4wS3DeBLKHOz3jCukMU="
     "kwbauson.cachix.org-1:a6RuFyeJKSShV8LAUw3Jx8z48luiCU755DkweAAkwX0="
   ];
+
+  magicSubstituters = [
+    "https://magic-school-ai.cachix.org"
+  ];
+
+  magicTrustedPublicKeys = [
+    "magic-school-ai.cachix.org-1:EcAHj+Bu7cr7tnrIXr4W2hiSQMOvswmV/o8Qi9shmFQ="
+  ];
+
 }
