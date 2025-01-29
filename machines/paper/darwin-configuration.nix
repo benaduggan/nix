@@ -1,8 +1,8 @@
 { common, lib, pkgs, ... }:
 {
 
-  nix.settings.substituters = common.cacheSubstituters;
-  nix.settings.trusted-public-keys = common.trustedPublicKeys;
+  nix.settings.substituters = common.cacheSubstituters ++ common.magicSubstituters;
+  nix.settings.trusted-public-keys = common.trustedPublicKeys ++ common.magicTrustedPublicKeys;
 
   documentation.enable = true;
 
