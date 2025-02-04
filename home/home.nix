@@ -50,6 +50,7 @@ in
         (with jacobi; [
           argus
           nixup
+          httptap
         ])
 
         (optList (!isMinimal) [
@@ -99,7 +100,6 @@ in
           libarchive
           libnotify
           lolcat
-          loop
           netcat-gnu
           nix-direnv
           nix-info
@@ -159,16 +159,18 @@ in
 
           # jacobi's stuff
           (with jacobi; [
+            _dex
             argus
-            general_pog_scripts
             aws_pog_scripts
-            nix_pog_scripts
-            ffmpeg_pog_scripts
             drm
             drmi
             dshell
-            _dex
+            ffmpeg_pog_scripts
+            general_pog_scripts
+            httptap
+            nix_pog_scripts
             nixup
+
           ])
         ])
 
