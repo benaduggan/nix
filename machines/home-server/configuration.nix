@@ -256,7 +256,7 @@
     containers.homeassistant = {
       volumes = [ "home-assistant:/config" ];
       environment.TZ = "US/Eastern";
-      image = "ghcr.io/home-assistant/home-assistant:2024.5.0";
+      image = "ghcr.io/home-assistant/home-assistant:2025.2.0";
       extraOptions = [
         "--network=host"
       ];
