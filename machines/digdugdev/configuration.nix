@@ -180,6 +180,21 @@
         }
       '';
       virtualHosts = {
+#        "magic-test.digdug.dev".extraConfig = ''
+#          reverse_proxy * {
+#            to magic-mbp:3000
+#          }
+#        '';
+#"student-magic-test.digdug.dev".extraConfig = ''
+#          reverse_proxy * {
+#            to magic-mbp:3000
+#          }
+#        '';
+#"magic-db.digdug.dev".extraConfig = ''
+#          reverse_proxy * {
+#            to magic-mbp:54321
+#          }
+#        '';
         "sink.digdug.dev".extraConfig = ''
           reverse_proxy /* {
             to localhost:8080
