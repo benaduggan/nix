@@ -202,8 +202,17 @@
     };
   };
 
+  services._3proxy = {
+    enable = true;
+    services = [{
+      type = "socks";
+      bindPort = 1080;
+      auth = [ "none" ];
+    }];
+  };
+
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
+  # networking.firewall.allowedTCPPorts = [ 1080 ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
