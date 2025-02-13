@@ -84,6 +84,7 @@
             system = "aarch64-darwin";
             modules = [
               commonMbp
+              "${self.inputs.jacobi}/hosts/modules/darwin/llama-server.nix"
               ./machines/paper/darwin-configuration.nix
               home-manager.darwinModules.home-manager
               {
@@ -99,6 +100,7 @@
             system = "aarch64-darwin";
             modules = [
               commonMagic
+              "${self.inputs.jacobi}/hosts/modules/darwin/llama-server.nix"
               ./machines/magic-mbp/darwin-configuration.nix
               home-manager.darwinModules.home-manager
               {

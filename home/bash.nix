@@ -1,9 +1,11 @@
 { config, common, ... }:
 let
   inherit (common) jacobi;
+  inherit (common) machineName;
+  perUser = if machineName == "paper" then "benduggan" else "bduggan";
 in
 {
-  programs.bash = {
+  programs. bash = {
     enable = true;
     inherit (config.home) sessionVariables;
     historyFileSize = -1;
@@ -44,15 +46,15 @@ in
       # add local scripts to path
       export PATH="$PATH:$HOME/.bin/:$HOME/.local/bin"
 
-      mkdir -p $HOME/.completions
-      source $HOME/.completions/*
+      # mkdir -p $HOME/.completions
+      # source $HOME/.completions/*
 
       # source ~/.nix-profile/etc/profile.d/bash_completion.sh
-      source /etc/profiles/per-user/benduggan/share/bash-completion/completions/git
-      source /etc/profiles/per-user/benduggan/share/bash-completion/completions/ssh
+      source /etc/profiles/per-user/${perUser}/share/bash-completion/completions/git
+      source /etc/profiles/per-user/${perUser}/share/bash-completion/completions/ssh
       complete -o bashdefault -o default -o nospace -F __git_wrap__git_main g
       complete -F __start_kubectl k
-      source /etc/profiles/per-user/benduggan/share/bash-completion/completions/docker
+      source /etc/profiles/per-user/${perUser}/share/bash-completion/completions/docker
       complete -F _docker d
 
       gu() {

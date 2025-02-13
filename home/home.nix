@@ -154,7 +154,7 @@ in
           ])
 
           # (if isDarwin then [
-          #   llama-cpp
+          #   # jacobi.llama-cpp-latest
           # ] else [ ])
 
           # jacobi's stuff

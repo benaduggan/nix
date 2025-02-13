@@ -28,6 +28,7 @@
 
   users.users."${common.username}" = {
     name = common.username;
+    shell = pkgs.bashInteractive;
     home = "/Users/${common.username}";
     openssh.authorizedKeys.keys = common.authorizedKeys;
   };
@@ -38,8 +39,9 @@
   system = {
     defaults = {
       NSGlobalDomain = {
-        InitialKeyRepeat = 5;
-        KeyRepeat = 6;
+        ApplePressAndHoldEnabled = false;
+        InitialKeyRepeat = 10;
+        KeyRepeat = 1;
         NSAutomaticCapitalizationEnabled = false;
         NSAutomaticDashSubstitutionEnabled = false;
         NSAutomaticPeriodSubstitutionEnabled = false;
@@ -75,6 +77,29 @@
 
   security.pam.enableSudoTouchIdAuth = true;
 
+  services.llama-server =
+    let
+      package = common.jacobi.pkgs.llama-cpp-latest;
+    in
+    {
+      servers = {
+        deepscaler-1-5b = {
+          package = package;
+          enable = true;
+          port = 8014;
+          model = "/opt/box/models/agentica-org_DeepScaleR-1.5B-Preview-Q8_0.gguf";
+          ngl = 99;
+        };
+        qwen-coder = {
+          package = package;
+          enable = true;
+          port = 8015;
+          model = "/opt/box/models/Qwen2.5.1-Coder-7B-Instruct-Q6_K_L.gguf";
+          ngl = 99;
+        };
+      };
+    };
+
   homebrew = {
     global.autoUpdate = false;
     enable = true;
@@ -87,10 +112,6 @@
     brews = [ "readline" "qemu" ];
 
     taps = [
-      # "homebrew/cask"
-      # "homebrew/cask-fonts"
-      # "homebrew/cask-versions"
-      # "homebrew/core"
       "homebrew/services"
     ];
 
