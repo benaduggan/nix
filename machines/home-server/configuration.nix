@@ -31,6 +31,10 @@
       vaultwarden.file = ../../secrets/vaultwarden.age;
       ondeck.file = ../../secrets/ondeck-vars.age;
 
+      litellm = {
+        file = ../../secrets/litellm.age;
+        mode = "644";
+      };
       magicRunnerToken = {
         file = ../../secrets/home-magic-runner.age;
         mode = "644";
@@ -261,6 +265,30 @@
         "--network=host"
       ];
     };
+
+    containers.litellm = {
+      image = "ghcr.io/berriai/litellm:main-v1.61.1";
+      volumes = [ "lite-llm:/app" ];
+      environmentFiles = [ config.age.secrets.litellm.path ];
+      extraOptions = [
+        "--network=host"
+      ];
+    };
+  };
+
+  # currently being used for litellm backend -- no backups or anything 😅
+  services.postgresql = {
+    enable = true;
+    ensureDatabases = [ "litellm" ];
+    authentication = pkgs.lib.mkOverride 10 ''
+      #type database  DBuser  auth-method
+      local all       all     trust
+      host all all 127.0.0.1/32 trust
+      host all all 0.0.0.0/0 trust
+      host    all            postgres         127.0.0.1/32           md5
+      host    all            postgres         ::1/128                md5
+      host    litellm        postgres         0.0.0.0/0              md5
+    '';
   };
 
   systemd.services.grafana.serviceConfig.EnvironmentFile = config.age.secrets.grafana.path;

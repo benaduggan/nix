@@ -9,6 +9,9 @@ in
   "home-magic-runner.age".publicKeys = constants.authorizedKeys;
   "home-self-runner.age".publicKeys = constants.authorizedKeys;
 
+  # litellm
+  "litellm.age".publicKeys = constants.authorizedKeys;
+
   # digdugdev
   "board.age".publicKeys = constants.authorizedKeys ++ [ constants.digdugdevKey ];
   "caddy.age".publicKeys = constants.authorizedKeys ++ [ constants.digdugdevKey ];
