@@ -225,6 +225,15 @@ in
     };
   };
 
+  services._3proxy = {
+    enable = true;
+    services = [{
+      type = "socks";
+      bindPort = 1080;
+      auth = [ "none" ];
+    }];
+  };
+
   systemd.services = {
     backup-vault = {
       path = [ pkgs.gnutar pkgs.sqlite pkgs.gzip ];

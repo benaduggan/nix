@@ -437,6 +437,15 @@
     };
   };
 
+  services._3proxy = {
+    enable = true;
+    services = [{
+      type = "socks";
+      bindPort = 1080;
+      auth = [ "none" ];
+    }];
+  };
+
   services.github-runners = {
     magic = {
       enable = true;
