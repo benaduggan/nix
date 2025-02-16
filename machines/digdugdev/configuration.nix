@@ -198,6 +198,11 @@
         #            to magic-mbp:54321
         #          }
         #        '';
+        "audio.digdug.dev".extraConfig = ''
+          reverse_proxy /* {
+            to bduggan-desktop:8000
+          }
+        '';
         "litellm.digdug.dev".extraConfig = ''
           reverse_proxy /* {
             to home-server-1:4000
