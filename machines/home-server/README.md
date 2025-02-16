@@ -24,6 +24,11 @@
 
 Secret config at `etc/default/grafana`
 
+## Open Web UI / LiteLLM
+
+This server facilitates LLM usage via lite llm. This points to all the services I want to expose
+and controls keys and limits to anyone using my services. The main use right now is open web ui which exposes a chatgpt like interface over the internet so I can provide access to friends and family to LLMs I run within my tailnet on various servers.
+
 ### features
 
 - alerting (email)

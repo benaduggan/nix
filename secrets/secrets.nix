@@ -11,6 +11,7 @@ in
 
   # litellm
   "litellm.age".publicKeys = constants.authorizedKeys;
+  "openwebui.age".publicKeys = constants.authorizedKeys;
 
   # digdugdev
   "board.age".publicKeys = constants.authorizedKeys ++ [ constants.digdugdevKey ];

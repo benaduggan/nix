@@ -35,6 +35,10 @@
         file = ../../secrets/litellm.age;
         mode = "644";
       };
+      openwebui = {
+        file = ../../secrets/openwebui.age;
+        mode = "644";
+      };
       magicRunnerToken = {
         file = ../../secrets/home-magic-runner.age;
         mode = "644";
@@ -274,6 +278,16 @@
         "--network=host"
       ];
     };
+
+    containers.openwebui = {
+      image = "ghcr.io/open-webui/open-webui:main";
+      volumes = [ "open-webui:/app/backend/data" ];
+      environmentFiles = [ config.age.secrets.openwebui.path ];
+      extraOptions = [
+        "--network=host"
+      ];
+    };
+
   };
 
   # currently being used for litellm backend -- no backups or anything 😅
