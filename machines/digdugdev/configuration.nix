@@ -120,6 +120,7 @@
       cobi = buildUser "godofjava@gmail.com" [ vaultRole desktopRole ];
       kevin = buildUser "kwbauson@gmail.com" [ vaultRole desktopRole ];
       ellie = buildUser "elliemduggan@gmail.com" [ vaultRole desktopRole ];
+      aly = buildUser "spiffai@gmail.com" [ vaultRole desktopRole ];
       # jade = buildUser "fisherrjd@gmail.com" [ vaultRole desktopRole ];
       ryguy = buildUser "rszemplinski22@gmail.com" [ vaultRole desktopRole ];
     in
@@ -168,6 +169,8 @@
             ${keri}
             ${anna}
             ${ryguy}
+            ${aly}
+
           }
 
           authorization policy google_auth {
@@ -195,6 +198,16 @@
         #            to magic-mbp:54321
         #          }
         #        '';
+        "litellm.digdug.dev".extraConfig = ''
+          reverse_proxy /* {
+            to home-server-1:4000
+          }
+        '';
+        "chat.digdug.dev".extraConfig = ''
+          reverse_proxy /* {
+            to home-server-1:8080
+          }
+        '';
         "sink.digdug.dev".extraConfig = ''
           reverse_proxy /* {
             to localhost:8080
