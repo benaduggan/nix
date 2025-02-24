@@ -478,4 +478,19 @@
       url = "https://github.com/benaduggan/nix";
     };
   };
+
+  services.ntfy-sh = {
+    enable = true;
+    settings = {
+      base-url = "https://ntfy.digdug.dev";
+      listen-http = "0.0.0.0:9090";
+      enable-login = true;
+      auth-default-access = "deny-all";
+      behind-proxy = true;
+      enable-metrics = true;
+      log-level = "debug";
+
+
+    };
+  };
 }
