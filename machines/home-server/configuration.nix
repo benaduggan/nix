@@ -271,7 +271,7 @@
     };
 
     containers.litellm = {
-      image = "ghcr.io/berriai/litellm:main-v1.61.1";
+      image = "ghcr.io/berriai/litellm:main-v1.61.17-nightly";
       volumes = [ "lite-llm:/app" ];
       environmentFiles = [ config.age.secrets.litellm.path ];
       extraOptions = [
