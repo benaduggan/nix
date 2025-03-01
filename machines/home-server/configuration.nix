@@ -142,13 +142,13 @@
   services.openssh.enable = true;
 
   # Set up files/dirs for vaultwarden to work
-  # systemd.tmpfiles.rules = [
-  #   "d /etc/vault 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
-  #   "f /etc/default/vaultwarden 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
-  # ];
+  systemd.tmpfiles.rules = [
+    "d /etc/vault 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
+    "f /etc/default/vaultwarden 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
+  ];
 
   services.vaultwarden = {
-    enable = false;
+    enable = true;
     environmentFile = config.age.secrets.vaultwarden.path; # extra secrets in here for email
     config = {
       ROCKET_ADDRESS = "0.0.0.0";
@@ -489,8 +489,6 @@
       behind-proxy = true;
       enable-metrics = true;
       log-level = "debug";
-
-
     };
   };
 }
