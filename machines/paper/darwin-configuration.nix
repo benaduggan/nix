@@ -23,8 +23,6 @@
   programs.bash.completion.enable = true;
   programs.nix-index.enable = true;
 
-  services.nix-daemon.enable = true;
-
   users.users.benduggan = {
     name = "benduggan";
     home = "/Users/benduggan";
