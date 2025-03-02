@@ -84,14 +84,14 @@
     {
       servers = {
         deepscaler-1-5b = {
-          package = package;
+          inherit package;
           enable = true;
           port = 8014;
           model = "/opt/box/models/agentica-org_DeepScaleR-1.5B-Preview-Q8_0.gguf";
           ngl = 99;
         };
         qwen-coder = {
-          package = package;
+          inherit package;
           enable = true;
           port = 8015;
           model = "/opt/box/models/Qwen2.5.1-Coder-7B-Instruct-Q6_K_L.gguf";
