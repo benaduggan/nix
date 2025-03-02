@@ -24,8 +24,6 @@
   programs.bash.completion.enable = true;
   programs.nix-index.enable = true;
 
-  services.nix-daemon.enable = true;
-
   users.users."${common.username}" = {
     name = common.username;
     shell = pkgs.bashInteractive;
