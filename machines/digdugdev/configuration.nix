@@ -198,6 +198,13 @@
         #            to magic-mbp:54321
         #          }
         #        '';
+        "ntfy.digdug.dev".extraConfig = ''
+          reverse_proxy /* {
+            header_up Connection {>Connection}
+            header_up Upgrade {>Upgrade}
+            to home-server-1:9090
+          }
+        '';
         "audio.digdug.dev".extraConfig = ''
           reverse_proxy /* {
             to bduggan-desktop:8000
@@ -246,13 +253,22 @@
             to desktop-5su64sl:9090
           }
         '';
+        # "vault.digdug.dev".extraConfig = ''
+        #   reverse_proxy /* {
+        #     to springfield:8000
+        #   }
+
+        #   reverse_proxy /notifications/hub {
+        #     to springfield:3012
+        #   }
+        # '';
         "vault.digdug.dev".extraConfig = ''
           reverse_proxy /* {
-            to springfield:8000
+            to home-server-1:8000
           }
 
           reverse_proxy /notifications/hub {
-            to springfield:3012
+            to home-server-1:3012
           }
         '';
         "grafana.digdug.dev".extraConfig = ''
