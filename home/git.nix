@@ -1,9 +1,10 @@
 { pkgs, common, ... }:
 let
-  inherit (common) firstName lastName email authorizedKeysRec machineName;
+  inherit (common) firstName lastName email authorizedKeysRec machineName digdugdevKey;
+  signingKey = if machineName == "digdugdev" then digdugdevKey else authorizedKeysRec.${machineName};
 in
 {
-  home.file.".ssh/allowed_signers".text = "* ${authorizedKeysRec.${machineName}}";
+  home.file.".ssh/allowed_signers".text = "* ${signingKey}";
   programs.git = {
     enable = true;
     package = pkgs.gitAndTools.gitFull;
