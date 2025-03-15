@@ -6,9 +6,9 @@ let
     lake = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMhq0qLYZCcWbgpRel02St/AxCsx7K9aufhiKXzkG3TM";
     paper = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINkINDS7fVFidAiIRM4AL821sbsJ7nmF9/KV+UuQ1Gtf";
     magicMbp = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIArr/sVKrsd6nlkdsbsn759Tvzwnp5cnwDo70xgNB2bY";
-    digdugdev = "omit-for-security";
     homeServer = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINVM1Pr/o+daMn1ElHm/A0gCyR6t85ZuP3LRkhIJFiF1";
     springfield = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFulKxPMuKmSevjxb6rhhcxKP1tmbqD6tlS0eXE99JwU";
+    # digdugdev is not added here cause it doesn't need to decrypt most of the secrets;
   };
 
   authorizedKeys = builtins.attrValues authorizedKeysRec;
