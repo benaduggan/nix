@@ -101,7 +101,7 @@
           ngl = 99;
         };
         qwen-r1-distill = {
-          package = package;
+          inherit package;
           enable = true;
           port = 8016;
           model = "/opt/box/models/DeepSeek-R1-Distill-Qwen-14B-Q8_0.gguf";
@@ -109,7 +109,7 @@
           extraFlags = "-c 16384";
         };
         gemma-3-12b = {
-          package = package;
+          inherit package;
           enable = true;
           port = 8017;
           model = "/opt/box/models/gemma-3-12b.gguf";
