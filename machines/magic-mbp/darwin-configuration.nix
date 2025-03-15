@@ -29,7 +29,12 @@
     shell = pkgs.bashInteractive;
     home = "/Users/${common.username}";
     openssh.authorizedKeys.keys = common.authorizedKeys;
+    packages = [
+      common.jacobi.pkgs.llama-cpp-latest
+    ];
   };
+
+
 
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog
@@ -73,7 +78,7 @@
     };
   };
 
-  security.pam.enableSudoTouchIdAuth = true;
+  # security.pam.enableSudoTouchIdAuth = true;
 
   services.llama-server =
     let
@@ -94,6 +99,22 @@
           port = 8015;
           model = "/opt/box/models/Qwen2.5.1-Coder-7B-Instruct-Q6_K_L.gguf";
           ngl = 99;
+        };
+        qwen-r1-distill = {
+          package = package;
+          enable = true;
+          port = 8016;
+          model = "/opt/box/models/DeepSeek-R1-Distill-Qwen-14B-Q8_0.gguf";
+          ngl = 99;
+          extraFlags = "-c 16384";
+        };
+        gemma-3-12b = {
+          package = package;
+          enable = true;
+          port = 8017;
+          model = "/opt/box/models/gemma-3-12b.gguf";
+          ngl = 99;
+          extraFlags = "-c 8096";
         };
       };
     };
