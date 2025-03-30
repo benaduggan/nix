@@ -59,11 +59,36 @@
         ) ++ import ./overlays.nix;
       };
 
+      # Define your custom packages
+      customPackages = pkgs: {
+        postgrestools = pkgs.callPackage ./pkgs/postgrestools.nix {
+          pkgs = pkgs;
+        };
+        # Add any other custom packages here
+      };
+
+      # Create an overlay to make custom packages available
+      overlay = final: prev: customPackages prev;
+
     in
     {
+      # Add the overlay to nixpkgs
+      overlays = {
+        apple-silicon = _final: prev: optionalAttrs (prev.stdenv.system == "aarch64-darwin") {
+          # Useful on Macs with Apple Silicon
+          # Adds access to x86 packages system is running Apple Silicon
+          pkgs-x86 = import nixpkgs {
+            system = "x86_64-darwin";
+            inherit (nixpkgsConfig) config;
+          };
+        };
+        custom = overlay;
+      };
+
+      # Optionally expose packages directly
       packages = lib.genAttrs lib.systems.flakeExposed (system:
         let
-          pkgs = import nixpkgs (nixpkgsConfig // { inherit system; });
+          pkgs = import nixpkgs (nixpkgsConfig // { inherit system; overlays = [ overlay ]; });
         in
         pkgs // {
           default = {
@@ -71,6 +96,9 @@
             x86_64-darwin = (self.darwinConfigurations.us-mbp-benduggan.override { system = "x86_64-darwin"; }).system;
             aarch64-darwin = self.darwinConfigurations.us-mbp-benduggan.system;
           }.${system};
+          postgrestools = pkgs.callPackage ./pkgs/postgrestools.nix {
+            pkgs = pkgs;
+          };
         }
       );
 
@@ -288,17 +316,6 @@
         modules = [
           ./generators/do-builder/configuration.nix
         ];
-      };
-
-      overlays = {
-        apple-silicon = _final: prev: optionalAttrs (prev.stdenv.system == "aarch64-darwin") {
-          # Useful on Macs with Apple Silicon
-          # Adds access to x86 packages system is running Apple Silicon
-          pkgs-x86 = import nixpkgs {
-            system = "x86_64-darwin";
-            inherit (nixpkgsConfig) config;
-          };
-        };
       };
     };
 }
