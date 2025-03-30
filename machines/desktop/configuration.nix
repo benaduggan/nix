@@ -91,6 +91,13 @@
     ];
   };
 
+  users.users.bdugganbak = {
+    isNormalUser = true;
+    description = "Benjamin Duggan";
+    extraGroups = [ "networkmanager" "wheel" ];
+    openssh.authorizedKeys.keys = common.authorizedKeys;
+  };
+
   # Enable automatic login for the user.
   # services.displayManager.autoLogin.enable = true;
   # services.displayManager.autoLogin.user = "bduggan";
@@ -211,6 +218,10 @@
     }];
   };
 
+  services.audiobookshelf = {
+    enable = true;
+    host = "0.0.0.0";
+  };
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ 1080 ];
   # networking.firewall.allowedUDPPorts = [ ... ];
