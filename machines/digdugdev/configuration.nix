@@ -323,6 +323,10 @@
             ''
           }
         '';
+        "assets.digdug.dev".extraConfig = ''
+          root * /var/www/tldr
+          file_server
+        '';
       };
     };
 
