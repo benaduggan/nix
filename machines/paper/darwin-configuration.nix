@@ -18,6 +18,8 @@
     extra-platforms = x86_64-darwin aarch64-darwin x86_64-linux
   '';
 
+  environment.systemPackages = with pkgs; [ postgrestools ];
+
   programs.zsh.enable = true;
   programs.bash.enable = true;
   programs.bash.completion.enable = true;
