@@ -1,8 +1,9 @@
 { common, lib, pkgs, ... }:
 {
 
-  nix.settings.substituters = common.cacheSubstituters ++ common.magicSubstituters;
-  nix.settings.trusted-public-keys = common.trustedPublicKeys ++ common.magicTrustedPublicKeys;
+  nix.settings.extra-trusted-substituters = common.cacheSubstituters ++ common.magicSubstituters;
+  nix.settings.extra-trusted-public-keys = common.trustedPublicKeys ++ common.magicTrustedPublicKeys;
+  nix.settings.trusted-users = [ "benduggan" ];
 
   documentation.enable = true;
 

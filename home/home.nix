@@ -51,6 +51,7 @@ in
           argus
           nixup
           httptap
+          # codex
         ])
 
         (optList (!isMinimal) [
