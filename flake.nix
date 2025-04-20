@@ -1,7 +1,7 @@
 {
   inputs = {
     #nixpkgs.url = "nixpkgs/73de017ef2d18a04ac4bfd0c02650007ccb31c2a";
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "nixpkgs/nixos-unstable-small";
     nixos-hardware.flake = true;
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";

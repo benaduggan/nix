@@ -2,6 +2,8 @@
 let
   inherit (common) isLinux isDarwin kwbauson jacobi isGraphical isMinimal;
   optList = conditional: list: if conditional then list else [ ];
+
+  myPogScripts = import ./pog/index.nix { inherit pkgs; pog = jacobi.pkgs.pog; };
 in
 {
   # Let Home Manager install and manage itself.
@@ -20,6 +22,7 @@ in
     packages = with lib;
       with pkgs;
       lib.flatten [
+        myPogScripts.spelltree
         common.agenix
         bashInteractive
         bash-completion
@@ -51,7 +54,6 @@ in
           argus
           nixup
           httptap
-          # codex
         ])
 
         (optList (!isMinimal) [
@@ -85,6 +87,7 @@ in
           bc
           bzip2
           cachix
+          codex
           diffutils
           dos2unix
           ed
