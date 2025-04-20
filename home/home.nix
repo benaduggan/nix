@@ -3,7 +3,7 @@ let
   inherit (common) isLinux isDarwin kwbauson jacobi isGraphical isMinimal;
   optList = conditional: list: if conditional then list else [ ];
 
-  myPogScripts = import ./pog/index.nix { inherit pkgs; pog = jacobi.pkgs.pog; };
+  myPogScripts = import ./pog/index.nix { inherit pkgs; inherit (jacobi.pkgs) pog; };
 in
 {
   # Let Home Manager install and manage itself.
