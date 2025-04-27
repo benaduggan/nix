@@ -183,31 +183,17 @@
         }
       '';
       virtualHosts = {
-        #        "magic-test.digdug.dev".extraConfig = ''
-        #          reverse_proxy * {
-        #            to magic-mbp:3000
-        #          }
-        #        '';
-        #"student-magic-test.digdug.dev".extraConfig = ''
-        #          reverse_proxy * {
-        #            to magic-mbp:3000
-        #          }
-        #        '';
-        #"magic-db.digdug.dev".extraConfig = ''
-        #          reverse_proxy * {
-        #            to magic-mbp:54321
-        #          }
-        #        '';
+        # Push Notifications
         "ntfy.digdug.dev".extraConfig = ''
-          reverse_proxy /* {
-            header_up Connection {>Connection}
-            header_up Upgrade {>Upgrade}
+          reverse_proxy * {
             to home-server-1:9090
           }
         '';
-        "audio.digdug.dev".extraConfig = ''
-          reverse_proxy /* {
-            to bduggan-desktop:8000
+
+        # LLM stuff
+        "n8n.digdug.dev".extraConfig = ''
+          reverse_proxy * {
+            to home-server-1:5678
           }
         '';
         "litellm.digdug.dev".extraConfig = ''
@@ -220,12 +206,37 @@
             to home-server-1:8080
           }
         '';
+        "ai.digdug.dev".extraConfig = ''
+          authorize with google_auth
+
+          reverse_proxy /* {
+            to desktop-5su64sl:9090
+          }
+        '';
+
+        # Content Hosting
+        "audio.digdug.dev".extraConfig = ''
+          reverse_proxy /* {
+            to bduggan-desktop:8000
+          }
+        '';
+
         "sink.digdug.dev".extraConfig = ''
           reverse_proxy /* {
             to localhost:8080
           }
         '';
-        # "digdug.dev/blog" = reverse_proxy "home-server:9000";
+        "books.digdug.dev".extraConfig = ''
+          reverse_proxy /* {
+            to bduggan-desktop:8083
+          }
+        '';
+        "assets.digdug.dev".extraConfig = ''
+          root * /var/www/tldr
+          file_server
+        '';
+
+        # Home Assistants
         "arden.ha.digdug.dev".extraConfig = ''
           reverse_proxy /* {
             to arden:8123
@@ -246,22 +257,9 @@
             to home-server-1:8123
           }
         '';
-        "ai.digdug.dev".extraConfig = ''
-          authorize with google_auth
 
-          reverse_proxy /* {
-            to desktop-5su64sl:9090
-          }
-        '';
-        # "vault.digdug.dev".extraConfig = ''
-        #   reverse_proxy /* {
-        #     to springfield:8000
-        #   }
 
-        #   reverse_proxy /notifications/hub {
-        #     to springfield:3012
-        #   }
-        # '';
+        # Misc
         "vault.digdug.dev".extraConfig = ''
           reverse_proxy /* {
             to home-server-1:8000
@@ -290,13 +288,14 @@
           encode gzip
           file_server
         '';
-        "garden.digdug.dev".extraConfig = ''
-          authorize with google_auth
+        # "garden.digdug.dev".extraConfig = ''
+        #   authorize with google_auth
 
-          reverse_proxy /* {
-            to nexus-6:8080
-          }
-        '';
+        #   reverse_proxy /* {
+        #     to nexus-6:8080
+        #   }
+        # '';
+
         "http://board.digdug.dev".extraConfig = ''
           header {
             Cache-Control "no-cache, no-store, must-revalidate"
@@ -311,20 +310,6 @@
             Cache-Control "no-cache, no-store, must-revalidate"
           }
           root * /var/www
-          file_server
-        '';
-        "digdug.dev".extraConfig = ''
-          encode gzip
-          file_server
-          root * ${
-            pkgs.runCommand "testdir" {} ''
-              mkdir "$out"
-              echo hello world > "$out/example.html"
-            ''
-          }
-        '';
-        "assets.digdug.dev".extraConfig = ''
-          root * /var/www/tldr
           file_server
         '';
       };
