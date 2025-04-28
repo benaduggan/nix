@@ -39,6 +39,10 @@
         file = ../../secrets/openwebui.age;
         mode = "644";
       };
+      n8n = {
+        file = ../../secrets/n8n.age;
+        mode = "644";
+      };
       magicRunnerToken = {
         file = ../../secrets/home-magic-runner.age;
         mode = "644";
@@ -189,58 +193,58 @@
   boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
 
   systemd.services = {
-    # backup-vault = {
-    #   path = [ pkgs.gnutar pkgs.sqlite pkgs.gzip ];
-    #   script = ''
-    #     PREFIX=`date -u +%Y-%m-%d-%H-%M`
-    #     DATA_FOLDER=/var/lib/bitwarden_rs
-    #     BACKUP_FOLDER=/etc/vault/backups/staging
-    #     mkdir -p $BACKUP_FOLDER
-
-    #     if [[ ! -f "$DATA_FOLDER"/db.sqlite3 ]]; then
-    #       echo "Could not find SQLite database file '$DATA_FOLDER/db.sqlite3'" >&2
-    #       exit 1
-    #     fi
-
-    #     ${pkgs.sqlite}/bin/sqlite3 "$DATA_FOLDER"/db.sqlite3 ".backup '$BACKUP_FOLDER/db.sqlite3'"
-    #     cp -r "$DATA_FOLDER"/attachments "$BACKUP_FOLDER"
-    #     cp -r "$DATA_FOLDER"/sends "$BACKUP_FOLDER"
-
-    #     # Used to sign JWTs of logged in users. Deleting logs out users
-    #     # cp "$DATA_FOLDER"/rsa_key.{der,pem,pub.der} "$BACKUP_FOLDER"
-
-    #     ${pkgs.gnutar}/bin/tar czf "/etc/vault/backups/$PREFIX-vault-backup.tar.gz" $BACKUP_FOLDER
-    #     ${pkgs.openssh}/bin/scp -o UserKnownHostsFile=/home/${common.username}/.ssh/known_hosts -i /home/${common.username}/.ssh/id_ed25519 "/etc/vault/backups/$PREFIX-vault-backup.tar.gz" ${common.username}@bduggan-desktop:/mnt/bigboi/vault-backups/
-
-    #     rm -rf $BACKUP_FOLDER
-    #   '';
-    #   serviceConfig = {
-    #     User = "root";
-    #     Type = "oneshot";
-    #   };
-    #   startAt = "*-*-* 02:00:00";
-    # };
-
-    engineer-on-deck = {
-      path = [ pkgs.gawk pkgs.gnugrep pkgs.curlMinimal ];
+    backup-vault = {
+      path = [ pkgs.gnutar pkgs.sqlite pkgs.gzip ];
       script = ''
-        # get the google sheet url and slack webhook url from secrets
-        export $(${pkgs.gnugrep}/bin/grep -v '^#' ${config.age.secrets.ondeck.path} | xargs)
+        PREFIX=`date -u +%Y-%m-%d-%H-%M`
+        DATA_FOLDER=/var/lib/bitwarden_rs
+        BACKUP_FOLDER=/etc/vault/backups/staging
+        mkdir -p $BACKUP_FOLDER
 
-        TMP_PATH=schedule.csv
-        TODAY=`date +"%-m/%-d/%Y"` # get the date without leading 0s
-        curl -L $GOOGLE_PUBLIC_URL -o $TMP_PATH
-        SLACK_ID=`cat $TMP_PATH | grep $TODAY | awk -F, '{print $3}'` # get the slack id from todays row
-        JSON='{"slack_user_id": "'$SLACK_ID'"}'
-        rm $TMP_PATH
-        curl -X POST -H "Content-type: application/json" -d "$JSON" $SLACK_WEBHOOK_URL
+        if [[ ! -f "$DATA_FOLDER"/db.sqlite3 ]]; then
+          echo "Could not find SQLite database file '$DATA_FOLDER/db.sqlite3'" >&2
+          exit 1
+        fi
+
+        ${pkgs.sqlite}/bin/sqlite3 "$DATA_FOLDER"/db.sqlite3 ".backup '$BACKUP_FOLDER/db.sqlite3'"
+        cp -r "$DATA_FOLDER"/attachments "$BACKUP_FOLDER"
+        cp -r "$DATA_FOLDER"/sends "$BACKUP_FOLDER"
+
+        # Used to sign JWTs of logged in users. Deleting logs out users
+        # cp "$DATA_FOLDER"/rsa_key.{der,pem,pub.der} "$BACKUP_FOLDER"
+
+        ${pkgs.gnutar}/bin/tar czf "/etc/vault/backups/$PREFIX-vault-backup.tar.gz" $BACKUP_FOLDER
+        ${pkgs.openssh}/bin/scp -o UserKnownHostsFile=/home/${common.username}/.ssh/known_hosts -i /home/${common.username}/.ssh/id_ed25519 "/etc/vault/backups/$PREFIX-vault-backup.tar.gz" ${common.username}@bduggan-desktop:/mnt/bigboi/vault-backups/
+
+        rm -rf $BACKUP_FOLDER
       '';
       serviceConfig = {
         User = "root";
         Type = "oneshot";
       };
-      startAt = "Mon..Fri 09:50";
+      startAt = "*-*-* 02:00:00";
     };
+
+    # engineer-on-deck = {
+    #   path = [ pkgs.gawk pkgs.gnugrep pkgs.curlMinimal ];
+    #   script = ''
+    #     # get the google sheet url and slack webhook url from secrets
+    #     export $(${pkgs.gnugrep}/bin/grep -v '^#' ${config.age.secrets.ondeck.path} | xargs)
+
+    #     TMP_PATH=schedule.csv
+    #     TODAY=`date +"%-m/%-d/%Y"` # get the date without leading 0s
+    #     curl -L $GOOGLE_PUBLIC_URL -o $TMP_PATH
+    #     SLACK_ID=`cat $TMP_PATH | grep $TODAY | awk -F, '{print $3}'` # get the slack id from todays row
+    #     JSON='{"slack_user_id": "'$SLACK_ID'"}'
+    #     rm $TMP_PATH
+    #     curl -X POST -H "Content-type: application/json" -d "$JSON" $SLACK_WEBHOOK_URL
+    #   '';
+    #   serviceConfig = {
+    #     User = "root";
+    #     Type = "oneshot";
+    #   };
+    #   startAt = "Mon..Fri 09:50";
+    # };
 
     greenhouse-service =
       let
@@ -271,7 +275,7 @@
     };
 
     containers.litellm = {
-      image = "ghcr.io/berriai/litellm:main-v1.63.11-stable.patch1";
+      image = "ghcr.io/berriai/litellm:main-v1.67.4-stable";
       volumes = [ "lite-llm:/app" ];
       environmentFiles = [ config.age.secrets.litellm.path ];
       extraOptions = [
@@ -280,9 +284,26 @@
     };
 
     containers.openwebui = {
-      image = "ghcr.io/open-webui/open-webui:main";
+      image = "ghcr.io/open-webui/open-webui:v0.6.5";
       volumes = [ "open-webui:/app/backend/data" ];
       environmentFiles = [ config.age.secrets.openwebui.path ];
+      extraOptions = [
+        "--network=host"
+      ];
+    };
+
+    containers.n8n = {
+      image = "docker.n8n.io/n8nio/n8n:1.89.2";
+      volumes = [ "n8n_data:/home/node/.n8n" ];
+      ports = [ "5678:5678" ];
+      environment = {
+        GENERIC_TIMEZONE = "America/Denver";
+        N8N_EDITOR_BASE_URL = "https://n8n.digdug.dev";
+        N8N_TEMPLATES_ENABLED = "true";
+        N8N_HIRING_BANNER_ENABLED = "false";
+
+      };
+      environmentFiles = [ config.age.secrets.n8n.path ];
       extraOptions = [
         "--network=host"
       ];
