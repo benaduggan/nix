@@ -213,5 +213,4 @@ in
   programs.vscode.enable = isGraphical && !isDarwin;
   programs.htop.enable = true;
   programs.dircolors.enable = true;
-  programs.lsd.enable = true;
 }
