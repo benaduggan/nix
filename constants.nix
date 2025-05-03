@@ -21,14 +21,14 @@ in
 
   cacheSubstituters = [
     "https://benaduggan.cachix.org"
-    "https://jacobi.cachix.org"
+    "https://cache.g7c.us"
     "https://kwbauson.cachix.org"
   ];
 
   trustedPublicKeys = [
     "benaduggan.cachix.org-1:BY2tmi++VqJD6My4kB/dXGfxT7nJqrOtRVNn9UhgrHE="
-    "jacobi.cachix.org-1:JJghCz+ZD2hc9BHO94myjCzf4wS3DeBLKHOz3jCukMU="
     "kwbauson.cachix.org-1:a6RuFyeJKSShV8LAUw3Jx8z48luiCU755DkweAAkwX0="
+    "cache.g7c.us:dSWpE2B5zK/Fahd7npIQWM4izRnVL+a4LiCAnrjdoFY="
   ];
 
   magicSubstituters = [
