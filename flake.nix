@@ -1,6 +1,5 @@
 {
   inputs = {
-    #nixpkgs.url = "nixpkgs/73de017ef2d18a04ac4bfd0c02650007ccb31c2a";
     nixpkgs.url = "nixpkgs/nixos-unstable-small";
     nixos-hardware.flake = true;
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
@@ -37,10 +36,15 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   # deadnix: skip
-  outputs = inputs@{ self, agenix, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi, devenv, nixos-hardware, vscode-server, nixos-generators }:
+  outputs = inputs@{ self, agenix, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi, devenv, nixos-hardware, vscode-server, nixos-generators, nixos-wsl }:
     let
       inherit (nixpkgs) lib;
       inherit (nix-darwin.lib) darwinSystem;
@@ -244,6 +248,31 @@
               home-manager.useUserPackages = true;
               home-manager.useGlobalPkgs = true;
               home-manager.users.bduggan = {
+                imports = [
+                  common
+                  ./home
+                ];
+              };
+            }
+          ];
+        };
+
+      nixosConfigurations.wsl =
+        let
+          common = import ./common.nix { machineName = "wsl"; isGraphical = false; isMinimal = true;  inherit inputs; inherit devenv; };
+        in
+        nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs; };
+          modules = [
+            common
+            nixos-wsl.nixosModules.wsl
+            ./machines/wsl/configuration.nix
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useUserPackages = true;
+              home-manager.useGlobalPkgs = true;
+              home-manager.users.nixos = {
                 imports = [
                   common
                   ./home
