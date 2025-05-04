@@ -1,4 +1,4 @@
-{ config, common, ... }:
+{ config, common, lib, ... }:
 let
   inherit (common) jacobi;
   inherit (common) machineName;
@@ -11,9 +11,9 @@ in
     historyFileSize = -1;
     historySize = -1;
     shellAliases = {
-      ls = "ls --color=auto";
-      l = "lsd -lA --permission octal";
-      ll = "ls -ahlFG";
+      ls = lib.mkForce "ls --color=auto";
+      l = lib.mkForce "lsd -lA --permission octal";
+      ll = lib.mkForce "ls -ahlFG";
       mkdir = "mkdir -pv";
       hm = "home-manager";
       wrun =

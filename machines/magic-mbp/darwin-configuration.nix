@@ -1,10 +1,7 @@
 { common, lib, pkgs, ... }:
 {
 
-  nix.settings.substituters = common.cacheSubstituters ++ common.magicSubstituters;
-  nix.settings.trusted-public-keys = common.trustedPublicKeys ++ common.magicTrustedPublicKeys;
-
-
+  nix.settings = common.nixSettings;
   documentation.enable = true;
 
   # Use a custom configuration.nix location.

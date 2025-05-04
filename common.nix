@@ -22,6 +22,15 @@ in
     inherit (devenv.packages.${pkgs.system}) devenv;
     agenix = inputs.agenix.packages.${pkgs.system}.default;
 
+    nixSettings = with constants; {
+      extra-trusted-substituters = cacheSubstituters ++ magicSubstituters;
+      extra-trusted-public-keys = trustedPublicKeys ++ magicTrustedPublicKeys;
+      trusted-users = [ username ];
+      narinfo-cache-negative-ttl = 10;
+      experimental-features = [ "nix-command" "flakes" ];
+    };
+
+
     ports = {
       ssh = 22;
       http = 80;

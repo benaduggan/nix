@@ -1,9 +1,9 @@
 { common, lib, pkgs, ... }:
 {
 
-  nix.settings.extra-trusted-substituters = common.cacheSubstituters ++ common.magicSubstituters;
-  nix.settings.extra-trusted-public-keys = common.trustedPublicKeys ++ common.magicTrustedPublicKeys;
-  nix.settings.trusted-users = [ "benduggan" ];
+  nix.settings = common.nixSettings // {
+    trusted-users = [ "benduggan" ];
+  };
 
   documentation.enable = true;
 
@@ -74,8 +74,8 @@
   # security.pam.enableSudoTouchIdAuth = true;
 
   homebrew = {
-    global.autoUpdate = false;
-    enable = true;
+    global.autoUpdate = true;
+    enable = false;
     onActivation = {
       autoUpdate = true;
       cleanup = "zap";
