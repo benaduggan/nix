@@ -75,7 +75,7 @@
 
   homebrew = {
     global.autoUpdate = true;
-    enable = false;
+    enable = true;
     onActivation = {
       autoUpdate = true;
       cleanup = "zap";
@@ -84,35 +84,21 @@
 
     brews = [ "readline" "qemu" ];
 
-    taps = [
-      "homebrew/cask"
-      "homebrew/cask-fonts"
-      "homebrew/cask-versions"
-      "homebrew/core"
-      "homebrew/services"
-    ];
+    taps = [ ];
 
     casks = map (name: { inherit name; greedy = true; }) [
-      # "android-studio"
-      "authy"
-      "font-fira-code-nerd-font"
       "epic-games"
       "spotify"
       "steam"
       "discord"
       "slack"
       "obs"
-      # "docker"
       "karabiner-elements"
-      # "macfuse"
       "microsoft-remote-desktop"
-      # "notion"
+      "notion"
       "parsec"
-      # "postman"
-      "qlvideo"
       "raycast"
       "rectangle"
-      # "redisinsight"
       "firefox"
       "google-chrome"
       "visual-studio-code"
@@ -121,8 +107,6 @@
       "insomnia"
       "tabby"
       "tailscale"
-      # "macfuse"
-      # "maccy"
     ];
 
     # These appear to be gated by having "purchased" the thing
