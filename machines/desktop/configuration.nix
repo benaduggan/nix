@@ -217,9 +217,18 @@
     }];
   };
 
+  # storing stuff on /mnt/bigboi/audiobookshelf
   services.audiobookshelf = {
     enable = true;
     host = "0.0.0.0";
+  };
+
+  services.calibre-web = {
+    enable = true;
+    listen.ip = "0.0.0.0";
+    options = {
+      enableBookUploading = true;
+    };
   };
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ 1080 ];

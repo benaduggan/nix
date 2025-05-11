@@ -25,7 +25,7 @@ in
     nixSettings = with constants; {
       extra-trusted-substituters = cacheSubstituters ++ magicSubstituters;
       extra-trusted-public-keys = trustedPublicKeys ++ magicTrustedPublicKeys;
-      trusted-users = [ username ];
+      trusted-users = [ "bduggan" ];
       narinfo-cache-negative-ttl = 10;
       experimental-features = [ "nix-command" "flakes" ];
     };
