@@ -273,7 +273,7 @@
     };
 
     containers.litellm = {
-      image = "ghcr.io/berriai/litellm:main-v1.67.4-stable";
+      image = "ghcr.io/berriai/litellm:main-v1.70.2.dev5";
       volumes = [ "lite-llm:/app" ];
       environmentFiles = [ config.age.secrets.litellm.path ];
       extraOptions = [
@@ -282,7 +282,7 @@
     };
 
     containers.openwebui = {
-      image = "ghcr.io/open-webui/open-webui:v0.6.5";
+      image = "ghcr.io/open-webui/open-webui:v0.6.10";
       volumes = [ "open-webui:/app/backend/data" ];
       environmentFiles = [ config.age.secrets.openwebui.path ];
       extraOptions = [
@@ -299,7 +299,7 @@
         N8N_EDITOR_BASE_URL = "https://n8n.digdug.dev";
         N8N_TEMPLATES_ENABLED = "true";
         N8N_HIRING_BANNER_ENABLED = "false";
-
+        WEBHOOK_URL = "https://n8n.digdug.dev";
       };
       environmentFiles = [ config.age.secrets.n8n.path ];
       extraOptions = [

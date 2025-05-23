@@ -5,7 +5,7 @@
 # NixOS-WSL specific options are documented on the NixOS-WSL repository:
 # https://github.com/nix-community/NixOS-WSL
 
-{ config, lib, pkgs, common, ... }:
+{ config, lib, pkgs, ... }:
 let
   cuda = pkgs.cudaPackages.cudatoolkit;
   CUDA_PATH = cuda.outPath;
@@ -25,7 +25,7 @@ in
   nixpkgs.config.allowUnfree = true;
   wsl.enable = true;
   wsl.defaultUser = "nixos";
-    users.users.nixos = {
+  users.users.nixos = {
     isNormalUser = true;
     description = "nixos user";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
