@@ -34,6 +34,7 @@
   # $ darwin-rebuild changelog
   system.stateVersion = 4;
   system = {
+    primaryUser = "benduggan";
     defaults = {
       NSGlobalDomain = {
         InitialKeyRepeat = 5;
@@ -88,7 +89,7 @@
 
     casks = map (name: { inherit name; greedy = true; }) [
       "epic-games"
-      "spotify"
+      # "spotify"
       "steam"
       "discord"
       "slack"

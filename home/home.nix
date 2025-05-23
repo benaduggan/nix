@@ -22,6 +22,7 @@ in
     packages = with lib;
       with pkgs;
       lib.flatten [
+        biome
         myPogScripts.spelltree
         common.agenix
         bashInteractive
@@ -85,6 +86,7 @@ in
           atool
           bat
           bc
+          biome
           bzip2
           cachix
           codex

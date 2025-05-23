@@ -37,6 +37,7 @@
   # $ darwin-rebuild changelog
   system.stateVersion = 4;
   system = {
+    primaryUser = common.username;
     defaults = {
       NSGlobalDomain = {
         ApplePressAndHoldEnabled = false;
