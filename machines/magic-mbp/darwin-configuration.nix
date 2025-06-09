@@ -77,6 +77,12 @@
   };
 
   # security.pam.enableSudoTouchIdAuth = true;
+  # services.mlx-vlm-api.servers = {
+  #   qwen2-vl-2b-Instruct-4bit = {
+  #     enable = true;
+  #     model = "mlx-community/Qwen2.5-VL-7B-Instruct-8bit";
+  #   };
+  # };
 
   services.llama-server =
     let
@@ -84,35 +90,60 @@
     in
     {
       servers = {
-        deepscaler-1-5b = {
-          inherit package;
-          enable = true;
-          port = 8014;
-          model = "/opt/box/models/agentica-org_DeepScaleR-1.5B-Preview-Q8_0.gguf";
-          ngl = 99;
-        };
-        qwen-coder = {
-          inherit package;
-          enable = true;
-          port = 8015;
-          model = "/opt/box/models/Qwen2.5.1-Coder-7B-Instruct-Q6_K_L.gguf";
-          ngl = 99;
-        };
-        qwen-r1-distill = {
-          inherit package;
-          enable = true;
-          port = 8016;
-          model = "/opt/box/models/DeepSeek-R1-Distill-Qwen-14B-Q8_0.gguf";
-          ngl = 99;
-          extraFlags = "-c 16384";
-        };
-        gemma-3-12b = {
+        # deepscaler-1-5b = {
+        #   inherit package;
+        #   enable = true;
+        #   port = 8014;
+        #   model = "/opt/box/models/agentica-org_DeepScaleR-1.5B-Preview-Q8_0.gguf";
+        #   ngl = 99;
+        # };
+        # qwen-coder-14 = {
+        #   inherit package;
+        #   enable = true;
+        #   port = 8020;
+        #   model = "/opt/box/models/qwen25coder14.gguf";
+        #   ngl = 99;
+        # };
+        # qwen-coder-32 = {
+        #   inherit package;
+        #   enable = true;
+        #   port = 8020;
+        #   model = "/opt/box/models/Qwen2.5-Coder-32B-Instruct-Q4_0.gguf";
+        #   ngl = 99;
+        # };
+        # qwen-coder = {
+        #   inherit package;
+        #   enable = true;
+        #   port = 8015;
+        #   model = "/opt/box/models/Qwen2.5.1-Coder-7B-Instruct-Q6_K_L.gguf";
+        #   ngl = 99;
+        # };
+        # qwen-r1-distill = {
+        #   inherit package;
+        #   enable = false;
+        #   port = 8016;
+        #   model = "/opt/box/models/DeepSeek-R1-Distill-Qwen-14B-Q8_0.gguf";
+        #   ngl = 99;
+        #   extraFlags = "-c 16384";
+        # };
+
+
+        # mutually exclusive:
+        # gemma-3-12b = {
+        #   inherit package;
+        #   enable = true;
+        #   port = 8017;
+        #   model = "/opt/box/models/gemma-3-12b.gguf";
+        #   ngl = 99;
+        #   extraFlags = "-c 16384 --temp 1.0 --top-k 64 --min-p 0 --top-p 0.95";
+        # };
+        qwen-3-30-a3b-ud = {
           inherit package;
           enable = true;
           port = 8017;
-          model = "/opt/box/models/gemma-3-12b.gguf";
+          model = "/opt/box/models/qwen-3-30-ud-q4.gguf";
           ngl = 99;
-          extraFlags = "-c 8096";
+          extraFlags = "-c 16384 --temp 0.6 --top-k 20 --min-p 0 --top-p 0.95";
         };
       };
     };
