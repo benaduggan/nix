@@ -243,4 +243,18 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = common.stateVersion;
+
+  services.logind = {
+    suspendKeyLongPress = "ignore";
+    suspendKey = "ignore";
+    rebootKeyLongPress = "ignore";
+    rebootKey = "ignore";
+    powerKeyLongPress = "ignore";
+    powerKey = "ignore";
+    lidSwitchExternalPower = "ignore";
+    lidSwitchDocked = "ignore";
+    lidSwitch = "ignore";
+    hibernateKeyLongPress = "ignore";
+    hibernateKey = "ignore";
+  };
 }
