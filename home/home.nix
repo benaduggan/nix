@@ -81,6 +81,7 @@ in
             '')
           ])
 
+          claude-code
           esbuild
           amazon-ecr-credential-helper
           atool
