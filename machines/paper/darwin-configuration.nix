@@ -107,7 +107,6 @@
       "zoom"
       "insomnia"
       "tabby"
-      "tailscale"
     ];
 
     # These appear to be gated by having "purchased" the thing
