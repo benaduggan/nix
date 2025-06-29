@@ -266,14 +266,14 @@
     containers.homeassistant = {
       volumes = [ "home-assistant:/config" ];
       environment.TZ = "US/Eastern";
-      image = "ghcr.io/home-assistant/home-assistant:2025.2.0";
+      image = "ghcr.io/home-assistant/home-assistant:2025.5.3";
       extraOptions = [
         "--network=host"
       ];
     };
 
     containers.litellm = {
-      image = "ghcr.io/berriai/litellm:main-v1.70.2.dev5";
+      image = "ghcr.io/berriai/litellm:main-v1.73.0-stable";
       volumes = [ "lite-llm:/app" ];
       environmentFiles = [ config.age.secrets.litellm.path ];
       extraOptions = [
@@ -282,7 +282,7 @@
     };
 
     containers.openwebui = {
-      image = "ghcr.io/open-webui/open-webui:v0.6.10";
+      image = "ghcr.io/open-webui/open-webui:v0.6.15";
       volumes = [ "open-webui:/app/backend/data" ];
       environmentFiles = [ config.age.secrets.openwebui.path ];
       extraOptions = [
@@ -291,7 +291,7 @@
     };
 
     containers.n8n = {
-      image = "docker.n8n.io/n8nio/n8n:1.89.2";
+      image = "docker.n8n.io/n8nio/n8n:1.99.1";
       volumes = [ "n8n_data:/home/node/.n8n" ];
       ports = [ "5678:5678" ];
       environment = {
