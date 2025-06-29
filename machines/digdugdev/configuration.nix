@@ -219,6 +219,10 @@
             to bduggan-desktop:8000
           }
         '';
+        "java.digdug.dev".extraConfig = ''
+          root * /var/www/java
+          file_server
+        '';
 
         "sink.digdug.dev".extraConfig = ''
           reverse_proxy /* {
