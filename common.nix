@@ -23,7 +23,7 @@ in
     agenix = inputs.agenix.packages.${pkgs.system}.default;
 
     nixSettings = with constants; {
-      extra-trusted-substituters = cacheSubstituters ++ magicSubstituters;
+      extra-substituters = cacheSubstituters ++ magicSubstituters;
       extra-trusted-public-keys = trustedPublicKeys ++ magicTrustedPublicKeys;
       trusted-users = [ "bduggan" ];
       narinfo-cache-negative-ttl = 10;
