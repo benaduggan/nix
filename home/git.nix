@@ -7,7 +7,7 @@ in
   home.file.".ssh/allowed_signers".text = "* ${signingKey}";
   programs.git = {
     enable = true;
-    package = pkgs.gitAndTools.gitFull;
+    # package = pkgs.gitAndTools.gitFull;
     userName = "${firstName} ${lastName}";
     userEmail = email;
     signing.signByDefault = true;
