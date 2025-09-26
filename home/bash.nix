@@ -11,6 +11,7 @@ in
     historyFileSize = -1;
     historySize = -1;
     shellAliases = {
+      cc = "security unlock-keychain ~/Library/Keychains/login.keychain-db && claude";
       ls = lib.mkForce "ls --color=auto";
       l = lib.mkForce "lsd -lA --permission octal";
       ll = lib.mkForce "ls -ahlFG";
