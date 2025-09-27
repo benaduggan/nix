@@ -140,7 +140,7 @@
   systemd.services = {
     unifi-manager-service =
       let
-        myPython = pkgs.python311.withPackages (p: with p; [
+        myPython = pkgs.python313.withPackages (p: with p; [
           pydantic
           pyunifi
           systemd
@@ -244,17 +244,19 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = common.stateVersion;
 
-  services.logind = {
-    suspendKeyLongPress = "ignore";
-    suspendKey = "ignore";
-    rebootKeyLongPress = "ignore";
-    rebootKey = "ignore";
-    powerKeyLongPress = "ignore";
-    powerKey = "ignore";
-    lidSwitchExternalPower = "ignore";
-    lidSwitchDocked = "ignore";
-    lidSwitch = "ignore";
-    hibernateKeyLongPress = "ignore";
-    hibernateKey = "ignore";
+  services.logind.settings = {
+    Login = {
+      HandleLidSwitchDocked = "ignore";
+      HandleLidSwitchExternalPower = "ignore";
+      HandleLidSwitch = "ignore";
+      HandleHibernateKeyLongPress = "ignore";
+      HandleHibernateKey = "ignore";
+      HandleSuspendKeyLongPress = "ignore";
+      HandleSuspendKey = "ignore";
+      HandleRebootKeyLongPress = "ignore";
+      HandleRebootKey = "ignore";
+      HandlePowerKeyLongPress = "ignore";
+      HandlePowerKey = "ignore";
+    };
   };
 }

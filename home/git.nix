@@ -1,4 +1,4 @@
-{ pkgs, common, ... }:
+{ common, ... }:
 let
   inherit (common) firstName lastName email authorizedKeysRec machineName digdugdevKey;
   signingKey = if machineName == "digdugdev" then digdugdevKey else authorizedKeysRec.${machineName};
@@ -7,7 +7,6 @@ in
   home.file.".ssh/allowed_signers".text = "* ${signingKey}";
   programs.git = {
     enable = true;
-    # package = pkgs.gitAndTools.gitFull;
     userName = "${firstName} ${lastName}";
     userEmail = email;
     signing.signByDefault = true;
