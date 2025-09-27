@@ -1,4 +1,4 @@
-{ common, config, lib, ... }:
+{ common, lib, ... }:
 let
   hostName = common.machineName;
 in
