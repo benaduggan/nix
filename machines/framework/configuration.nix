@@ -135,6 +135,13 @@
   boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
 
 
+  virtualisation.podman.enable = true;
+  virtualisation.docker.enable = true;
+  users.extraGroups.docker.members = [ common.username ];
+  virtualisation.oci-containers = {
+    backend = "podman";
+  };
+
   systemd.services.NetworkManager-wait-online.enable = lib.mkForce false;
   systemd.services.systemd-networkd-wait-online.enable = lib.mkForce false;
   # Open ports in the firewall.
