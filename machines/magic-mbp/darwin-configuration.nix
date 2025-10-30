@@ -137,11 +137,19 @@
         #   ngl = 99;
         #   extraFlags = "-c 16384 --temp 1.0 --top-k 64 --min-p 0 --top-p 0.95";
         # };
-        qwen-3-30-a3b-ud = {
+        # qwen-3-30-a3b-ud = {
+        #   inherit package;
+        #   enable = true;
+        #   port = 8017;
+        #   model = "/opt/box/models/qwen-3-30-ud-q4.gguf";
+        #   ngl = 99;
+        #   extraFlags = "-c 16384 --temp 0.6 --top-k 20 --min-p 0 --top-p 0.95";
+        # };
+        qwen-3-coder-30-a3b-ud = {
           inherit package;
           enable = true;
           port = 8017;
-          model = "/opt/box/models/qwen-3-30-ud-q4.gguf";
+          model = "/opt/box/models/qwen-3-coder-30b-a3b.gguf";
           ngl = 99;
           extraFlags = "-c 16384 --temp 0.6 --top-k 20 --min-p 0 --top-p 0.95";
         };

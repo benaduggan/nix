@@ -45,8 +45,7 @@ in
       export LANG=en_US.UTF-8
 
       # add local scripts to path
-      export PATH="$PATH:$HOME/.bin/:$HOME/.local/bin"
-
+      export PATH="$PATH:$HOME/.bin/:$HOME/.local/bin:~/.rd/bin"
       # mkdir -p $HOME/.completions
       # source $HOME/.completions/*
 
