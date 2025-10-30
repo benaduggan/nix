@@ -176,7 +176,7 @@
       "font-fira-code-nerd-font"
       "spotify"
       "discord"
-      "slack"
+      # "slack"
       "karabiner-elements"
       "microsoft-remote-desktop"
       "qlvideo"
