@@ -14,7 +14,7 @@ in
     settings = {
       user = {
         name = "${firstName} ${lastName}";
-        email = email;
+        inherit email;
       };
       alias = {
         co = "checkout";

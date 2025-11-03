@@ -320,7 +320,7 @@
       };
 
       overlays = {
-  apple-silicon = _final: prev: optionalAttrs (prev.stdenv.hostPlatform.system == "aarch64-darwin") {
+        apple-silicon = _final: prev: optionalAttrs (prev.stdenv.hostPlatform.system == "aarch64-darwin") {
           # Useful on Macs with Apple Silicon
           # Adds access to x86 packages system is running Apple Silicon
           pkgs-x86 = import nixpkgs {
