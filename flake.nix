@@ -56,7 +56,7 @@
         overlays = attrValues self.overlays ++ singleton (
           # Sub in x86 version of packages that don't build on Apple Silicon yet
           # These might get updated, when that happens, just remove them from that list
-          final: prev: (optionalAttrs (prev.stdenv.system == "aarch64-darwin") {
+          final: prev: (optionalAttrs (prev.stdenv.hostPlatform.system == "aarch64-darwin") {
             inherit (final.pkgs-x86)
               purescript;
           })
@@ -320,7 +320,7 @@
       };
 
       overlays = {
-        apple-silicon = _final: prev: optionalAttrs (prev.stdenv.system == "aarch64-darwin") {
+  apple-silicon = _final: prev: optionalAttrs (prev.stdenv.hostPlatform.system == "aarch64-darwin") {
           # Useful on Macs with Apple Silicon
           # Adds access to x86 packages system is running Apple Silicon
           pkgs-x86 = import nixpkgs {
