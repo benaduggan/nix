@@ -32,11 +32,7 @@ in
   };
 
   programs.command-not-found.enable = false;
-  programs.nix-ld = {
-    enable = true;
-    package = pkgs.nix-ld-rs;
-  };
-
+  programs.nix-ld.enable = true;
 
   environment = {
     systemPackages = with pkgs; [
