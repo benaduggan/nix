@@ -41,7 +41,7 @@ in
         wget
         yq-go
         vim
-        gitAndTools.delta
+        delta
         nixpkgs-fmt
         nil
         difftastic
