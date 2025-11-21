@@ -8,7 +8,7 @@ jobs:
   updates:
     runs-on: [nix, Linux, X64]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v31
         with:
           extra_nix_config: |
