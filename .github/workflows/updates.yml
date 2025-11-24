@@ -16,7 +16,7 @@ jobs:
             substituters = https://cache.nixos.org/ https://benaduggan.cachix.org https://devenv.cachix.org https://jacobi.cachix.org https://kwbauson.cachix.org
       - run: |
           nix flake update
-      - uses: peter-evans/create-pull-request@v7.0.8
+      - uses: peter-evans/create-pull-request@v7.0.9
         with:
           author: Ben Duggan <benaduggan@gmail.com>
           title: "Flake update"
