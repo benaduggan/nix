@@ -2,20 +2,30 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, common, ... }:
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [
+      # Include the results of the hardware scan.
       ./hardware-configuration.nix
     ];
 
+  nix.settings = common.nixSettings;
+  programs.nix-ld.enable = true;
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   services.openssh.enable = true;
   networking.hostName = "beast"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+
+  systemd.sleep.extraConfig = ''
+    AllowSuspend=no
+    AllowHibernation=no
+    AllowHybridSleep=no
+    AllowSuspendThenHibernate=no
+  '';
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -42,12 +52,29 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
-
-  # Enable the Pantheon Desktop Environment.
-  services.xserver.displayManager.lightdm.enable = true;
-  services.xserver.desktopManager.pantheon.enable = true;
+  services = {
+    flatpak.enable = true;
+    pantheon.apps.enable = true;
+    xserver = {
+      enable = true;
+      displayManager = {
+        lightdm.enable = true;
+        lightdm.greeters.pantheon.enable = true;
+        lightdm.extraConfig = ''
+          logind-check-graphical=true
+        '';
+      };
+    };
+    desktopManager = {
+      pantheon = {
+        enable = true;
+        extraWingpanelIndicators = with pkgs; [
+          monitor
+          wingpanel-indicator-ayatana
+        ];
+      };
+    };
+  };
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -78,31 +105,73 @@
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.bduggan = {
-    isNormalUser = true;
-    description = "ben";
-    extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-    #  thunderbird
-    ];
+  users.users = {
+    bduggan = {
+      isNormalUser = true;
+      description = "ben";
+      extraGroups = [ "networkmanager" "wheel" ];
+      openssh.authorizedKeys.keys = common.authorizedKeys;
+      packages = with pkgs; [
+        #  thunderbird
+      ];
+    };
   };
 
-  # Enable automatic login for the user.
+  services.tailscale.enable = true;
+  services.tailscale.useRoutingFeatures = "both";
+  boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
+  boot.kernel.sysctl."net.ipv4.conf.all.forwarding" = 1;
+  boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
+
   services.displayManager.autoLogin.enable = true;
   services.displayManager.autoLogin.user = "bduggan";
 
   # Install firefox.
   programs.firefox.enable = true;
-
-  # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+
+  programs.steam.enable = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
+    appeditor # elementary OS menu editor
+    celluloid # Video Player
+    formatter # elementary OS filesystem formatter
+    gthumb # Image Viewer
+    simple-scan # Scanning
+    indicator-application-gtk3 # App Indicator
+    pantheon.sideload # elementary OS Flatpak installer
+    pantheon-tweaks
   ];
+
+  programs = {
+    gnome-disks.enable = true;
+  };
+
+  environment.pantheon.excludePackages = with pkgs.pantheon; [
+    elementary-music
+    elementary-photos
+    elementary-videos
+    epiphany
+  ];
+
+  # App indicator
+  # - https://discourse.nixos.org/t/anyone-with-pantheon-de/28422
+  # - https://github.com/NixOS/nixpkgs/issues/144045#issuecomment-992487775
+  environment.pathsToLink = [ "/libexec" ];
+
+  # App indicator
+  # - https://github.com/NixOS/nixpkgs/issues/144045#issuecomment-992487775
+  systemd.user.services.indicatorapp = {
+    description = "indicator-application-gtk3";
+    wantedBy = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.indicator-application-gtk3}/libexec/indicator-application/indicator-application-service";
+    };
+  };
+
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -114,14 +183,18 @@
 
   # List services that you want to enable:
 
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   networking.firewall.enable = false;
+  services.xserver.videoDrivers = [ "nvidia" ];
+  hardware = {
+    nvidia = {
+      open = false;
+      package = config.boot.kernelPackages.nvidiaPackages.stable;
+    };
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
