@@ -145,6 +145,34 @@
           ];
         };
 
+      nixosConfigurations.beast =
+        let
+          common = import ./common.nix { machineName = "beast"; isGraphical = true; isMinimal = false; inherit inputs; inherit devenv; };
+        in
+        nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            common
+            ./machines/beast/configuration.nix
+            vscode-server.nixosModule
+            (_: {
+              services.vscode-server.enable = true;
+            })
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useUserPackages = true;
+              home-manager.useGlobalPkgs = true;
+              home-manager.users.bduggan = {
+                imports = [
+                  common
+                  ./home
+                ];
+              };
+            }
+          ];
+        };
+
+
       nixosConfigurations.home-server =
         let
           common = import ./common.nix { machineName = "homeServer"; isGraphical = false; isMinimal = false;  inherit inputs; inherit devenv; };
