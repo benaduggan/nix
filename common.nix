@@ -6,7 +6,7 @@ let
 in
 {
   _module.args.common = {
-    inherit (constants) authorizedKeys authorizedKeysRec cacheSubstituters digdugdevKey trustedPublicKeys magicSubstituters magicTrustedPublicKeys;
+    inherit (constants) authorizedKeys authorizedKeysRec cacheSubstituters digdugdevKey trustedPublicKeys magicSubstituters magicTrustedPublicKeys communitySubstituters communityTrustedPublicKeys;
     inherit (pkgs.stdenv) isLinux isDarwin;
     inherit isGraphical;
     inherit isMinimal;
@@ -24,8 +24,8 @@ in
     agenix = inputs.agenix.packages.${sys}.default;
 
     nixSettings = with constants; {
-      extra-substituters = cacheSubstituters ++ magicSubstituters;
-      extra-trusted-public-keys = trustedPublicKeys ++ magicTrustedPublicKeys;
+      extra-substituters = cacheSubstituters ++ magicSubstituters ++ pkgs.lib.optionals (machineName == "homeServer") communitySubstituters;
+      extra-trusted-public-keys = trustedPublicKeys ++ magicTrustedPublicKeys ++ pkgs.lib.optionals (machineName == "homeServer") communityTrustedPublicKeys;
       trusted-users = [ "bduggan" ];
       narinfo-cache-negative-ttl = 10;
       experimental-features = [ "nix-command" "flakes" ];

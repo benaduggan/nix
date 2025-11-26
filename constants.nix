@@ -32,6 +32,14 @@ in
     "kwbauson.cachix.org-1:a6RuFyeJKSShV8LAUw3Jx8z48luiCU755DkweAAkwX0="
   ];
 
+  communitySubstituters = [
+    "https://nix-community.cachix.org"
+  ];
+
+  communityTrustedPublicKeys = [
+    "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+  ];
+
   magicSubstituters = [
     "https://magic-school-ai.cachix.org"
   ];
