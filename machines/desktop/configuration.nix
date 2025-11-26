@@ -143,7 +143,7 @@
         myPython = pkgs.python313.withPackages (p: with p; [
           pydantic
           pyunifi
-          systemd
+          systemd-python
         ]);
       in
       {
