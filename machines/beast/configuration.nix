@@ -196,6 +196,13 @@
     };
   };
 
+  services.jellyfin = {
+    enable = true;
+    openFirewall = true;
+    dataDir = "/mnt/massive/jellyfin";
+    cacheDir = "/mnt/massive/jellyfin/cache";
+  };
+
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave
