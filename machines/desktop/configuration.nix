@@ -183,7 +183,7 @@ in
         myPython = pkgs.python313.withPackages (p: with p; [
           pydantic
           pyunifi
-          systemd
+          systemd-python
         ]);
       in
       {
@@ -211,7 +211,7 @@ in
     containers.homeassistant = {
       volumes = [ "home-assistant:/config" ];
       environment.TZ = "US/Eastern";
-      image = "ghcr.io/home-assistant/home-assistant:2024.8.1";
+      image = "ghcr.io/home-assistant/home-assistant:2025.10.3";
       extraOptions = [
         "--network=host"
       ];

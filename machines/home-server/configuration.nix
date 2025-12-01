@@ -83,8 +83,8 @@
   services.xserver.enable = false;
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = false;
-  services.xserver.desktopManager.gnome.enable = false;
+  services.displayManager.gdm.enable = false;
+  services.desktopManager.gnome.enable = false;
 
   # Configure keymap in X11
   services.xserver = {
@@ -266,14 +266,14 @@
     containers.homeassistant = {
       volumes = [ "home-assistant:/config" ];
       environment.TZ = "US/Eastern";
-      image = "ghcr.io/home-assistant/home-assistant:2025.7.2";
+      image = "ghcr.io/home-assistant/home-assistant:2025.11.3";
       extraOptions = [
         "--network=host"
       ];
     };
 
     containers.litellm = {
-      image = "ghcr.io/berriai/litellm:main-v1.74.3-stable";
+      image = "ghcr.io/berriai/litellm:main-v1.80.0-stable.1 ";
       volumes = [ "lite-llm:/app" ];
       environmentFiles = [ config.age.secrets.litellm.path ];
       extraOptions = [
@@ -282,7 +282,7 @@
     };
 
     containers.openwebui = {
-      image = "ghcr.io/open-webui/open-webui:v0.6.18";
+      image = "ghcr.io/open-webui/open-webui:v0.6.40";
       volumes = [ "open-webui:/app/backend/data" ];
       environmentFiles = [ config.age.secrets.openwebui.path ];
       extraOptions = [
@@ -291,7 +291,7 @@
     };
 
     containers.n8n = {
-      image = "docker.n8n.io/n8nio/n8n:1.102.4";
+      image = "docker.n8n.io/n8nio/n8n:1.121.3";
       volumes = [ "n8n_data:/home/node/.n8n" ];
       ports = [ "5678:5678" ];
       environment = {
@@ -510,4 +510,59 @@
       log-level = "debug";
     };
   };
+
+  services.wyoming.faster-whisper = {
+    # package = pkgs.wyoming-faster-whisper;  # default, rarely need to override
+
+    servers = {
+      "default" = {
+        enable = true;
+
+        # Model selection - pick one:
+        # tiny-int8 (default), tiny, base-int8, small-int8, medium-int8
+        # distil-small.en, distil-medium.en, distil-large-v2/v3 (English only, fast)
+        # large-v3, turbo (best quality, need more resources)
+        model = "small-int8"; # good balance of speed/accuracy
+
+        # Device: "cpu" or "cuda"
+        # CUDA on NixOS can be painful - start with cpu
+        device = "cpu";
+
+        # URI for Home Assistant to connect to
+        uri = "tcp://0.0.0.0:10300";
+
+        # Language - use "en" for English, "auto" for auto-detect
+        language = "en";
+
+        # Beam size - higher = more accurate, slower. Default is fine.
+        # beamSize = 5;
+
+        # Optional initial prompt to guide transcription
+        # initialPrompt = "Turn on the lights";
+
+        # Use HuggingFace transformers models instead (requires useTransformers = true)
+        # useTransformers = true;
+        # model = "openai/whisper-tiny.en";
+
+        # Extra CLI args if needed
+        # extraArgs = [ "--debug" ];
+      };
+    };
+  };
+
+  services.wyoming.piper.servers."default" = {
+    enable = true;
+    uri = "tcp://0.0.0.0:10200";
+
+    # Voice model - downloads automatically
+    # Browse voices at: https://rhasspy.github.io/piper-samples/
+    voice = "en_US-amy-low"; # decent quality, not too slow
+
+    # Other options:
+    # voice = "en_US-amy-low";      # faster, lower quality
+    # voice = "en_US-ryan-high";    # slower, better quality
+    # voice = "en_US-lessac-medium"; # decent quality, not too slow
+    # voice = "en_GB-alba-medium";  # British accent
+  };
+
 }

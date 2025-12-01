@@ -7,19 +7,19 @@
 
 { config, lib, pkgs, ... }:
 let
-  # cuda = pkgs.cudaPackages.cudatoolkit;
-  # CUDA_PATH = cuda.outPath;
-  # CUDA_LDPATH = "${
-  #     lib.concatStringsSep ":" [
-  #       "/usr/lib/wsl/lib"
-  #       "/run/opengl-drivers/lib"
-  #       # "/run/opengl-drivers-32/lib"
-  #       "${cuda}/lib"
-  #       "${pkgs.cudaPackages.cudnn}/lib"
-  #     ]
-  #   }:${
-  #     lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib cuda.lib ]
-  #   }";
+  cuda = pkgs.cudaPackages.cudatoolkit;
+  CUDA_PATH = cuda.outPath;
+  CUDA_LDPATH = "${
+      lib.concatStringsSep ":" [
+        "/usr/lib/wsl/lib"
+        "/run/opengl-drivers/lib"
+        # "/run/opengl-drivers-32/lib"
+        "${cuda}/lib"
+        "${pkgs.cudaPackages.cudnn}/lib"
+      ]
+    }:${
+      lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib cuda.lib ]
+    }";
 in
 {
   nixpkgs.config.allowUnfree = true;
@@ -32,29 +32,25 @@ in
   };
 
   programs.command-not-found.enable = false;
-  programs.nix-ld = {
-    enable = true;
-    package = pkgs.nix-ld-rs;
-  };
-
+  programs.nix-ld.enable = true;
 
   environment = {
     systemPackages = with pkgs; [
-      # cudaPackages.cudatoolkit
-      # cudaPackages.cudnn
-      # nvidia-docker
+      cudaPackages.cudatoolkit
+      cudaPackages.cudnn
+      nvidia-docker
     ];
     variables = {
-      # _CUDA_PATH = CUDA_PATH;
-      # _CUDA_LDPATH = CUDA_LDPATH;
-      # XLA_FLAGS = "--xla_gpu_cuda_data_dir=${CUDA_PATH}";
+      _CUDA_PATH = CUDA_PATH;
+      _CUDA_LDPATH = CUDA_LDPATH;
+      XLA_FLAGS = "--xla_gpu_cuda_data_dir=${CUDA_PATH}";
     };
   };
 
 
-  # services = {
-  #   xserver.videoDrivers = [ "nvidia" ];
-  # };
+  services = {
+    xserver.videoDrivers = [ "nvidia" ];
+  };
 
   virtualisation.docker = {
     enable = true;
@@ -66,18 +62,18 @@ in
   };
 
   hardware = {
-    # graphics = {
-    #   enable = true;
-    #   enable32Bit = true;
-    # };
-    # nvidia-container-toolkit = {
-    #   enable = true;
-    #   mount-nvidia-executables = false;
-    # };
-    # nvidia = {
-    #   open = false;
-    #   package = config.boot.kernelPackages.nvidiaPackages.stable;
-    # };
+    graphics = {
+      enable = true;
+      enable32Bit = true;
+    };
+    nvidia-container-toolkit = {
+      enable = true;
+      mount-nvidia-executables = false;
+    };
+    nvidia = {
+      open = false;
+      package = config.boot.kernelPackages.nvidiaPackages.stable;
+    };
   };
 
   # This value determines the NixOS release from which the default

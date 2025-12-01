@@ -8,6 +8,7 @@ let
     magicMbp = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIArr/sVKrsd6nlkdsbsn759Tvzwnp5cnwDo70xgNB2bY";
     homeServer = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINVM1Pr/o+daMn1ElHm/A0gCyR6t85ZuP3LRkhIJFiF1";
     springfield = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFulKxPMuKmSevjxb6rhhcxKP1tmbqD6tlS0eXE99JwU";
+    beast = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOoAXeYNb3LC5nyu3yfheXHH/jvxCbKH7V7UVhdGKosk";
     wsl = "test";
     # digdugdev is not added here cause it doesn't need to decrypt most of the secrets;
   };
@@ -29,6 +30,14 @@ in
     "benaduggan.cachix.org-1:BY2tmi++VqJD6My4kB/dXGfxT7nJqrOtRVNn9UhgrHE="
     "cache.g7c.us:dSWpE2B5zK/Fahd7npIQWM4izRnVL+a4LiCAnrjdoFY="
     "kwbauson.cachix.org-1:a6RuFyeJKSShV8LAUw3Jx8z48luiCU755DkweAAkwX0="
+  ];
+
+  communitySubstituters = [
+    "https://nix-community.cachix.org"
+  ];
+
+  communityTrustedPublicKeys = [
+    "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
   ];
 
   magicSubstituters = [
