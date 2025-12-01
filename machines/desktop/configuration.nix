@@ -284,21 +284,21 @@ in
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = common.stateVersion;
 
-  # services.logind.settings = {
-  #   Login = {
-  #     HandleLidSwitchDocked = "ignore";
-  #     HandleLidSwitchExternalPower = "ignore";
-  #     HandleLidSwitch = "ignore";
-  #     HandleHibernateKeyLongPress = "ignore";
-  #     HandleHibernateKey = "ignore";
-  #     HandleSuspendKeyLongPress = "ignore";
-  #     HandleSuspendKey = "ignore";
-  #     HandleRebootKeyLongPress = "ignore";
-  #     HandleRebootKey = "ignore";
-  #     HandlePowerKeyLongPress = "ignore";
-  #     HandlePowerKey = "ignore";
-  #   };
-  # };
+  services.logind.settings = {
+    Login = {
+      HandleLidSwitchDocked = "ignore";
+      HandleLidSwitchExternalPower = "ignore";
+      HandleLidSwitch = "ignore";
+      HandleHibernateKeyLongPress = "ignore";
+      HandleHibernateKey = "ignore";
+      HandleSuspendKeyLongPress = "ignore";
+      HandleSuspendKey = "ignore";
+      HandleRebootKeyLongPress = "ignore";
+      HandleRebootKey = "ignore";
+      HandlePowerKeyLongPress = "ignore";
+      HandlePowerKey = "ignore";
+    };
+  };
 
   nixpkgs.config.cudaCapabilities = [ "6.1" ];
 
@@ -306,7 +306,7 @@ services.llama-cpp = {
   enable = true;
   package =
     let
-      version = "b6085";
+      version = "b7211";
       hash = "sha256-u2oUTNTiFs82xTiN9na3SCu0sG+KIGMMB2lqKec4lZY=";
     in
     (pkgs.llama-cpp.overrideAttrs (old: {
