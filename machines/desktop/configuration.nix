@@ -1,4 +1,18 @@
 { common, config, lib, pkgs, ... }:
+let
+  cuda = pkgs.cudaPackages.cudatoolkit;
+  CUDA_PATH = cuda.outPath;
+  CUDA_LDPATH = "${
+      lib.concatStringsSep ":" [
+        "/run/opengl-drivers/lib"
+        # "/run/opengl-drivers-32/lib"
+        "${cuda}/lib"
+        "${pkgs.cudaPackages.cudnn}/lib"
+      ]
+    }:${
+      lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib cuda.lib ]
+    }";
+in
 {
   imports =
     [
@@ -110,10 +124,36 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    #  wget
-  ];
+  environment = {
+    systemPackages = with pkgs; [
+      cudaPackages.cudatoolkit
+      cudaPackages.cudnn
+      # nvidia-docker
+    ];
+    variables = {
+      _CUDA_PATH = CUDA_PATH;
+      _CUDA_LDPATH = CUDA_LDPATH;
+      XLA_FLAGS = "--xla_gpu_cuda_data_dir=${CUDA_PATH}";
+    };
+  };
+
+
+    services.xserver.videoDrivers = [ "nvidia" ];
+
+  hardware = {
+    graphics = {
+      enable = true;
+      enable32Bit = true;
+    };
+    nvidia-container-toolkit = {
+      enable = true;
+      mount-nvidia-executables = false;
+    };
+    nvidia = {
+      open = false;
+      package = config.boot.kernelPackages.nvidiaPackages.stable;
+    };
+  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -140,7 +180,7 @@
   systemd.services = {
     unifi-manager-service =
       let
-        myPython = pkgs.python311.withPackages (p: with p; [
+        myPython = pkgs.python313.withPackages (p: with p; [
           pydantic
           pyunifi
           systemd
@@ -244,17 +284,56 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = common.stateVersion;
 
-  services.logind = {
-    suspendKeyLongPress = "ignore";
-    suspendKey = "ignore";
-    rebootKeyLongPress = "ignore";
-    rebootKey = "ignore";
-    powerKeyLongPress = "ignore";
-    powerKey = "ignore";
-    lidSwitchExternalPower = "ignore";
-    lidSwitchDocked = "ignore";
-    lidSwitch = "ignore";
-    hibernateKeyLongPress = "ignore";
-    hibernateKey = "ignore";
-  };
+  # services.logind.settings = {
+  #   Login = {
+  #     HandleLidSwitchDocked = "ignore";
+  #     HandleLidSwitchExternalPower = "ignore";
+  #     HandleLidSwitch = "ignore";
+  #     HandleHibernateKeyLongPress = "ignore";
+  #     HandleHibernateKey = "ignore";
+  #     HandleSuspendKeyLongPress = "ignore";
+  #     HandleSuspendKey = "ignore";
+  #     HandleRebootKeyLongPress = "ignore";
+  #     HandleRebootKey = "ignore";
+  #     HandlePowerKeyLongPress = "ignore";
+  #     HandlePowerKey = "ignore";
+  #   };
+  # };
+
+  nixpkgs.config.cudaCapabilities = [ "6.1" ];
+
+services.llama-cpp = {
+  enable = true;
+  package =
+    let
+      version = "b6085";
+      hash = "sha256-u2oUTNTiFs82xTiN9na3SCu0sG+KIGMMB2lqKec4lZY=";
+    in
+    (pkgs.llama-cpp.overrideAttrs (old: {
+      inherit version;
+      src = pkgs.fetchFromGitHub {
+        inherit hash;
+        tag = version;
+        owner = "ggerganov";
+        repo = "llama.cpp";
+        leaveDotGit = true;
+        postFetch = ''
+          git -C "$out" rev-parse --short HEAD > $out/COMMIT
+          find "$out" -name .git -print0 | xargs -0 rm -rf
+        '';
+      };
+      # Fix the build number - strip the 'b' prefix
+      cmakeFlags = (old.cmakeFlags or []) ++ [
+        "-DLLAMA_BUILD_NUMBER=6085"
+      ];
+    })).override {
+      cudaSupport = true;
+    };
+  port = 8015;
+  model = "/opt/box/models/qwen-3-4b.gguf";
+  host = "0.0.0.0";
+  extraFlags = ["-c" "16384" "--temp" "0.6" "--top-k" "20" "--min-p" "0" "--top-p" "0.95"
+      "--n-gpu-layers" "99" "--jinja"
+  ];
+};
 }
