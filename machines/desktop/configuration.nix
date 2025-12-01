@@ -306,7 +306,7 @@ services.llama-cpp = {
   enable = true;
   package =
     let
-      version = "b6085";
+      version = "b7211";
       hash = "sha256-u2oUTNTiFs82xTiN9na3SCu0sG+KIGMMB2lqKec4lZY=";
     in
     (pkgs.llama-cpp.overrideAttrs (old: {
