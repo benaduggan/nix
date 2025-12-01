@@ -19,4 +19,7 @@ in
   # digdugdev
   "board.age".publicKeys = constants.authorizedKeys ++ [ constants.digdugdevKey ];
   "caddy.age".publicKeys = constants.authorizedKeys ++ [ constants.digdugdevKey ];
+
+  # ntfy
+  "ntfy.age".publicKeys = constants.authorizedKeys;
 }

@@ -4,10 +4,9 @@ let
   CUDA_PATH = cuda.outPath;
   CUDA_LDPATH = "${
       lib.concatStringsSep ":" [
+        "/run/opengl-driver/lib"
         "/run/opengl-drivers/lib"
-        # "/run/opengl-drivers-32/lib"
         "${cuda}/lib"
-        "${pkgs.cudaPackages.cudnn}/lib"
       ]
     }:${
       lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib cuda.lib ]
@@ -183,7 +182,7 @@ in
         myPython = pkgs.python313.withPackages (p: with p; [
           pydantic
           pyunifi
-          systemd
+          systemd-python
         ]);
       in
       {
@@ -211,7 +210,7 @@ in
     containers.homeassistant = {
       volumes = [ "home-assistant:/config" ];
       environment.TZ = "US/Eastern";
-      image = "ghcr.io/home-assistant/home-assistant:2024.8.1";
+      image = "ghcr.io/home-assistant/home-assistant:2025.10.3";
       extraOptions = [
         "--network=host"
       ];
@@ -284,21 +283,21 @@ in
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = common.stateVersion;
 
-  # services.logind.settings = {
-  #   Login = {
-  #     HandleLidSwitchDocked = "ignore";
-  #     HandleLidSwitchExternalPower = "ignore";
-  #     HandleLidSwitch = "ignore";
-  #     HandleHibernateKeyLongPress = "ignore";
-  #     HandleHibernateKey = "ignore";
-  #     HandleSuspendKeyLongPress = "ignore";
-  #     HandleSuspendKey = "ignore";
-  #     HandleRebootKeyLongPress = "ignore";
-  #     HandleRebootKey = "ignore";
-  #     HandlePowerKeyLongPress = "ignore";
-  #     HandlePowerKey = "ignore";
-  #   };
-  # };
+  services.logind.settings = {
+    Login = {
+      HandleLidSwitchDocked = "ignore";
+      HandleLidSwitchExternalPower = "ignore";
+      HandleLidSwitch = "ignore";
+      HandleHibernateKeyLongPress = "ignore";
+      HandleHibernateKey = "ignore";
+      HandleSuspendKeyLongPress = "ignore";
+      HandleSuspendKey = "ignore";
+      HandleRebootKeyLongPress = "ignore";
+      HandleRebootKey = "ignore";
+      HandlePowerKeyLongPress = "ignore";
+      HandlePowerKey = "ignore";
+    };
+  };
 
   nixpkgs.config.cudaCapabilities = [ "6.1" ];
 

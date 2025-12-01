@@ -11,6 +11,7 @@ in
     historyFileSize = -1;
     historySize = -1;
     shellAliases = {
+      cc = "security unlock-keychain ~/Library/Keychains/login.keychain-db && claude";
       ls = lib.mkForce "ls --color=auto";
       l = lib.mkForce "lsd -lA --permission octal";
       ll = lib.mkForce "ls -ahlFG";
@@ -44,8 +45,7 @@ in
       export LANG=en_US.UTF-8
 
       # add local scripts to path
-      export PATH="$PATH:$HOME/.bin/:$HOME/.local/bin"
-
+      export PATH="$PATH:$HOME/.bin/:$HOME/.local/bin:~/.rd/bin"
       # mkdir -p $HOME/.completions
       # source $HOME/.completions/*
 

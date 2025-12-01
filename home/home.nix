@@ -41,7 +41,7 @@ in
         wget
         yq-go
         vim
-        gitAndTools.delta
+        delta
         nixpkgs-fmt
         nil
         difftastic
@@ -168,7 +168,7 @@ in
           (with jacobi; [
             _dex
             argus
-            aws_pog_scripts
+            # aws_pog_scripts
             drm
             drmi
             dshell

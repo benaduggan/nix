@@ -12,7 +12,7 @@
 
   nix.extraOptions = ''
     experimental-features = nix-command flakes
-  '' + lib.optionalString (pkgs.system == "aarch64-darwin") ''
+  '' + lib.optionalString (pkgs.stdenv.hostPlatform.system == "aarch64-darwin") ''
     extra-platforms = x86_64-darwin aarch64-darwin x86_64-linux
   '';
 
@@ -137,13 +137,21 @@
         #   ngl = 99;
         #   extraFlags = "-c 16384 --temp 1.0 --top-k 64 --min-p 0 --top-p 0.95";
         # };
-        qwen-3-30-a3b-ud = {
+        # qwen-3-30-a3b-ud = {
+        #   inherit package;
+        #   enable = true;
+        #   port = 8017;
+        #   model = "/opt/box/models/qwen-3-30-ud-q4.gguf";
+        #   ngl = 99;
+        #   extraFlags = "-c 16384 --temp 0.6 --top-k 20 --min-p 0 --top-p 0.95";
+        # };
+        qwen-3-vl-30b-ud = {
           inherit package;
           enable = true;
           port = 8017;
-          model = "/opt/box/models/qwen-3-30-ud-q4.gguf";
+          model = "/opt/box/models/Qwen3-VL-30B-A3B-Instruct-UD-Q4_K_XL.gguf";
           ngl = 99;
-          extraFlags = "-c 16384 --temp 0.6 --top-k 20 --min-p 0 --top-p 0.95";
+          extraFlags = "--mmproj /opt/box/models/mmproj-F16.gguf --n-gpu-layers 99 --jinja --top-p 0.8 --top-k 20 --temp 0.7 --min-p 0.0 --flash-attn on --presence-penalty 1.5 --ctx-size 16384";
         };
       };
     };
@@ -168,7 +176,7 @@
       "font-fira-code-nerd-font"
       "spotify"
       "discord"
-      "slack"
+      # "slack"
       "karabiner-elements"
       "microsoft-remote-desktop"
       "qlvideo"
