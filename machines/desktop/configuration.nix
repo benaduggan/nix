@@ -4,10 +4,9 @@ let
   CUDA_PATH = cuda.outPath;
   CUDA_LDPATH = "${
       lib.concatStringsSep ":" [
+        "/run/opengl-driver/lib"
         "/run/opengl-drivers/lib"
-        # "/run/opengl-drivers-32/lib"
         "${cuda}/lib"
-        "${pkgs.cudaPackages.cudnn}/lib"
       ]
     }:${
       lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib cuda.lib ]
