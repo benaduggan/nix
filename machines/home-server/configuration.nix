@@ -510,4 +510,59 @@
       log-level = "debug";
     };
   };
+
+  services.wyoming.faster-whisper = {
+    # package = pkgs.wyoming-faster-whisper;  # default, rarely need to override
+
+    servers = {
+      "default" = {
+        enable = true;
+
+        # Model selection - pick one:
+        # tiny-int8 (default), tiny, base-int8, small-int8, medium-int8
+        # distil-small.en, distil-medium.en, distil-large-v2/v3 (English only, fast)
+        # large-v3, turbo (best quality, need more resources)
+        model = "small-int8"; # good balance of speed/accuracy
+
+        # Device: "cpu" or "cuda"
+        # CUDA on NixOS can be painful - start with cpu
+        device = "cpu";
+
+        # URI for Home Assistant to connect to
+        uri = "tcp://0.0.0.0:10300";
+
+        # Language - use "en" for English, "auto" for auto-detect
+        language = "en";
+
+        # Beam size - higher = more accurate, slower. Default is fine.
+        # beamSize = 5;
+
+        # Optional initial prompt to guide transcription
+        # initialPrompt = "Turn on the lights";
+
+        # Use HuggingFace transformers models instead (requires useTransformers = true)
+        # useTransformers = true;
+        # model = "openai/whisper-tiny.en";
+
+        # Extra CLI args if needed
+        # extraArgs = [ "--debug" ];
+      };
+    };
+  };
+
+  services.wyoming.piper.servers."default" = {
+    enable = true;
+    uri = "tcp://0.0.0.0:10200";
+
+    # Voice model - downloads automatically
+    # Browse voices at: https://rhasspy.github.io/piper-samples/
+    voice = "en_US-amy-low"; # decent quality, not too slow
+
+    # Other options:
+    # voice = "en_US-amy-low";      # faster, lower quality
+    # voice = "en_US-ryan-high";    # slower, better quality
+    # voice = "en_US-lessac-medium"; # decent quality, not too slow
+    # voice = "en_GB-alba-medium";  # British accent
+  };
+
 }
