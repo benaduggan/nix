@@ -33,6 +33,7 @@
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog
   system.stateVersion = common.darwinStateVersion;
+  ids.gids.nixbld = 30000;
   system = {
     primaryUser = "benduggan";
     defaults = {
