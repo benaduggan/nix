@@ -36,6 +36,7 @@
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog
   system.stateVersion = common.darwinStateVersion;
+  ids.gids.nixbld = 30000;
   system = {
     primaryUser = common.username;
     defaults = {
@@ -151,7 +152,7 @@
           port = 8017;
           model = "/opt/box/models/Qwen3-VL-30B-A3B-Instruct-UD-Q4_K_XL.gguf";
           ngl = 99;
-          extraFlags = "--mmproj /opt/box/models/mmproj-F16.gguf --n-gpu-layers 99 --jinja --top-p 0.8 --top-k 20 --temp 0.7 --min-p 0.0 --flash-attn on --presence-penalty 1.5 --ctx-size 16384";
+          extraFlags = "--mmproj /opt/box/models/mmproj-F16.gguf --n-gpu-layers 99 --jinja --top-p 0.8 --top-k 20 --temp 0.7 --min-p 0.0 --flash-attn on --presence-penalty 1.5 --ctx-size 32768";
         };
       };
     };
@@ -174,7 +175,7 @@
     casks = map (name: { inherit name; greedy = true; }) [
       "authy"
       "font-fira-code-nerd-font"
-      "spotify"
+      # "spotify"
       "discord"
       # "slack"
       "karabiner-elements"
