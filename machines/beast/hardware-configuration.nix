@@ -39,6 +39,12 @@
     options = [ "nofail" "noatime" "x-systemd.automount" "x-systemd.idle-timeout=600" ];
   };
 
+  fileSystems."/mnt/8tb" = {
+    device = "/dev/disk/by-uuid/5EDA-6A8E";
+    fsType = "exfat";
+    options = [ "nofail" "noatime" "x-systemd.automount" "x-systemd.idle-timeout=600" ];
+  };
+
   swapDevices =
     [{ device = "/dev/disk/by-uuid/8531ec26-c858-4e1e-a10a-4751c3bcd748"; }];
 
