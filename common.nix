@@ -16,7 +16,8 @@ in
     firstName = "Ben";
     lastName = "Duggan";
     username = "bduggan";
-    stateVersion = "24.05";
+    stateVersion = "25.11";
+    darwinStateVersion = 6;
 
     jacobi = inputs.jacobi.packages.${sys};
     kwbauson = inputs.kwbauson.packages.${sys};
