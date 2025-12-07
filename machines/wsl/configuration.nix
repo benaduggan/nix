@@ -5,7 +5,7 @@
 # NixOS-WSL specific options are documented on the NixOS-WSL repository:
 # https://github.com/nix-community/NixOS-WSL
 
-{ config, lib, pkgs, ... }:
+{ config, common, lib, pkgs, ... }:
 let
   cuda = pkgs.cudaPackages.cudatoolkit;
   CUDA_PATH = cuda.outPath;
