@@ -195,7 +195,7 @@
       path = [ pkgs.gnutar pkgs.sqlite pkgs.gzip ];
       script = ''
         PREFIX=`date -u +%Y-%m-%d-%H-%M`
-        DATA_FOLDER=/var/lib/bitwarden_rs
+        DATA_FOLDER=/var/lib/vaultwarden
         BACKUP_FOLDER=/etc/vault/backups/staging
         mkdir -p $BACKUP_FOLDER
 

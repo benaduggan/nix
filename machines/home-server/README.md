@@ -18,10 +18,10 @@
 - untar the tar for date you want to restore from
 - stop vaultwarden service
 - `sudo su`
-- cd to the vaultwarden data directory `/var/lib/bitwarden_rs`
+- cd to the vaultwarden data directory `/var/lib/vaultwarden`
 - remove all files in the data directory
-- copy the files from the tar to the data directory `cp -r /path/to/backup/* /var/lib/bitwarden_rs`
-- chown the files to the vaultwarden user `chown -R vaultwarden:vaultwarden /var/lib/bitwarden_rs`
+- copy the files from the tar to the data directory `cp -r /path/to/backup/* /var/lib/vaultwarden`
+- chown the files to the vaultwarden user `chown -R vaultwarden:vaultwarden /var/lib/vaultwarden`
 - start the vaultwarden service and verify things are working as expected
 - swap out the caddy entry on digdugdev
 
