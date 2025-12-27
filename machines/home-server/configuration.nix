@@ -291,7 +291,7 @@
     };
 
     containers.n8n = {
-      image = "docker.n8n.io/n8nio/n8n:1.121.3";
+      image = "docker.n8n.io/n8nio/n8n:2.1.4";
       volumes = [ "n8n_data:/home/node/.n8n" ];
       ports = [ "5678:5678" ];
       environment = {
