@@ -133,9 +133,10 @@ in
     backend = "docker";
 
     containers.homeassistant = {
+      # https://github.com/home-assistant/core
+      image = "ghcr.io/home-assistant/home-assistant:2025.12.5";
       volumes = [ "home-assistant:/config" ];
       environment.TZ = "US/Eastern";
-      image = "ghcr.io/home-assistant/home-assistant:2025.10.3";
       extraOptions = [
         "--network=host"
       ];
