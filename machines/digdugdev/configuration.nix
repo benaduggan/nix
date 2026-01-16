@@ -1,4 +1,7 @@
 { common, config, pkgs, modulesPath, lib, ... }:
+let
+  blogDeployKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMgeR1LVuAzCC1d0SNE02mMF46fNwqr3sw/Mh8Pk5/IJ digdug-deploy";
+in
 {
   imports = lib.optional (builtins.pathExists ./do-userdata.nix) ./do-userdata.nix ++ [
     (modulesPath + "/virtualisation/digital-ocean-config.nix")
@@ -56,6 +59,23 @@
     useDefaultShell = true;
     openssh.authorizedKeys.keys = common.authorizedKeys;
   };
+
+  users.groups.deploy-blog = {};
+  users.extraUsers.deploy-blog = {
+    isSystemUser = true;
+    group = "deploy-blog";
+    home = "/var/www/digdug.dev";
+    createHome = true;
+    useDefaultShell = true;
+    openssh.authorizedKeys.keys = [
+      ''command="${pkgs.rrsync}/bin/rrsync -wo /var/www/digdug.dev",restrict ${blogDeployKey}''
+    ];
+  };
+
+
+  systemd.tmpfiles.rules = [
+    "d /var/www/digdug.dev 0755 deploy-blog deploy-blog -"
+  ];
 
   networking.firewall.enable = true;
   networking.firewall.allowedTCPPorts = [ 80 443 ];
@@ -184,6 +204,18 @@
         }
       '';
       virtualHosts = {
+        "digdug.dev".extraConfig = ''
+          root * /var/www/digdug.dev
+          file_server
+          encode gzip
+
+          header {
+            X-Content-Type-Options nosniff
+            X-Frame-Options DENY
+            Referrer-Policy strict-origin-when-cross-origin
+          }
+        '';
+
         # Push Notifications
         "ntfy.digdug.dev".extraConfig = ''
           reverse_proxy * {

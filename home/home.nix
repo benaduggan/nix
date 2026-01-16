@@ -39,6 +39,7 @@ in
         q
         tealdeer
         wget
+        rrsync
         yq-go
         vim
         delta
