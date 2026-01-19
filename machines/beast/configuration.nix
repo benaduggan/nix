@@ -72,7 +72,7 @@
         enable = true;
         extraWingpanelIndicators = with pkgs; [
           monitor
-          wingpanel-indicator-ayatana
+          wingpanel-indicator-namarupa
         ];
       };
     };
