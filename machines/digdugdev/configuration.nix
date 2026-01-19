@@ -60,7 +60,7 @@ in
     openssh.authorizedKeys.keys = common.authorizedKeys;
   };
 
-  users.groups.deploy-blog = {};
+  users.groups.deploy-blog = { };
   users.extraUsers.deploy-blog = {
     isSystemUser = true;
     group = "deploy-blog";
