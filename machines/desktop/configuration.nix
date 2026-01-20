@@ -153,7 +153,8 @@ in
     };
     nvidia = {
       open = false;
-      package = config.boot.kernelPackages.nvidiaPackages.stable;
+      # Use nvidia driver from pinned nixpkgs, built for current kernel
+      package = (nixpkgs-pascal-cuda-meme.linuxKernel.packagesFor config.boot.kernelPackages.kernel).nvidiaPackages.stable;
     };
   };
 
