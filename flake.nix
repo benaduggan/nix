@@ -41,10 +41,13 @@
       url = "github:nix-community/NixOS-WSL";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Pinned nixpkgs for working CUDA stack
+    nixpkgs-pascal-cuda.url = "github:nixos/nixpkgs/35f1742e4f1470817ff8203185e2ce0359947f12";
   };
 
   # deadnix: skip
-  outputs = inputs@{ self, agenix, nixpkgs, nix-darwin, home-manager, kwbauson, jacobi, devenv, nixos-hardware, vscode-server, nixos-generators, nixos-wsl }:
+  outputs = inputs@{ self, agenix, nixpkgs, nixpkgs-pascal-cuda, nix-darwin, home-manager, kwbauson, jacobi, devenv, nixos-hardware, vscode-server, nixos-generators, nixos-wsl }:
     let
       inherit (nixpkgs) lib;
       inherit (nix-darwin.lib) darwinSystem;
@@ -204,9 +207,14 @@
       nixosConfigurations.bduggan-desktop =
         let
           common = import ./common.nix { machineName = "lake"; isGraphical = false; isMinimal = false;  inherit inputs; inherit devenv; };
+          nixpkgs-pascal-cuda-meme = import nixpkgs-pascal-cuda {
+            system = "x86_64-linux";
+            config.allowUnfree = true;
+          };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
+          specialArgs = { inherit nixpkgs-pascal-cuda-meme; };
           modules = [
             common
             agenix.nixosModules.default
