@@ -1,4 +1,4 @@
-{ common, lib, pkgs, ... }:
+{ common, lib, pkgs, pkgs-cuda, ... }:
 {
   imports =
     [
