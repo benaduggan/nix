@@ -312,9 +312,10 @@ in
         version = "b7211";
         hash = "sha256-UPjQBoqLM9u2TGrltdHtfYF+Q204kgZ3JWM0I4iYdyg=";
       in
-      (pkgs.llama-cpp.overrideAttrs (old: {
+      # Use llama-cpp entirely from pinned nixpkgs to avoid ABI mismatches
+      (nixpkgs-pascal-cuda-meme.llama-cpp.overrideAttrs (old: {
         inherit version;
-        src = pkgs.fetchFromGitHub {
+        src = nixpkgs-pascal-cuda-meme.fetchFromGitHub {
           inherit hash;
           tag = version;
           owner = "ggerganov";
@@ -331,7 +332,6 @@ in
         ];
       })).override {
         cudaSupport = true;
-        cudaPackages = cudaPkg;
       };
     port = 8015;
     model = "/opt/box/models/qwen-3-4b.gguf";
