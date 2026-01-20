@@ -140,7 +140,7 @@ in
   };
 
 
-    services.xserver.videoDrivers = [ "nvidia" ];
+  services.xserver.videoDrivers = [ "nvidia" ];
 
   hardware = {
     graphics = {
@@ -304,39 +304,51 @@ in
 
   nixpkgs.config.cudaCapabilities = [ "6.1" ];
 
-services.llama-cpp = {
-  enable = true;
-  package =
-    let
-      version = "b7211";
-      hash = "sha256-UPjQBoqLM9u2TGrltdHtfYF+Q204kgZ3JWM0I4iYdyg=";
-    in
-    (pkgs.llama-cpp.overrideAttrs (old: {
-      inherit version;
-      src = pkgs.fetchFromGitHub {
-        inherit hash;
-        tag = version;
-        owner = "ggerganov";
-        repo = "llama.cpp";
-        leaveDotGit = true;
-        postFetch = ''
-          git -C "$out" rev-parse --short HEAD > $out/COMMIT
-          find "$out" -name .git -print0 | xargs -0 rm -rf
-        '';
+  services.llama-cpp = {
+    enable = true;
+    package =
+      let
+        version = "b7211";
+        hash = "sha256-UPjQBoqLM9u2TGrltdHtfYF+Q204kgZ3JWM0I4iYdyg=";
+      in
+      (pkgs.llama-cpp.overrideAttrs (old: {
+        inherit version;
+        src = pkgs.fetchFromGitHub {
+          inherit hash;
+          tag = version;
+          owner = "ggerganov";
+          repo = "llama.cpp";
+          leaveDotGit = true;
+          postFetch = ''
+            git -C "$out" rev-parse --short HEAD > $out/COMMIT
+            find "$out" -name .git -print0 | xargs -0 rm -rf
+          '';
+        };
+        # Fix the build number - strip the 'b' prefix
+        cmakeFlags = (old.cmakeFlags or [ ]) ++ [
+          "-DLLAMA_BUILD_NUMBER=6085"
+        ];
+      })).override {
+        cudaSupport = true;
+        cudaPackages = cudaPkg;
       };
-      # Fix the build number - strip the 'b' prefix
-      cmakeFlags = (old.cmakeFlags or []) ++ [
-        "-DLLAMA_BUILD_NUMBER=6085"
-      ];
-    })).override {
-      cudaSupport = true;
-      cudaPackages = cudaPkg;
-    };
-  port = 8015;
-  model = "/opt/box/models/qwen-3-4b.gguf";
-  host = "0.0.0.0";
-  extraFlags = ["-c" "16384" "--temp" "0.6" "--top-k" "20" "--min-p" "0" "--top-p" "0.95"
-      "--n-gpu-layers" "99" "--jinja"
-  ];
-};
+    port = 8015;
+    model = "/opt/box/models/qwen-3-4b.gguf";
+    host = "0.0.0.0";
+    extraFlags = [
+      "-c"
+      "16384"
+      "--temp"
+      "0.6"
+      "--top-k"
+      "20"
+      "--min-p"
+      "0"
+      "--top-p"
+      "0.95"
+      "--n-gpu-layers"
+      "99"
+      "--jinja"
+    ];
+  };
 }
