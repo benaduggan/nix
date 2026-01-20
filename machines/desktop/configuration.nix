@@ -1,16 +1,18 @@
-{ common, config, lib, pkgs, ... }:
+{ common, config, lib, pkgs, nixpkgs-pascal-cuda-meme, ... }:
 let
-  cuda = pkgs.cudaPackages.cudatoolkit;
+  # Use time-traveled nixpkgs for CUDA packages
+  cudaPkg = nixpkgs-pascal-cuda-meme.cudaPackages;
+  cuda = cudaPkg.cudatoolkit;
   CUDA_PATH = cuda.outPath;
   CUDA_LDPATH = "${
       lib.concatStringsSep ":" [
         "/run/opengl-drivers/lib"
         # "/run/opengl-drivers-32/lib"
         "${cuda}/lib"
-        "${pkgs.cudaPackages.cudnn}/lib"
+        "${cudaPkg.cudnn}/lib"
       ]
     }:${
-      lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib cuda.lib ]
+      lib.makeLibraryPath [ nixpkgs-pascal-cuda-meme.stdenv.cc.cc.lib cuda.lib ]
     }";
 in
 {
@@ -125,9 +127,9 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment = {
-    systemPackages = with pkgs; [
-      cudaPackages.cudatoolkit
-      cudaPackages.cudnn
+    systemPackages = [
+      cudaPkg.cudatoolkit
+      cudaPkg.cudnn
       # nvidia-docker
     ];
     variables = {
@@ -183,7 +185,7 @@ in
         myPython = pkgs.python313.withPackages (p: with p; [
           pydantic
           pyunifi
-          systemd
+          systemd-python
         ]);
       in
       {
@@ -307,7 +309,7 @@ services.llama-cpp = {
   package =
     let
       version = "b7211";
-      hash = "sha256-u2oUTNTiFs82xTiN9na3SCu0sG+KIGMMB2lqKec4lZY=";
+      hash = "sha256-UPjQBoqLM9u2TGrltdHtfYF+Q204kgZ3JWM0I4iYdyg=";
     in
     (pkgs.llama-cpp.overrideAttrs (old: {
       inherit version;
@@ -328,6 +330,7 @@ services.llama-cpp = {
       ];
     })).override {
       cudaSupport = true;
+      cudaPackages = cudaPkg;
     };
   port = 8015;
   model = "/opt/box/models/qwen-3-4b.gguf";
