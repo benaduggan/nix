@@ -329,6 +329,7 @@ in
         # Fix the build number - strip the 'b' prefix
         cmakeFlags = (old.cmakeFlags or [ ]) ++ [
           "-DLLAMA_BUILD_NUMBER=6085"
+          "-DCMAKE_CUDA_ARCHITECTURES=61"
         ];
       })).override {
         cudaSupport = true;

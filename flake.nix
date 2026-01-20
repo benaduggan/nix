@@ -209,7 +209,10 @@
           common = import ./common.nix { machineName = "lake"; isGraphical = false; isMinimal = false;  inherit inputs; inherit devenv; };
           nixpkgs-pascal-cuda-meme = import nixpkgs-pascal-cuda {
             system = "x86_64-linux";
-            config.allowUnfree = true;
+            config = {
+              allowUnfree = true;
+              cudaCapabilities = [ "6.1" ];
+            };
           };
         in
         nixpkgs.lib.nixosSystem {
