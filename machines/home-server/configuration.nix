@@ -337,6 +337,7 @@
         http_port = common.ports.grafana;
         http_addr = "0.0.0.0";
       };
+      security.secret_key = "$__env{GF_SECURITY_SECRET_KEY}";
     };
     provision = {
       enable = true;
