@@ -26,6 +26,7 @@ in
 
 
   # Bootloader.
+  boot.kernelPackages = nixpkgs-pascal-cuda-meme.linuxPackages;
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
