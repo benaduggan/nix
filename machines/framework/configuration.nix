@@ -12,7 +12,10 @@
     ];
 
 
-  nix.settings = common.nixSettings;
+  nix.settings = common.nixSettings // {
+    extra-substituters = common.nixSettings.extra-substituters ++ common.adaptiveReaderSubstituters ++ common.magicSubstituters;
+    extra-trusted-public-keys = common.nixSettings.extra-trusted-public-keys ++ common.adaptiveReaderTrustedPublicKeys ++ common.magicTrustedPublicKeys;
+  };
 
   programs.nix-ld.enable = true;
 
