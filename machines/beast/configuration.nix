@@ -23,10 +23,10 @@
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   systemd.sleep.settings.Sleep = {
-    AllowSuspend="no";
-    AllowHibernation="no";
-    AllowHybridSleep="no";
-    AllowSuspendThenHibernate="no";
+    AllowSuspend = "no";
+    AllowHibernation = "no";
+    AllowHybridSleep = "no";
+    AllowSuspendThenHibernate = "no";
   };
 
   # Configure network proxy if necessary
