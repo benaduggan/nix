@@ -214,7 +214,7 @@
 
   services.llama-cpp = {
     enable = true;
-    package = pkgs.llama-cpp.override {
+    package = pkgs.llama-cpp-latest.override {
       cudaSupport = true;
     };
     port = 8015;
