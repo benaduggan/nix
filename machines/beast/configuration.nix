@@ -212,5 +212,37 @@
     openFirewall = true;
   };
 
+  services.llama-cpp = {
+    enable = true;
+    package = pkgs.llama-cpp.override {
+      cudaSupport = true;
+    };
+    port = 8015;
+    model = "/opt/box/models/Qwen_Qwen3.5-27B-Q4_K_M.gguf";
+    host = "0.0.0.0";
+    extraFlags = [
+      "-c"
+      "65536"
+      "--temp"
+      "0.6"
+      "--top-k"
+      "20"
+      "--min-p"
+      "0"
+      "--top-p"
+      "0.8"
+      "--n-gpu-layers"
+      "99"
+      "--jinja"
+      "-fa"
+      "--flash-attn"
+      "--no-mmap"
+      "-b"
+      "1024"
+      "-ub"
+      "1024"
+    ];
+  };
+
   system.stateVersion = common.stateVersion;
 }
