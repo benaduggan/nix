@@ -2,8 +2,21 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, common, ... }:
-
+{ config, lib, pkgs, common, ... }:
+let
+  cudaPkg = pkgs.cudaPackages;
+  cuda = cudaPkg.cudatoolkit;
+  CUDA_PATH = cuda.outPath;
+  CUDA_LDPATH = "${
+      lib.concatStringsSep ":" [
+        "/run/opengl-drivers/lib"
+        "${cuda}/lib"
+        "${cudaPkg.cudnn}/lib"
+      ]
+    }:${
+      lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib cuda.lib ]
+    }";
+in
 {
   imports =
     [
@@ -131,12 +144,21 @@
   # Install firefox.
   programs.firefox.enable = true;
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.cudaCapabilities = [ "8.6" ];
 
   programs.steam.enable = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
+  environment.variables = {
+    _CUDA_PATH = CUDA_PATH;
+    _CUDA_LDPATH = CUDA_LDPATH;
+    XLA_FLAGS = "--xla_gpu_cuda_data_dir=${CUDA_PATH}";
+  };
+
   environment.systemPackages = with pkgs; [
+    cudaPkg.cudatoolkit
+    cudaPkg.cudnn
     appeditor # elementary OS menu editor
     celluloid # Video Player
     formatter # elementary OS filesystem formatter
@@ -192,6 +214,10 @@
   networking.firewall.enable = false;
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware = {
+    graphics = {
+      enable = true;
+      enable32Bit = true;
+    };
     nvidia = {
       open = false;
       package = config.boot.kernelPackages.nvidiaPackages.stable;
