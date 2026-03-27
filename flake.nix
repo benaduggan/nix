@@ -13,6 +13,8 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
+    flake-compat.url = "github:NixOS/flake-compat";
+    flake-compat.flake = false;
 
     jacobi = {
       url = "github:jpetrucciani/nix";
@@ -25,7 +27,6 @@
     };
 
     vscode-server.url = "github:msteen/nixos-vscode-server";
-    devenv.url = "github:cachix/devenv/latest";
 
     nixos-generators = {
       url = "github:nix-community/nixos-generators";
@@ -47,7 +48,7 @@
   };
 
   # deadnix: skip
-  outputs = inputs@{ self, agenix, nixpkgs, nixpkgs-pascal-cuda, nix-darwin, home-manager, kwbauson, jacobi, devenv, nixos-hardware, vscode-server, nixos-generators, nixos-wsl }:
+  outputs = inputs@{ self, agenix, nixpkgs, nixpkgs-pascal-cuda, nix-darwin, home-manager, kwbauson, jacobi, nixos-hardware, vscode-server, nixos-generators, nixos-wsl, ... }:
     let
       inherit (nixpkgs) lib;
       inherit (nix-darwin.lib) darwinSystem;
@@ -83,8 +84,8 @@
 
       darwinConfigurations =
         let
-          commonMbp = import ./common.nix { machineName = "paper"; isGraphical = true; isMinimal = false; inherit inputs; inherit devenv; };
-          commonMagic = import ./common.nix { machineName = "magicMbp"; isGraphical = true; isMinimal = false; inherit inputs; inherit devenv; };
+          commonMbp = import ./common.nix { machineName = "paper"; isGraphical = true; isMinimal = false; inherit inputs; };
+          commonMagic = import ./common.nix { machineName = "magicMbp"; isGraphical = true; isMinimal = false; inherit inputs; };
         in
         {
           us-mbp-benduggan = lib.makeOverridable darwinSystem {
@@ -122,7 +123,7 @@
 
       nixosConfigurations.bduggan-framework =
         let
-          common = import ./common.nix { machineName = "framework"; isGraphical = true; isMinimal = false; inherit inputs; inherit devenv; };
+          common = import ./common.nix { machineName = "framework"; isGraphical = true; isMinimal = false; inherit inputs; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -150,7 +151,7 @@
 
       nixosConfigurations.beast =
         let
-          common = import ./common.nix { machineName = "beast"; isGraphical = true; isMinimal = false; inherit inputs; inherit devenv; };
+          common = import ./common.nix { machineName = "beast"; isGraphical = true; isMinimal = false; inherit inputs; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -178,7 +179,7 @@
 
       nixosConfigurations.home-server =
         let
-          common = import ./common.nix { machineName = "homeServer"; isGraphical = false; isMinimal = false;  inherit inputs; inherit devenv; };
+          common = import ./common.nix { machineName = "homeServer"; isGraphical = false; isMinimal = false;  inherit inputs; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -206,7 +207,7 @@
 
       nixosConfigurations.bduggan-desktop =
         let
-          common = import ./common.nix { machineName = "lake"; isGraphical = false; isMinimal = false;  inherit inputs; inherit devenv; };
+          common = import ./common.nix { machineName = "lake"; isGraphical = false; isMinimal = false;  inherit inputs; };
           nixpkgs-pascal-cuda-meme = import nixpkgs-pascal-cuda {
             system = "x86_64-linux";
             config = {
@@ -242,7 +243,7 @@
 
       nixosConfigurations.arden =
         let
-          common = import ./common.nix { machineName = "arden"; isGraphical = false; isMinimal = false;  inherit inputs; inherit devenv; };
+          common = import ./common.nix { machineName = "arden"; isGraphical = false; isMinimal = false;  inherit inputs; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -270,7 +271,7 @@
 
       nixosConfigurations.springfield =
         let
-          common = import ./common.nix { machineName = "springfield"; isGraphical = false; isMinimal = false;  inherit inputs; inherit devenv; };
+          common = import ./common.nix { machineName = "springfield"; isGraphical = false; isMinimal = false;  inherit inputs; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -298,7 +299,7 @@
 
       nixosConfigurations.wsl =
         let
-          common = import ./common.nix { machineName = "wsl"; isGraphical = false; isMinimal = true;  inherit inputs; inherit devenv; };
+          common = import ./common.nix { machineName = "wsl"; isGraphical = false; isMinimal = true;  inherit inputs; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -323,7 +324,7 @@
 
       nixosConfigurations.digdugdev =
         let
-          common = import ./common.nix { machineName = "digdugdev"; isGraphical = false; isMinimal = true;  inherit inputs; inherit devenv; };
+          common = import ./common.nix { machineName = "digdugdev"; isGraphical = false; isMinimal = true;  inherit inputs; };
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";

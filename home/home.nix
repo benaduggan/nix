@@ -150,9 +150,6 @@ in
           zip
           (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
 
-
-          # common.devenv
-
           # # chief keef's stuff
           (with kwbauson; [
             better-comma

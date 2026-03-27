@@ -36,4 +36,13 @@ with builtins; [
   (_self: super:
     with super;
     mapAttrs (_n: hax.fakePlatform) { inherit gixy; })
+  (final: prev:
+    with final; with lib;
+    {
+      requiredSubstitutes = optionalAttrs stdenv.isLinux {
+        inherit firefox-unwrapped ffmpeg-full nvidia-docker cudatoolkit;
+        chromium = chromium.browser;
+      };
+    })
 ]
+

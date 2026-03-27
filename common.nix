@@ -1,4 +1,4 @@
-{ machineName, isGraphical, isMinimal, inputs, devenv }:
+{ machineName, isGraphical, isMinimal, inputs }:
 { pkgs, ... }:
 let
   constants = import ./constants.nix;
@@ -21,7 +21,6 @@ in
 
     jacobi = inputs.jacobi.packages.${sys};
     kwbauson = inputs.kwbauson.packages.${sys};
-    inherit (devenv.packages.${sys}) devenv;
     agenix = inputs.agenix.packages.${sys}.default;
 
     nixSettings = with constants; {
