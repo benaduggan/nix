@@ -36,7 +36,7 @@ with builtins; [
   (_self: super:
     with super;
     mapAttrs (_n: hax.fakePlatform) { inherit gixy; })
-  (final: prev:
+  (final: _prev:
     with final; with lib;
     {
       requiredSubstitutes = optionalAttrs stdenv.isLinux {
