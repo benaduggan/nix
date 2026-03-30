@@ -15,7 +15,8 @@ jobs:
           extra_nix_config: |
             trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= benaduggan.cachix.org-1:BY2tmi++VqJD6My4kB/dXGfxT7nJqrOtRVNn9UhgrHE= cache.g7c.us:dSWpE2B5zK/Fahd7npIQWM4izRnVL+a4LiCAnrjdoFY= kwbauson.cachix.org-1:a6RuFyeJKSShV8LAUw3Jx8z48luiCU755DkweAAkwX0=
             substituters = https://cache.nixos.org/ https://benaduggan.cachix.org https://cache.g7c.us https://kwbauson.cachix.org
-      - run: nix -v -L build --no-link --max-jobs 0 -f . requiredSubstitutes
+      - if: matrix.system.os != 'macOS'
+        run: nix -v -L build --no-link --max-jobs 0 -f . requiredSubstitutes
       - run: nix -L --show-trace build
       # figure this out in the future
       # - run: nix -L build .#checks.default
