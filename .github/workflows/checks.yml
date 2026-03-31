@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v31
-      - run: nix run .#nodePackages.prettier -- --check .
+      - run: nix run .#prettier -- --check .
   nixpkgs-fmt:
     runs-on: ubuntu-latest
     steps:
