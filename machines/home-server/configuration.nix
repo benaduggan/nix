@@ -372,13 +372,6 @@
   services.prometheus = {
     enable = true;
     port = common.ports.prometheus;
-    exporters = {
-      node = {
-        enable = true;
-        enabledCollectors = [ "systemd" "processes" ];
-        port = common.ports.prometheus_node_exporter;
-      };
-    };
     scrapeConfigs = [
       {
         job_name = "Loki service";
