@@ -344,6 +344,8 @@
           modules = [
             common
             agenix.nixosModules.default
+            ./modules/alloy.nix
+            ./modules/node-exporter.nix
             ./machines/digdugdev/configuration.nix
             home-manager.nixosModules.home-manager
             vscode-server.nixosModule

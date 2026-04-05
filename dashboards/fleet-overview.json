@@ -1,14 +1,24 @@
 {
-  "annotations": { "list": [] },
+  "annotations": {
+    "list": []
+  },
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
   "links": [],
   "panels": [
     {
-      "title": "CPU Usage by Host",
+      "title": "CPU Usage — $instance",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 0
+      },
+      "repeat": "instance",
+      "repeatDirection": "h",
+      "maxPerRow": 6,
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
@@ -24,20 +34,40 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "" },
-          "expr": "1 - avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m]))",
-          "legendFormat": "{{ instance }}"
+          "datasource": {
+            "type": "prometheus",
+            "uid": ""
+          },
+          "expr": "1 - avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\", instance=\"$instance\"}[5m]))",
+          "legendFormat": "cpu"
         }
       ],
       "options": {
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "lastNotNull", "max"] },
-        "tooltip": { "mode": "multi" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       }
     },
     {
-      "title": "Memory Usage by Host",
+      "title": "Memory Usage — $instance",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 8
+      },
+      "repeat": "instance",
+      "repeatDirection": "h",
+      "maxPerRow": 6,
       "fieldConfig": {
         "defaults": {
           "unit": "bytes",
@@ -52,25 +82,48 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "" },
-          "expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes",
-          "legendFormat": "{{ instance }} used"
+          "datasource": {
+            "type": "prometheus",
+            "uid": ""
+          },
+          "expr": "node_memory_MemTotal_bytes{instance=\"$instance\"} - node_memory_MemAvailable_bytes{instance=\"$instance\"}",
+          "legendFormat": "used"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "" },
-          "expr": "node_memory_MemTotal_bytes",
-          "legendFormat": "{{ instance }} total"
+          "datasource": {
+            "type": "prometheus",
+            "uid": ""
+          },
+          "expr": "node_memory_MemTotal_bytes{instance=\"$instance\"}",
+          "legendFormat": "total"
         }
       ],
       "options": {
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "lastNotNull", "max"] },
-        "tooltip": { "mode": "multi" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
       }
     },
     {
-      "title": "Memory Usage % by Host",
+      "title": "Memory % — $instance",
       "type": "gauge",
-      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 16 },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 0,
+        "y": 16
+      },
+      "repeat": "instance",
+      "repeatDirection": "h",
+      "maxPerRow": 6,
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
@@ -79,9 +132,18 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 0.7 },
-              { "color": "red", "value": 0.85 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.7
+              },
+              {
+                "color": "red",
+                "value": 0.85
+              }
             ]
           }
         },
@@ -89,22 +151,37 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "" },
-          "expr": "1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)",
+          "datasource": {
+            "type": "prometheus",
+            "uid": ""
+          },
+          "expr": "1 - (node_memory_MemAvailable_bytes{instance=\"$instance\"} / node_memory_MemTotal_bytes{instance=\"$instance\"})",
           "legendFormat": "{{ instance }}"
         }
       ],
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "orientation": "horizontal",
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       }
     },
     {
-      "title": "Disk Usage by Host",
+      "title": "Disk Usage — $instance",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 22 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 21
+      },
+      "repeat": "instance",
+      "repeatDirection": "h",
+      "maxPerRow": 6,
       "fieldConfig": {
         "defaults": {
           "unit": "bytes",
@@ -119,25 +196,48 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "" },
-          "expr": "node_filesystem_size_bytes{mountpoint=\"/\"} - node_filesystem_avail_bytes{mountpoint=\"/\"}",
-          "legendFormat": "{{ instance }} used"
+          "datasource": {
+            "type": "prometheus",
+            "uid": ""
+          },
+          "expr": "node_filesystem_size_bytes{mountpoint=\"/\", instance=\"$instance\"} - node_filesystem_avail_bytes{mountpoint=\"/\", instance=\"$instance\"}",
+          "legendFormat": "used"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "" },
-          "expr": "node_filesystem_size_bytes{mountpoint=\"/\"}",
-          "legendFormat": "{{ instance }} total"
+          "datasource": {
+            "type": "prometheus",
+            "uid": ""
+          },
+          "expr": "node_filesystem_size_bytes{mountpoint=\"/\", instance=\"$instance\"}",
+          "legendFormat": "total"
         }
       ],
       "options": {
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "lastNotNull", "max"] },
-        "tooltip": { "mode": "multi" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
       }
     },
     {
-      "title": "Disk Usage % by Host",
+      "title": "Disk % — $instance",
       "type": "gauge",
-      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 30 },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 0,
+        "y": 29
+      },
+      "repeat": "instance",
+      "repeatDirection": "h",
+      "maxPerRow": 6,
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
@@ -146,9 +246,18 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 0.7 },
-              { "color": "red", "value": 0.85 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.7
+              },
+              {
+                "color": "red",
+                "value": 0.85
+              }
             ]
           }
         },
@@ -156,22 +265,37 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "" },
-          "expr": "1 - (node_filesystem_avail_bytes{mountpoint=\"/\"} / node_filesystem_size_bytes{mountpoint=\"/\"})",
+          "datasource": {
+            "type": "prometheus",
+            "uid": ""
+          },
+          "expr": "1 - (node_filesystem_avail_bytes{mountpoint=\"/\", instance=\"$instance\"} / node_filesystem_size_bytes{mountpoint=\"/\", instance=\"$instance\"})",
           "legendFormat": "{{ instance }}"
         }
       ],
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "orientation": "horizontal",
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       }
     },
     {
-      "title": "Network Received by Host",
+      "title": "Network RX — $instance",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 36 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 34
+      },
+      "repeat": "instance",
+      "repeatDirection": "h",
+      "maxPerRow": 6,
       "fieldConfig": {
         "defaults": {
           "unit": "Bps",
@@ -186,20 +310,40 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "" },
-          "expr": "rate(node_network_receive_bytes_total{device!~\"lo|veth.*|br.*|docker.*\"}[5m])",
-          "legendFormat": "{{ instance }} {{ device }}"
+          "datasource": {
+            "type": "prometheus",
+            "uid": ""
+          },
+          "expr": "rate(node_network_receive_bytes_total{device!~\"lo|veth.*|br.*|docker.*\", instance=\"$instance\"}[5m])",
+          "legendFormat": "{{ device }} rx"
         }
       ],
       "options": {
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "lastNotNull", "max"] },
-        "tooltip": { "mode": "multi" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
       }
     },
     {
-      "title": "Network Transmitted by Host",
+      "title": "Network TX — $instance",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 36 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 42
+      },
+      "repeat": "instance",
+      "repeatDirection": "h",
+      "maxPerRow": 6,
       "fieldConfig": {
         "defaults": {
           "unit": "Bps",
@@ -214,20 +358,40 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "" },
-          "expr": "rate(node_network_transmit_bytes_total{device!~\"lo|veth.*|br.*|docker.*\"}[5m])",
-          "legendFormat": "{{ instance }} {{ device }}"
+          "datasource": {
+            "type": "prometheus",
+            "uid": ""
+          },
+          "expr": "rate(node_network_transmit_bytes_total{device!~\"lo|veth.*|br.*|docker.*\", instance=\"$instance\"}[5m])",
+          "legendFormat": "{{ device }} tx"
         }
       ],
       "options": {
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "lastNotNull", "max"] },
-        "tooltip": { "mode": "multi" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
       }
     },
     {
-      "title": "System Load (1m) by Host",
+      "title": "System Load (1m) — $instance",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 44 },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 50
+      },
+      "repeat": "instance",
+      "repeatDirection": "h",
+      "maxPerRow": 6,
       "fieldConfig": {
         "defaults": {
           "min": 0,
@@ -241,29 +405,58 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "" },
-          "expr": "node_load1",
-          "legendFormat": "{{ instance }}"
+          "datasource": {
+            "type": "prometheus",
+            "uid": ""
+          },
+          "expr": "node_load1{instance=\"$instance\"}",
+          "legendFormat": "load1"
         }
       ],
       "options": {
-        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "lastNotNull", "max"] },
-        "tooltip": { "mode": "multi" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       }
     },
     {
-      "title": "Uptime by Host",
+      "title": "Uptime — $instance",
       "type": "stat",
-      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 52 },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 58
+      },
+      "repeat": "instance",
+      "repeatDirection": "h",
+      "maxPerRow": 6,
       "fieldConfig": {
         "defaults": {
           "unit": "s",
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 3600 },
-              { "color": "green", "value": 86400 }
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 3600
+              },
+              {
+                "color": "green",
+                "value": 86400
+              }
             ]
           }
         },
@@ -271,13 +464,20 @@
       },
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "" },
-          "expr": "time() - node_boot_time_seconds",
-          "legendFormat": "{{ instance }}"
+          "datasource": {
+            "type": "prometheus",
+            "uid": ""
+          },
+          "expr": "time() - node_boot_time_seconds{instance=\"$instance\"}",
+          "legendFormat": "uptime"
         }
       ],
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "colorMode": "background",
         "graphMode": "none",
         "textMode": "auto"
@@ -285,9 +485,40 @@
     }
   ],
   "schemaVersion": 39,
-  "tags": ["fleet", "nodes"],
-  "templating": { "list": [] },
-  "time": { "from": "now-6h", "to": "now" },
+  "tags": [
+    "fleet",
+    "nodes"
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "instance",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": ""
+        },
+        "query": "label_values(node_uname_info, instance)",
+        "regex": "/^[^:]+$/",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        }
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
   "title": "Fleet Overview",
   "uid": "fleet-overview"
 }

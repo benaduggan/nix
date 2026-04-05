@@ -389,7 +389,7 @@
         job_name = "node";
         static_configs = [{
           targets = [
-            "localhost:${toString config.services.prometheus.exporters.node.port}"
+            "home-server:${toString common.ports.prometheus_node_exporter}"
             "arden:${toString common.ports.prometheus_node_exporter}"
             "springfield:${toString common.ports.prometheus_node_exporter}"
             "bduggan-desktop:${toString common.ports.prometheus_node_exporter}"
@@ -397,6 +397,11 @@
             "beast:${toString common.ports.prometheus_node_exporter}"
             "digdugdev:${toString common.ports.prometheus_node_exporter}"
           ];
+        }];
+        relabel_configs = [{
+          source_labels = [ "__address__" ];
+          regex = "([^:]+):\\d+";
+          target_label = "instance";
         }];
       }
       {
