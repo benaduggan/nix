@@ -1,6 +1,7 @@
 { common, config, lib, ... }:
 let
-  hostLabel = if config.services.alloy.hostLabel != null
+  hostLabel =
+    if config.services.alloy.hostLabel != null
     then config.services.alloy.hostLabel
     else config.networking.hostName;
 in
