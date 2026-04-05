@@ -42,7 +42,7 @@ in
       loki = 3100;
       home-assistant = 8123;
       prometheus_node_exporter = 9002;
-      promtail = 9080;
+      alloy = 12345;
     };
 
   };
