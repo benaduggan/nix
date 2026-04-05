@@ -433,5 +433,6 @@ in
     };
   };
 
+  services.alloy.enable = true;
 }
 

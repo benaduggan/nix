@@ -4,6 +4,7 @@ let
     if config.services.alloy.hostLabel != null
     then config.services.alloy.hostLabel
     else config.networking.hostName;
+  lokiUrl = config.services.alloy.lokiUrl;
 in
 {
   options.services.alloy.hostLabel = lib.mkOption {
@@ -12,12 +13,18 @@ in
     description = "Override the host label sent to Loki. Defaults to networking.hostName.";
   };
 
+  options.services.alloy.lokiUrl = lib.mkOption {
+    type = lib.types.str;
+    default = "http://home-server-1:${toString common.ports.loki}/loki/api/v1/push";
+    description = "Loki push URL.";
+  };
+
   config = lib.mkIf config.services.alloy.enable {
     systemd.services.alloy.serviceConfig.SupplementaryGroups = [ "adm" "systemd-journal" ];
     environment.etc."alloy/config.alloy".text = ''
       loki.write "default" {
         endpoint {
-          url = "http://home-server-1:${toString common.ports.loki}/loki/api/v1/push"
+          url = "${lokiUrl}"
         }
       }
 

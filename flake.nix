@@ -129,6 +129,8 @@
           system = "x86_64-linux";
           modules = [
             common
+            ./modules/alloy.nix
+            ./modules/node-exporter.nix
             ./machines/framework/configuration.nix
             nixos-hardware.nixosModules.framework-11th-gen-intel
             vscode-server.nixosModule
@@ -157,6 +159,8 @@
           system = "x86_64-linux";
           modules = [
             common
+            ./modules/alloy.nix
+            ./modules/node-exporter.nix
             ./machines/beast/configuration.nix
             vscode-server.nixosModule
             (_: {
@@ -186,6 +190,8 @@
           modules = [
             common
             agenix.nixosModules.default
+            ./modules/alloy.nix
+            ./modules/node-exporter.nix
             ./machines/home-server/configuration.nix
             vscode-server.nixosModule
             (_: {
@@ -223,6 +229,7 @@
             common
             agenix.nixosModules.default
             ./modules/alloy.nix
+            ./modules/node-exporter.nix
             ./machines/desktop/configuration.nix
             vscode-server.nixosModule
             (_: {
@@ -252,6 +259,7 @@
             common
             agenix.nixosModules.default
             ./modules/alloy.nix
+            ./modules/node-exporter.nix
             ./machines/arden/configuration.nix
             vscode-server.nixosModule
             (_: {
@@ -281,6 +289,7 @@
             common
             agenix.nixosModules.default
             ./modules/alloy.nix
+            ./modules/node-exporter.nix
             ./machines/springfield/configuration.nix
             vscode-server.nixosModule
             (_: {

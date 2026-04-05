@@ -270,5 +270,7 @@ in
     ];
   };
 
+  services.alloy.enable = true;
+
   system.stateVersion = common.stateVersion;
 }

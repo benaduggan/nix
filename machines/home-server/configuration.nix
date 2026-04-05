@@ -326,6 +326,9 @@
     '';
   };
 
+  services.alloy.enable = true;
+  services.alloy.lokiUrl = "http://localhost:${toString common.ports.loki}/loki/api/v1/push";
+
   systemd.services.grafana.serviceConfig.EnvironmentFile = config.age.secrets.grafana.path;
   services.grafana = {
     enable = true;
@@ -341,6 +344,13 @@
     };
     provision = {
       enable = true;
+      dashboards.settings.providers = [
+        {
+          name = "default";
+          options.path = "${../../dashboards}";
+          options.foldersFromFilesStructure = false;
+        }
+      ];
       datasources.settings.datasources = [
         {
           name = "Prometheus";
@@ -365,7 +375,7 @@
     exporters = {
       node = {
         enable = true;
-        enabledCollectors = [ "systemd" ];
+        enabledCollectors = [ "systemd" "processes" ];
         port = common.ports.prometheus_node_exporter;
       };
     };
@@ -383,9 +393,17 @@
         }];
       }
       {
-        job_name = "chrysalis";
+        job_name = "node";
         static_configs = [{
-          targets = [ "localhost:${toString config.services.prometheus.exporters.node.port}" ];
+          targets = [
+            "localhost:${toString config.services.prometheus.exporters.node.port}"
+            "arden:${toString common.ports.prometheus_node_exporter}"
+            "springfield:${toString common.ports.prometheus_node_exporter}"
+            "bduggan-desktop:${toString common.ports.prometheus_node_exporter}"
+            "bduggan-framework:${toString common.ports.prometheus_node_exporter}"
+            "beast:${toString common.ports.prometheus_node_exporter}"
+            "digdugdev:${toString common.ports.prometheus_node_exporter}"
+          ];
         }];
       }
       {
@@ -456,8 +474,8 @@
       };
 
       table_manager = {
-        retention_deletes_enabled = false;
-        retention_period = "0s";
+        retention_deletes_enabled = true;
+        retention_period = "720h";
       };
 
       compactor = {
