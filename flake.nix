@@ -222,6 +222,7 @@
           modules = [
             common
             agenix.nixosModules.default
+            ./modules/alloy.nix
             ./machines/desktop/configuration.nix
             vscode-server.nixosModule
             (_: {
@@ -250,6 +251,7 @@
           modules = [
             common
             agenix.nixosModules.default
+            ./modules/alloy.nix
             ./machines/arden/configuration.nix
             vscode-server.nixosModule
             (_: {
@@ -278,6 +280,7 @@
           modules = [
             common
             agenix.nixosModules.default
+            ./modules/alloy.nix
             ./machines/springfield/configuration.nix
             vscode-server.nixosModule
             (_: {

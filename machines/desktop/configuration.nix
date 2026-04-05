@@ -222,35 +222,8 @@ in
     };
   };
 
-  services.promtail = {
-    enable = true;
-    configuration = {
-      positions.filename = "/tmp/positions.yaml";
-      server = {
-        http_listen_port = 9080;
-        grpc_listen_port = 0;
-      };
-      clients = [{
-        url = "http://home-server-1:3100/loki/api/v1/push";
-      }];
-      scrape_configs = [
-        {
-          job_name = "journal";
-          journal = {
-            max_age = "12h";
-            labels = {
-              job = "systemd-journal";
-              host = "lakehouse";
-            };
-          };
-          relabel_configs = [{
-            source_labels = [ "__journal__systemd_unit" ];
-            target_label = "unit";
-          }];
-        }
-      ];
-    };
-  };
+  services.alloy.enable = true;
+  services.alloy.hostLabel = "lakehouse";
 
   services._3proxy = {
     enable = true;
