@@ -4,7 +4,7 @@ let
     if config.services.alloy.hostLabel != null
     then config.services.alloy.hostLabel
     else config.networking.hostName;
-  lokiUrl = config.services.alloy.lokiUrl;
+  lokiUrl = inherit (config.services.alloy) lokiUrl;
 in
 {
   options.services.alloy.hostLabel = lib.mkOption {

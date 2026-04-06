@@ -46,10 +46,7 @@
         "legend": {
           "displayMode": "list",
           "placement": "bottom",
-          "calcs": [
-            "mean",
-            "lastNotNull"
-          ]
+          "calcs": ["mean", "lastNotNull"]
         },
         "tooltip": {
           "mode": "single"
@@ -102,10 +99,7 @@
         "legend": {
           "displayMode": "list",
           "placement": "bottom",
-          "calcs": [
-            "mean",
-            "lastNotNull"
-          ]
+          "calcs": ["mean", "lastNotNull"]
         },
         "tooltip": {
           "mode": "multi"
@@ -161,9 +155,7 @@
       ],
       "options": {
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "orientation": "horizontal",
         "showThresholdLabels": false,
@@ -216,10 +208,7 @@
         "legend": {
           "displayMode": "list",
           "placement": "bottom",
-          "calcs": [
-            "mean",
-            "lastNotNull"
-          ]
+          "calcs": ["mean", "lastNotNull"]
         },
         "tooltip": {
           "mode": "multi"
@@ -275,9 +264,7 @@
       ],
       "options": {
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "orientation": "horizontal",
         "showThresholdLabels": false,
@@ -322,10 +309,7 @@
         "legend": {
           "displayMode": "list",
           "placement": "bottom",
-          "calcs": [
-            "mean",
-            "lastNotNull"
-          ]
+          "calcs": ["mean", "lastNotNull"]
         },
         "tooltip": {
           "mode": "multi"
@@ -370,10 +354,7 @@
         "legend": {
           "displayMode": "list",
           "placement": "bottom",
-          "calcs": [
-            "mean",
-            "lastNotNull"
-          ]
+          "calcs": ["mean", "lastNotNull"]
         },
         "tooltip": {
           "mode": "multi"
@@ -417,10 +398,7 @@
         "legend": {
           "displayMode": "list",
           "placement": "bottom",
-          "calcs": [
-            "mean",
-            "lastNotNull"
-          ]
+          "calcs": ["mean", "lastNotNull"]
         },
         "tooltip": {
           "mode": "single"
@@ -474,9 +452,7 @@
       ],
       "options": {
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "colorMode": "background",
         "graphMode": "none",
@@ -485,10 +461,7 @@
     }
   ],
   "schemaVersion": 39,
-  "tags": [
-    "fleet",
-    "nodes"
-  ],
+  "tags": ["fleet", "nodes"],
   "templating": {
     "list": [
       {
@@ -505,12 +478,8 @@
         "multi": true,
         "current": {
           "selected": true,
-          "text": [
-            "All"
-          ],
-          "value": [
-            "$__all"
-          ]
+          "text": ["All"],
+          "value": ["$__all"]
         }
       }
     ]
