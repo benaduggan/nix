@@ -307,8 +307,6 @@ in
           }
         '';
         "grafana.digdug.dev".extraConfig = ''
-          authorize with google_auth
-
           reverse_proxy /* {
             to home-server-1:2342
           }
