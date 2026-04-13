@@ -40,7 +40,7 @@
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog
   system.stateVersion = common.darwinStateVersion;
-  ids.gids.nixbld = 30000;
+  ids.gids.nixbld = 350;
   system = {
     primaryUser = common.username;
     defaults = {
@@ -173,21 +173,18 @@
     brews = [ "readline" "qemu" ];
 
     taps = [
-      "homebrew/services"
     ];
 
     casks = map (name: { inherit name; greedy = true; }) [
-      "authy"
       "font-fira-code-nerd-font"
       # "spotify"
       "discord"
       # "slack"
       "karabiner-elements"
       "microsoft-remote-desktop"
-      "qlvideo"
+      "quicklook-video"
       "raycast"
       "rectangle"
-      "firefox"
       "chromium"
       "google-chrome"
       "visual-studio-code"
