@@ -189,6 +189,11 @@ in
       ];
     };
 
+    audiobookshelf.serviceConfig = {
+      ReadWritePaths = [ "/mnt/bigboi/audiobookshelf" ];
+      BindPaths = [ "/mnt/bigboi/audiobookshelf:/opt/box/audiobookshelf" ];
+    };
+
     unifi-manager-service =
       let
         myPython = pkgs.python313.withPackages (p: with p; [
