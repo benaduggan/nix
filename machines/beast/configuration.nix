@@ -242,7 +242,7 @@ in
     enable = true;
     package = common.jacobi.pkgs.llama-cpp-cuda-latest;
     port = 8015;
-    model = "/opt/box/models/Qwen_Qwen3.5-27B-Q4_K_M.gguf";
+    model = "/opt/box/models/Qwen3.6-27B-UD-Q4_K_XL.gguf";
     host = "0.0.0.0";
     extraFlags = [
       "-c"
