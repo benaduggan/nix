@@ -45,10 +45,13 @@
 
     # Pinned nixpkgs for working CUDA stack
     nixpkgs-pascal-cuda.url = "github:nixos/nixpkgs/35f1742e4f1470817ff8203185e2ce0359947f12";
+
+    # Separate nixpkgs for beast's NVIDIA/CUDA deps (updated independently)
+    nixpkgs-beast.url = "nixpkgs/nixos-unstable";
   };
 
   # deadnix: skip
-  outputs = inputs@{ self, agenix, nixpkgs, nixpkgs-pascal-cuda, nix-darwin, home-manager, kwbauson, jacobi, nixos-hardware, vscode-server, nixos-generators, nixos-wsl, ... }:
+  outputs = inputs@{ self, agenix, nixpkgs, nixpkgs-pascal-cuda, nixpkgs-beast, nix-darwin, home-manager, kwbauson, jacobi, nixos-hardware, vscode-server, nixos-generators, nixos-wsl, ... }:
     let
       inherit (nixpkgs) lib;
       inherit (nix-darwin.lib) darwinSystem;
@@ -64,7 +67,15 @@
             inherit (final.pkgs-x86)
               purescript;
           })
-        ) ++ import ./overlays.nix;
+        ) ++ import ./overlays.nix { inherit beastPkgs; };
+      };
+
+      beastPkgs = import nixpkgs-beast {
+        system = "x86_64-linux";
+        config = {
+          allowUnfree = true;
+          cudaCapabilities = [ "8.6" ];
+        };
       };
 
     in
@@ -157,6 +168,7 @@
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
+          specialArgs = { nixpkgs-beast-pkgs = beastPkgs; };
           modules = [
             common
             ./modules/alloy.nix

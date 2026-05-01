@@ -2,9 +2,9 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, pkgs, common, ... }:
+{ config, lib, pkgs, common, nixpkgs-beast-pkgs, ... }:
 let
-  cudaPkg = pkgs.cudaPackages;
+  cudaPkg = nixpkgs-beast-pkgs.cudaPackages;
   cuda = cudaPkg.cudatoolkit;
   CUDA_PATH = cuda.outPath;
   CUDA_LDPATH = "${
@@ -14,7 +14,7 @@ let
         "${cudaPkg.cudnn}/lib"
       ]
     }:${
-      lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib cuda.lib ]
+      lib.makeLibraryPath [ nixpkgs-beast-pkgs.stdenv.cc.cc.lib cuda.lib ]
     }";
 in
 {
@@ -27,6 +27,7 @@ in
   nix.settings = common.nixSettings;
   programs.nix-ld.enable = true;
   # Bootloader.
+  boot.kernelPackages = nixpkgs-beast-pkgs.linuxPackages;
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.supportedFilesystems = [ "exfat" ];
