@@ -47,7 +47,7 @@ with builtins; [
       requiredSubstitutes-beast = optionalAttrs stdenv.isLinux {
         inherit (beastPkgs) nvidia-docker cudatoolkit;
         inherit (beastPkgs.cudaPackages) cudnn cuda_cudart;
-        nvidia_x11 = beastPkgs.linuxPackages.nvidia_x11;
+        inherit (beastPkgs.linuxPackages) nvidia_x11;
       };
     })
 ]
