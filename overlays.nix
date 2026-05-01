@@ -1,3 +1,4 @@
+{ beastPkgs }:
 with builtins; [
   (_self: super:
     (x: { hax = x; }) (with super;
@@ -40,8 +41,11 @@ with builtins; [
     with final; with lib;
     {
       requiredSubstitutes = optionalAttrs stdenv.isLinux {
-        inherit firefox-unwrapped ffmpeg-full nvidia-docker cudatoolkit;
+        inherit firefox-unwrapped ffmpeg-full;
         chromium = chromium.browser;
+      };
+      requiredSubstitutes-beast = optionalAttrs stdenv.isLinux {
+        inherit (beastPkgs) nvidia-docker cudatoolkit;
       };
     })
 ]

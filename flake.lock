@@ -722,6 +722,21 @@
         "type": "github"
       }
     },
+    "nixpkgs-beast": {
+      "locked": {
+        "lastModified": 1777586718,
+        "narHash": "sha256-XqqAel6imMLIA8ZeX5CNydzOaokD6GIoUf02DuFeWr4=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "417335fe04072fe234d9a566b72d7955df681844",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "ref": "nixos-unstable-small",
+        "type": "indirect"
+      }
+    },
     "nixpkgs-pascal-cuda": {
       "locked": {
         "lastModified": 1755375481,
@@ -1032,6 +1047,7 @@
         "nixos-hardware": "nixos-hardware",
         "nixos-wsl": "nixos-wsl_2",
         "nixpkgs": "nixpkgs_8",
+        "nixpkgs-beast": "nixpkgs-beast",
         "nixpkgs-pascal-cuda": "nixpkgs-pascal-cuda",
         "vscode-server": "vscode-server_2"
       }
