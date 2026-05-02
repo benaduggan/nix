@@ -321,30 +321,30 @@
           ];
         };
 
-      nixosConfigurations.wsl =
-        let
-          common = import ./common.nix { machineName = "wsl"; isGraphical = false; isMinimal = true;  inherit inputs; };
-        in
-        nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit inputs; };
-          modules = [
-            common
-            nixos-wsl.nixosModules.wsl
-            ./machines/wsl/configuration.nix
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useUserPackages = true;
-              home-manager.useGlobalPkgs = true;
-              home-manager.users.nixos = {
-                imports = [
-                  common
-                  ./home
-                ];
-              };
-            }
-          ];
-        };
+      # nixosConfigurations.wsl =
+      #   let
+      #     common = import ./common.nix { machineName = "wsl"; isGraphical = false; isMinimal = true;  inherit inputs; };
+      #   in
+      #   nixpkgs.lib.nixosSystem {
+      #     system = "x86_64-linux";
+      #     specialArgs = { inherit inputs; };
+      #     modules = [
+      #       common
+      #       nixos-wsl.nixosModules.wsl
+      #       ./machines/wsl/configuration.nix
+      #       home-manager.nixosModules.home-manager
+      #       {
+      #         home-manager.useUserPackages = true;
+      #         home-manager.useGlobalPkgs = true;
+      #         home-manager.users.nixos = {
+      #           imports = [
+      #             common
+      #             ./home
+      #           ];
+      #         };
+      #       }
+      #     ];
+      #   };
 
       nixosConfigurations.digdugdev =
         let
