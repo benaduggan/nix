@@ -221,7 +221,9 @@ in
     };
     nvidia = {
       open = false;
-      package = config.boot.kernelPackages.nvidiaPackages.stable;
+      package = config.boot.kernelPackages.nvidiaPackages.stable.overrideAttrs (old: {
+        passthru = old.passthru // { mod = old.passthru.kernel; };
+      });
     };
   };
 
