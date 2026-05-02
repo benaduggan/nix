@@ -221,11 +221,13 @@ in
     };
     nvidia = {
       open = false;
-      package = let
-        base = config.boot.kernelPackages.nvidiaPackages.stable;
-      in base.overrideAttrs (old: {
-        passthru = old.passthru // { mod = base; };
-      });
+      package =
+        let
+          base = config.boot.kernelPackages.nvidiaPackages.stable;
+        in
+        base.overrideAttrs (old: {
+          passthru = old.passthru // { mod = base; };
+        });
     };
   };
 
