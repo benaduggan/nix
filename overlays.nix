@@ -45,9 +45,8 @@ with builtins; [
         chromium = chromium.browser;
       };
       requiredSubstitutes-beast = optionalAttrs stdenv.isLinux {
-        inherit (beastPkgs) nvidia-docker cudatoolkit;
+        inherit (beastPkgs) cudatoolkit;
         inherit (beastPkgs.cudaPackages) cudnn cuda_cudart;
-        inherit (beastPkgs.linuxPackages) nvidia_x11;
       };
     })
 ]
