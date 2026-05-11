@@ -270,6 +270,13 @@ in
         '';
         "assets.digdug.dev".extraConfig = ''
           root * /var/www/tldr
+          header {
+            Access-Control-Allow-Origin "*"
+            Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+            Access-Control-Allow-Headers "*"
+          }
+          @options method OPTIONS
+          respond @options 204
           file_server
         '';
 
