@@ -7,6 +7,8 @@ in
     (modulesPath + "/virtualisation/digital-ocean-config.nix")
   ];
 
+  networking.hostName = "digdugdev";
+
   nix = {
     extraOptions = ''
       max-jobs = auto
@@ -23,7 +25,11 @@ in
   age = {
     identityPaths = [ "/home/bduggan/.ssh/id_ed25519" ];
     secrets = {
-      board.file = ../../secrets/board.age;
+      board = {
+        file = ../../secrets/board.age;
+        owner = "quote-board";
+        group = "quote-board";
+      };
       caddy = {
         file = ../../secrets/caddy.age;
         path = "/etc/default/caddy";
@@ -372,6 +378,12 @@ in
       };
     };
 
+  # set this up after we get loki going.
+  # services.journald.extraConfig = ''
+  #   SystemMaxUse=500M
+  #   MaxRetentionSec=1month
+  # '';
+
   systemd.timers.update-quotes = {
     wantedBy = [ "timers.target" ];
     timerConfig = {
@@ -474,5 +486,6 @@ in
   };
 
   services.alloy.enable = true;
+  services.alloy.hostLabel = "digdugdev";
 }
 
