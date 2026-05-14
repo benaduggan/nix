@@ -161,9 +161,6 @@ in
       inherit (common) email;
       package = common.jacobi.zaddy;
       globalConfig = ''
-        order authenticate before respond
-        order authorize before basicauth
-
         security {
           oauth identity provider google {
             realm google
