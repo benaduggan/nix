@@ -207,7 +207,6 @@ in
             crypto key verify {env.JWT_SHARED_KEY}
             allow roles vault_users
             validate bearer header
-            validate bearer cookie
             inject headers with claims
           }
         }
