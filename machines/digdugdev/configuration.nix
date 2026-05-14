@@ -175,6 +175,7 @@ in
             crypto key sign-verify {env.JWT_SHARED_KEY}
             enable identity provider google
             cookie domain digdug.dev
+            trust login redirect uri domain digdug.dev
             ui {
               links {
                 "My Identity" "/whoami" icon "las la-user"
