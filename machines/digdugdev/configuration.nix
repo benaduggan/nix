@@ -158,7 +158,6 @@ in
       cobi = buildUser "godofjava@gmail.com" [ vaultRole desktopRole ];
       kevin = buildUser "kwbauson@gmail.com" [ vaultRole desktopRole ];
       ellie = buildUser "elliemduggan@gmail.com" [ vaultRole desktopRole ];
-      aly = buildUser "spiffai@gmail.com" [ vaultRole desktopRole ];
       # jade = buildUser "fisherrjd@gmail.com" [ vaultRole desktopRole ];
       ryguy = buildUser "rszemplinski22@gmail.com" [ vaultRole desktopRole ];
     in
@@ -409,29 +408,39 @@ in
     update-quotes = {
       path = [ pkgs.jq pkgs.gawk pkgs.gnused pkgs.curlMinimal ];
       script = ''
+        set -xe
         HTML_OUTPUT_PATH=/var/www/index.html
         QOUTES_PATH=/var/www/quotes.txt
 
         # get the google sheet url from agenix secret
+        echo "Loading secrets from ${config.age.secrets.board.path}"
         export $(${pkgs.gnugrep}/bin/grep -v '^#' ${config.age.secrets.board.path} | xargs)
 
-
         # Fetch the latest quotes from google drive
+        echo "Fetching quotes from Google Drive..."
         curl -L $GOOGLE_PUBLIC_URL -o $QOUTES_PATH
+        echo "Downloaded quotes file ($(wc -l < "$QOUTES_PATH") lines)"
 
         RANDOM_LINE=$(shuf -n 1 "$QOUTES_PATH")
         NAME=$(echo $RANDOM_LINE | awk '{print $1}')
         QUOTE=$(echo $RANDOM_LINE | awk '{$1=""; print $0}' | sed 's/^[ \t]*//')
+        echo "Selected quote — name=$NAME quote=$QUOTE"
+
         PHOTOS=(/var/www/imgs/$NAME/$NAME*.png /var/www/imgs/$NAME/$NAME*.jpg /var/www/imgs/$NAME/$NAME*.jpeg)
-        PHOTOS=($(ls -1 "''${PHOTOS[@]}" 2>/dev/null))
+        PHOTOS=($(ls -1 "''${PHOTOS[@]}" 2>/dev/null)) || true
         PHOTO_COUNT=''${#PHOTOS[@]}
+        echo "Found $PHOTO_COUNT photo(s) for $NAME"
+
         if [ "$PHOTO_COUNT" -eq 0 ]; then
           IMG_PATH="imgs/$NAME/$NAME1.png"
+          echo "No photos found, using fallback: $IMG_PATH"
         else
           RANDOM_INDEX=$(( RANDOM % PHOTO_COUNT ))
           IMG_PATH="''${PHOTOS[$RANDOM_INDEX]#/var/www/}"
+          echo "Selected photo: $IMG_PATH"
         fi
 
+        echo "Writing HTML to $HTML_OUTPUT_PATH"
         cat > $HTML_OUTPUT_PATH << EOF
         <!DOCTYPE html>
         <html lang="en">
