@@ -198,7 +198,6 @@ in
             ${keri}
             ${anna}
             ${ryguy}
-            ${aly}
 
           }
 
