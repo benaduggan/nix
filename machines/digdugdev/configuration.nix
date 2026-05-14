@@ -72,6 +72,7 @@ in
     group = "deploy-blog";
     home = "/var/www/digdug.dev";
     createHome = true;
+    homeMode = "755";
     useDefaultShell = true;
     openssh.authorizedKeys.keys = [
       ''command="${pkgs.rrsync}/bin/rrsync -wo /var/www/digdug.dev",restrict ${blogDeployKey}''
