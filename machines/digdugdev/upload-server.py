@@ -5,6 +5,7 @@ Serves an upload form and handles file uploads to /var/www/imgs/<NAME>/.
 Intended to run behind Caddy on sec-board.digdug.dev (auth handled by Caddy).
 """
 
+import html
 import os
 import re
 import glob
@@ -73,7 +74,7 @@ def html_page(title, body):
 
 def upload_form():
     names = get_available_names()
-    options = "".join(f'<option value="{n}">{n}</option>' for n in names)
+    options = "".join(f'<option value="{html.escape(n)}">{html.escape(n)}</option>' for n in names)
     return html_page("Upload Photo", f"""
   <h1>Upload Photo</h1>
   <form method="POST" enctype="multipart/form-data" action="/upload">
@@ -91,7 +92,7 @@ def upload_form():
 def success_page(name, filename):
     return html_page("Upload Successful", f"""
   <h1>Upload Successful</h1>
-  <div class="msg ok">Saved <strong>{filename}</strong> for {name}.</div>
+  <div class="msg ok">Saved <strong>{html.escape(filename)}</strong> for {html.escape(name)}.</div>
   <p style="margin-top:16px"><a href="/upload">Upload another</a></p>
 """)
 
@@ -99,7 +100,7 @@ def success_page(name, filename):
 def error_page(message):
     return html_page("Upload Error", f"""
   <h1>Upload Error</h1>
-  <div class="msg err">{message}</div>
+  <div class="msg err">{html.escape(message)}</div>
   <p style="margin-top:16px"><a href="/upload">Try again</a></p>
 """)
 
