@@ -60,6 +60,12 @@ in
     openssh.authorizedKeys.keys = common.authorizedKeys;
   };
 
+  users.groups.quote-board = { };
+  users.extraUsers.quote-board = {
+    isSystemUser = true;
+    group = "quote-board";
+  };
+
   users.groups.deploy-blog = { };
   users.extraUsers.deploy-blog = {
     isSystemUser = true;
@@ -75,6 +81,10 @@ in
 
   systemd.tmpfiles.rules = [
     "d /var/www/digdug.dev 0755 deploy-blog deploy-blog -"
+    "d /var/www/imgs 0755 quote-board quote-board -"
+    "Z /var/www/imgs 0755 quote-board quote-board -"
+    "f /var/www/index.html 0644 quote-board quote-board -"
+    "f /var/www/quotes.txt 0644 quote-board quote-board -"
   ];
 
   networking.firewall.enable = true;
@@ -351,8 +361,15 @@ in
           header {
             Cache-Control "no-cache, no-store, must-revalidate"
           }
-          root * /var/www
-          file_server
+
+          handle /upload* {
+            reverse_proxy localhost:8787
+          }
+
+          handle {
+            root * /var/www
+            file_server
+          }
         '';
       };
     };
@@ -367,6 +384,18 @@ in
   };
 
   systemd.services = {
+    quote-upload = {
+      wantedBy = [ "multi-user.target" ];
+      after = [ "network.target" ];
+      path = [ pkgs.python3 ];
+      script = ''python ${./upload-server.py}'';
+      serviceConfig = {
+        User = "quote-board";
+        Group = "quote-board";
+        Restart = "on-failure";
+      };
+    };
+
     update-quotes = {
       path = [ pkgs.jq pkgs.gawk pkgs.gnused pkgs.curlMinimal ];
       script = ''
@@ -383,8 +412,15 @@ in
         RANDOM_LINE=$(shuf -n 1 "$QOUTES_PATH")
         NAME=$(echo $RANDOM_LINE | awk '{print $1}')
         QUOTE=$(echo $RANDOM_LINE | awk '{$1=""; print $0}' | sed 's/^[ \t]*//')
-        RANDOM_PHOTO_INDEX=$(( RANDOM % 11 + 1 ))
-        IMG_PATH="imgs/$NAME/$NAME$RANDOM_PHOTO_INDEX.png"
+        PHOTOS=(/var/www/imgs/$NAME/$NAME*.png /var/www/imgs/$NAME/$NAME*.jpg /var/www/imgs/$NAME/$NAME*.jpeg)
+        PHOTOS=($(ls -1 "''${PHOTOS[@]}" 2>/dev/null))
+        PHOTO_COUNT=''${#PHOTOS[@]}
+        if [ "$PHOTO_COUNT" -eq 0 ]; then
+          IMG_PATH="imgs/$NAME/$NAME1.png"
+        else
+          RANDOM_INDEX=$(( RANDOM % PHOTO_COUNT ))
+          IMG_PATH="''${PHOTOS[$RANDOM_INDEX]#/var/www/}"
+        fi
 
         cat > $HTML_OUTPUT_PATH << EOF
         <!DOCTYPE html>
@@ -432,7 +468,8 @@ in
         EOF
       '';
       serviceConfig = {
-        User = "root";
+        User = "quote-board";
+        Group = "quote-board";
         Type = "oneshot";
       };
     };
