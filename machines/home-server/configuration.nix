@@ -530,6 +530,29 @@
     };
   };
 
+  services.syncthing = {
+    enable = true;
+    user = common.username;
+    dataDir = "/home/${common.username}/syncthing";
+    configDir = "/home/${common.username}/.config/syncthing";
+    openDefaultPorts = true;
+    guiAddress = "127.0.0.1:8384";
+    settings = {
+      devices = {
+        "magic-mbp" = {
+          id = "4RSZHH5-KOJ7HCH-DTIEVJO-ITKGEAM-E5NM3FU-ASKUGVI-3QDLJ6S-PXG2GQ4";
+          name = "magic-mbp.local";
+        };
+      };
+      folders = {
+        "3rt2u-u7hjy" = {
+          path = "/home/${common.username}/syncthing";
+          devices = [ "magic-mbp" ];
+        };
+      };
+    };
+  };
+
   services.wyoming.faster-whisper = {
     # package = pkgs.wyoming-faster-whisper;  # default, rarely need to override
 
