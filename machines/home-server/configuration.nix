@@ -147,6 +147,7 @@
   systemd.tmpfiles.rules = [
     "d /etc/vault 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
     "f /etc/default/vaultwarden 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
+    "d /home/${common.username}/syncthing/obsidian/mindmap/n8n-drop 0755 ${common.username} users -"
   ];
 
   services.vaultwarden = {
@@ -255,6 +256,26 @@
         wantedBy = [ "multi-user.target" ];
         script = ''python /home/bduggan/greenhouse-passthrough/server.py'';
       };
+
+    obsidian-autocommit = {
+      path = [ pkgs.git pkgs.openssh ];
+      script = ''
+        cd /home/${common.username}/syncthing/obsidian
+        git add -A
+        if git diff --cached --quiet; then
+          echo "no changes to commit"
+          exit 0
+        fi
+        git -c user.name="home-server" -c user.email="ben@adaptivereader.com" \
+          commit -m "auto: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        git push
+      '';
+      serviceConfig = {
+        User = common.username;
+        Type = "oneshot";
+      };
+      startAt = "hourly";
+    };
   };
 
   # docker stuff
@@ -296,7 +317,10 @@
     containers.n8n = {
       # https://github.com/n8n-io/n8n
       image = "docker.n8n.io/n8nio/n8n:2.17.7";
-      volumes = [ "n8n_data:/home/node/.n8n" ];
+      volumes = [
+        "n8n_data:/home/node/.n8n"
+        "/home/${common.username}/syncthing/obsidian/mindmap/n8n-drop:/n8n-drop"
+      ];
       ports = [ "5678:5678" ];
       environment = {
         GENERIC_TIMEZONE = "America/Denver";
@@ -304,6 +328,7 @@
         N8N_TEMPLATES_ENABLED = "true";
         N8N_HIRING_BANNER_ENABLED = "false";
         WEBHOOK_URL = "https://n8n.digdug.dev";
+        N8N_RESTRICT_FILE_ACCESS_TO = "/n8n-drop";
       };
       environmentFiles = [ config.age.secrets.n8n.path ];
       extraOptions = [
@@ -536,18 +561,30 @@
     dataDir = "/home/${common.username}/syncthing";
     configDir = "/home/${common.username}/.config/syncthing";
     openDefaultPorts = true;
-    guiAddress = "127.0.0.1:8384";
+    guiAddress = "0.0.0.0:8384";
     settings = {
       devices = {
+        "phone" = {
+          id = "XVZZXXW-CGV7I3X-WUSSC5Q-SGXJHZT-WXIZZ2N-DFBABSE-TLXWGKD-WPWGVA4";
+          name = "phone";
+        };
+        "desktop" = {
+          id = "KRAFMTC-RRLF62O-RIK7NBR-CPATD7L-BKP776D-O7XJEG5-3P7PZCA-DJQVUA7";
+          name = "desktop";
+        };
         "magic-mbp" = {
           id = "4RSZHH5-KOJ7HCH-DTIEVJO-ITKGEAM-E5NM3FU-ASKUGVI-3QDLJ6S-PXG2GQ4";
           name = "magic-mbp.local";
         };
       };
       folders = {
-        "3rt2u-u7hjy" = {
-          path = "/home/${common.username}/syncthing";
+        "obsidian" = {
+          path = "/home/${common.username}/syncthing/obsidian";
           devices = [ "magic-mbp" ];
+          ignorePatterns = [
+            "**/.git/**"
+            "**/.obsidian/**"
+          ];
         };
       };
     };

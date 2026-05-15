@@ -34,6 +34,9 @@ Secret config at `etc/default/grafana`
 This server facilitates LLM usage via lite llm. This points to all the services I want to expose
 and controls keys and limits to anyone using my services. The main use right now is open web ui which exposes a chatgpt like interface over the internet so I can provide access to friends and family to LLMs I run within my tailnet on various servers.
 
+## n8n meeting transcript ingestion
+TranscriptTonic webhook to https://n8n.digdug.dev/webhook/abb342bd-72d7-4676-8bce-f36a6786eeeb will put the transcript file in my obsidan vault
+
 ### features
 
 - alerting (email)
