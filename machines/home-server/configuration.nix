@@ -580,8 +580,10 @@
       folders = {
         "obsidian" = {
           path = "/home/${common.username}/syncthing/obsidian";
-          devices = [ "magic-mbp" ];
+          devices = [ "magic-mbp" "desktop" "phone" ];
           ignorePatterns = [
+            ".git/"
+            ".obsidian/"
             "**/.git/**"
             "**/.obsidian/**"
           ];
