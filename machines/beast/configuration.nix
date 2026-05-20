@@ -27,7 +27,7 @@ in
   nix.settings = common.nixSettings;
   programs.nix-ld.enable = true;
   # Bootloader.
-  boot.kernelPackages = nixpkgs-beast-pkgs.linuxPackages;
+  boot.kernelPackages = nixpkgs-beast-pkgs.linuxPackages_6_12;
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.supportedFilesystems = [ "exfat" ];
@@ -221,13 +221,7 @@ in
     };
     nvidia = {
       open = false;
-      package =
-        let
-          base = config.boot.kernelPackages.nvidiaPackages.stable;
-        in
-        base.overrideAttrs (old: {
-          passthru = old.passthru // { mod = base; };
-        });
+      package = config.boot.kernelPackages.nvidiaPackages.production;
     };
   };
 
