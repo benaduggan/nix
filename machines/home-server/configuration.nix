@@ -247,7 +247,7 @@
 
     greenhouse-service =
       let
-        myPython = pkgs.python311.withPackages (p: with p; [
+        myPython = pkgs.python313.withPackages (p: with p; [
           requests
         ]);
       in
