@@ -11,6 +11,10 @@
       ./hardware-configuration.nix
     ];
 
+  nixpkgs.config.permittedInsecurePackages = [
+    "nodejs-20.20.2"
+  ];
+
   nix.settings = common.nixSettings;
   programs.nix-ld.enable = true;
   # Bootloader.
