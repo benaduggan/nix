@@ -268,6 +268,9 @@ in
       "1024"
       "--sleep-idle-seconds"
       "300"
+      "--spec-type draft-mtp"
+      "--spec-draft-n-max"
+      "2"
     ];
   };
 

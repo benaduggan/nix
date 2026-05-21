@@ -247,7 +247,7 @@
 
     greenhouse-service =
       let
-        myPython = pkgs.python311.withPackages (p: with p; [
+        myPython = pkgs.python313.withPackages (p: with p; [
           requests
         ]);
       in
@@ -526,14 +526,16 @@
   services.github-runners = {
     magic = {
       enable = true;
+      nodeRuntimes = [ "node24" ];
       extraLabels = [ "nix" ];
-      extraPackages = with pkgs; [ gh cachix nodejs_20 corepack_20 gnused ];
+      extraPackages = with pkgs; [ gh cachix gnused ];
       replace = true;
       tokenFile = config.age.secrets.magicRunnerToken.path;
       url = "https://github.com/MagicSchoolAi/MagicSchoolAi/";
     };
     nix-repo = {
       enable = true;
+      nodeRuntimes = [ "node24" ];
       extraLabels = [ "nix" ];
       extraPackages = with pkgs; [ gh cachix ];
       replace = true;
