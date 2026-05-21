@@ -11,11 +11,6 @@
       ./hardware-configuration.nix
     ];
 
-  nixpkgs.config.permittedInsecurePackages = [
-    "nodejs-20.20.2"
-    "nodejs-slim-20.20.2"
-  ];
-
   nix.settings = common.nixSettings;
   programs.nix-ld.enable = true;
   # Bootloader.
@@ -532,7 +527,7 @@
     magic = {
       enable = true;
       extraLabels = [ "nix" ];
-      extraPackages = with pkgs; [ gh cachix nodejs_20 corepack_20 gnused ];
+      extraPackages = with pkgs; [ gh cachix gnused ];
       replace = true;
       tokenFile = config.age.secrets.magicRunnerToken.path;
       url = "https://github.com/MagicSchoolAi/MagicSchoolAi/";
