@@ -526,6 +526,7 @@
   services.github-runners = {
     magic = {
       enable = true;
+      nodeRuntimes = [ "node24" ];
       extraLabels = [ "nix" ];
       extraPackages = with pkgs; [ gh cachix gnused ];
       replace = true;
@@ -534,6 +535,7 @@
     };
     nix-repo = {
       enable = true;
+      nodeRuntimes = [ "node24" ];
       extraLabels = [ "nix" ];
       extraPackages = with pkgs; [ gh cachix ];
       replace = true;
