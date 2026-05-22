@@ -27,7 +27,7 @@ in
   nix.settings = common.nixSettings;
   programs.nix-ld.enable = true;
   # Bootloader.
-  boot.kernelPackages = nixpkgs-beast-pkgs.linuxPackages_6_12;
+  # boot.kernelPackages = nixpkgs-beast-pkgs.linuxPackages_6_12;
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.supportedFilesystems = [ "exfat" ];
@@ -247,7 +247,7 @@ in
     host = "0.0.0.0";
     extraFlags = [
       "-c"
-      "65536"
+      "32768"
       "--temp"
       "0.6"
       "--top-k"
@@ -268,7 +268,8 @@ in
       "1024"
       "--sleep-idle-seconds"
       "300"
-      "--spec-type draft-mtp"
+      "--spec-type"
+      "draft-mtp"
       "--spec-draft-n-max"
       "2"
     ];
