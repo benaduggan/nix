@@ -424,6 +424,9 @@ in
         RANDOM_LINE=$(shuf -n 1 "$QOUTES_PATH")
         NAME=$(echo $RANDOM_LINE | awk '{print $1}')
         QUOTE=$(echo $RANDOM_LINE | awk '{$1=""; print $0}' | sed 's/^[ \t]*//')
+        # HTML-escape so &, <, > in the quote can't break the page.
+        # & must be escaped first, otherwise it would double-escape the others.
+        QUOTE=$(printf '%s' "$QUOTE" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g')
         echo "Selected quote — name=$NAME quote=$QUOTE"
 
         PHOTOS=(/var/www/imgs/$NAME/$NAME*.png /var/www/imgs/$NAME/$NAME*.jpg /var/www/imgs/$NAME/$NAME*.jpeg)
@@ -450,38 +453,56 @@ in
             <meta http-equiv="X-UA-Compatible" content="ie=edge">
             <title>Quote Board</title>
             <style>
-            * {
-              margin: 0;
-            }
+            * { margin: 0; padding: 0; }
 
-            body {
-              margin: 0;
-              max-width: 600px;
-              max-height: 800px;
+            html, body {
               width: 600px;
               height: 800px;
+              overflow: hidden;
+              font-family: Georgia, serif;
             }
 
-            .quote-text {
-              margin: 0 auto;
-              display: block;
-              font-size: 24px;
-              font-weight: bold;
-              max-width: 80%;
-              padding: 20px;
+            .photo-box {
+              width: 600px;
+              height: 560px;
+              overflow: hidden;
               text-align: center;
+              background: #000;
             }
 
             .profile {
-              width: 100%;
               max-width: 600px;
+              max-height: 560px;
+              width: auto;
               height: auto;
+              vertical-align: middle;
+            }
+
+            .quote-box {
+              width: 600px;
+              height: 240px;
+              overflow: hidden;
+              display: table;
+            }
+
+            .quote-text {
+              display: table-cell;
+              vertical-align: middle;
+              text-align: center;
+              font-size: 28px;
+              font-weight: bold;
+              padding: 16px 40px;
+              line-height: 1.3;
             }
             </style>
           </head>
           <body>
-            <img class="profile" src="$IMG_PATH" />
-            <p class="quote-text">$QUOTE</p>
+            <div class="photo-box">
+              <img class="profile" src="$IMG_PATH" alt="" />
+            </div>
+            <div class="quote-box">
+              <p class="quote-text">$QUOTE</p>
+            </div>
           </body>
         </html>
         EOF
