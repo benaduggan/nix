@@ -12,12 +12,19 @@ jobs:
       - uses: cachix/install-nix-action@v31
       - run: nix flake update $(nix flake metadata --json 2>/dev/null | nix run nixpkgs#jq -- -r '.locks.nodes.root.inputs | keys[] | select(. != "nixpkgs-beast" and . != "nixpkgs-pascal-cuda")')
       - uses: peter-evans/create-pull-request@v8.1.1
+        id: cpr
         with:
           author: Ben Duggan <benaduggan@gmail.com>
           title: "Flake update"
           commit-message: "Update flake.lock"
           branch: updates-all
           token: ${{ secrets.PAT }}
+      - if: steps.cpr.outputs.pull-request-number
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          token: ${{ secrets.PAT }}
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: squash
   updates-beast:
     runs-on: [nix, Linux, X64]
     steps:
@@ -25,9 +32,16 @@ jobs:
       - uses: cachix/install-nix-action@v31
       - run: nix flake update nixpkgs-beast
       - uses: peter-evans/create-pull-request@v8.1.1
+        id: cpr
         with:
           author: Ben Duggan <benaduggan@gmail.com>
           title: "Flake update (beast nixpkgs)"
           commit-message: "Update flake.lock (nixpkgs-beast)"
           branch: updates-beast
           token: ${{ secrets.PAT }}
+      - if: steps.cpr.outputs.pull-request-number
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          token: ${{ secrets.PAT }}
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: squash
