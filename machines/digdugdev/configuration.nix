@@ -283,6 +283,7 @@ in
         '';
         "assets.digdug.dev".extraConfig = ''
           root * /var/www/tldr
+          encode zstd gzip
           header {
             Access-Control-Allow-Origin "*"
             Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
