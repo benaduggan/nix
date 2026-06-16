@@ -272,6 +272,9 @@ in
       "draft-mtp"
       "--spec-draft-n-max"
       "2"
+      "--mmproj"
+      "/opt/box/models/mmproj-BF16.gguf"
+      "--no-mmproj-offload"
     ];
   };
 
