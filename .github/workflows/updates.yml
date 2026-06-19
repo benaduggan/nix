@@ -8,7 +8,7 @@ jobs:
   updates:
     runs-on: [nix, Linux, X64]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
       - run: nix flake update $(nix flake metadata --json 2>/dev/null | nix run nixpkgs#jq -- -r '.locks.nodes.root.inputs | keys[] | select(. != "nixpkgs-beast" and . != "nixpkgs-pascal-cuda")')
       - uses: peter-evans/create-pull-request@v8.1.1
@@ -28,7 +28,7 @@ jobs:
   updates-beast:
     runs-on: [nix, Linux, X64]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
       - run: nix flake update nixpkgs-beast
       - uses: peter-evans/create-pull-request@v8.1.1
