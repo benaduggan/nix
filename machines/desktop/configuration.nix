@@ -27,6 +27,8 @@ in
 
   # Bootloader.
   boot.kernelPackages = nixpkgs-pascal-cuda-meme.linuxPackages;
+  hardware.deviceTree.enable = false;
+  system.boot.loader.kernelFile = "bzImage";
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
@@ -321,23 +323,17 @@ in
       })).override {
         cudaSupport = true;
       };
-    port = 8015;
-    model = "/opt/box/models/qwen-3-4b.gguf";
-    host = "0.0.0.0";
-    extraFlags = [
-      "-c"
-      "16384"
-      "--temp"
-      "0.6"
-      "--top-k"
-      "20"
-      "--min-p"
-      "0"
-      "--top-p"
-      "0.95"
-      "--n-gpu-layers"
-      "99"
-      "--jinja"
-    ];
+    settings = {
+      host = "0.0.0.0";
+      port = 8015;
+      model = "/opt/box/models/qwen-3-4b.gguf";
+      ctx-size = 16384;
+      temp = 0.6;
+      top-k = 20;
+      min-p = 0;
+      top-p = 0.95;
+      n-gpu-layers = 99;
+      jinja = true;
+    };
   };
 }
