@@ -242,40 +242,27 @@ in
   services.llama-cpp = {
     enable = true;
     package = common.jacobi.pkgs.llama-cpp-cuda-latest;
-    port = 8015;
-    model = "/opt/box/models/Qwen3.6-27B-UD-Q4_K_XL.gguf";
-    host = "0.0.0.0";
-    extraFlags = [
-      "-c"
-      "32768"
-      "--temp"
-      "0.6"
-      "--top-k"
-      "20"
-      "--min-p"
-      "0"
-      "--top-p"
-      "0.8"
-      "--n-gpu-layers"
-      "99"
-      "--jinja"
-      "--flash-attn"
-      "on"
-      "--no-mmap"
-      "-b"
-      "1024"
-      "-ub"
-      "1024"
-      "--sleep-idle-seconds"
-      "300"
-      "--spec-type"
-      "draft-mtp"
-      "--spec-draft-n-max"
-      "2"
-      "--mmproj"
-      "/opt/box/models/mmproj-BF16.gguf"
-      "--no-mmproj-offload"
-    ];
+    settings = {
+      host = "0.0.0.0";
+      port = 8015;
+      model = "/opt/box/models/Qwen3.6-27B-UD-Q4_K_XL.gguf";
+      ctx-size = 32768;
+      temp = 0.6;
+      top-k = 20;
+      min-p = 0;
+      top-p = 0.8;
+      n-gpu-layers = 99;
+      jinja = true;
+      flash-attn = "on";
+      no-mmap = true;
+      batch-size = 1024;
+      ubatch-size = 1024;
+      sleep-idle-seconds = 300;
+      spec-type = "draft-mtp";
+      spec-draft-n-max = 2;
+      mmproj = "/opt/box/models/mmproj-BF16.gguf";
+      no-mmproj-offload = true;
+    };
   };
 
   services.alloy.enable = true;
