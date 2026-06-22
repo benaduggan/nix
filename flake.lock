@@ -489,18 +489,19 @@
         "nixvim": "nixvim"
       },
       "locked": {
-        "lastModified": 1781893814,
-        "narHash": "sha256-uH+lamTRuxu4NifIdctW5c4PPj0RV8a6vjiZOuFwJxg=",
-        "owner": "kwbauson",
-        "repo": "cfg",
-        "rev": "269aa641c7ac056398c7cb9af4e54f1f0a6ee683",
+        "lastModified": 1782141006,
+        "narHash": "sha256-DDiTaHheMsm/UTteW3AvN+SzsISvnNuS47IUipRGMTs=",
+        "ref": "refs/heads/main",
+        "rev": "fb879e9d2218d2ce736761cd44a5d8bf91d68729",
+        "revCount": 4367,
         "submodules": true,
-        "type": "github"
+        "type": "git",
+        "url": "https://github.com/kwbauson/cfg"
       },
       "original": {
-        "owner": "kwbauson",
-        "repo": "cfg",
-        "type": "github"
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/kwbauson/cfg"
       }
     },
     "nix-darwin": {
