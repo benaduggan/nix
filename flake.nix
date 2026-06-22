@@ -5,7 +5,7 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     kwbauson = {
-      url = "github:kwbauson/cfg";
+      url = "git+https://github.com/kwbauson/cfg?submodules=1";
       inputs = {
         home-manager.follows = "home-manager";
         nix-darwin.follows = "nix-darwin";
