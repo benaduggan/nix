@@ -86,29 +86,29 @@
       upgrade = true;
     };
 
-    brews = [ "readline" "qemu" ];
+    #  brews = [ "readline" "qemu" ];
 
     taps = [ ];
 
     casks = map (name: { inherit name; greedy = true; }) [
-      "epic-games"
+      #    "epic-games"
       # "spotify"
-      "steam"
-      "discord"
+      #   "steam"
+      #  "discord"
       "slack"
-      "obs"
-      "karabiner-elements"
+      #    "obs"
+      #     "karabiner-elements"
       "microsoft-remote-desktop"
       "notion"
-      "parsec"
+      #      "parsec"
       "raycast"
       "rectangle"
       "firefox"
       "google-chrome"
       "visual-studio-code"
       "vlc"
-      "zoom"
-      "insomnia"
+      #      "zoom"
+      #       "insomnia"
       "tabby"
     ];
 
