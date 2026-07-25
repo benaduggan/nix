@@ -47,6 +47,11 @@ in
         nil
         difftastic
         docker-client
+        (writeShellApplication {
+          name = "git-clean-merged";
+          runtimeInputs = [ git ];
+          text = builtins.readFile ./scripts/git-clean-merged.sh;
+        })
         (optList isLinux [
           gnutar
           man-pages

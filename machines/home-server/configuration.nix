@@ -442,6 +442,13 @@
           targets = [ "192.168.0.216" ];
         }];
       }
+      {
+        job_name = "ellie-office-temp-hmd";
+        scrape_interval = "60s";
+        static_configs = [{
+          targets = [ "192.168.1.156" ];
+        }];
+      }
     ];
   };
 
