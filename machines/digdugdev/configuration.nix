@@ -88,6 +88,7 @@ in
 
   systemd.tmpfiles.rules = [
     "d /var/www/digdug.dev 0755 deploy-blog deploy-blog -"
+    "d /var/www/remi-bday 0755 bduggan users -"
     "d /var/www/imgs 0755 quote-board quote-board -"
     "Z /var/www/imgs 0755 quote-board quote-board -"
     "f /var/www/index.html 0644 quote-board quote-board -"
@@ -268,6 +269,19 @@ in
         '';
         "java.digdug.dev".extraConfig = ''
           root * /var/www/java
+          file_server
+        '';
+
+        "remi-bday.digdug.dev".extraConfig = ''
+          root * /var/www/remi-bday
+          encode zstd gzip
+
+          header {
+            X-Content-Type-Options nosniff
+            X-Frame-Options DENY
+            Referrer-Policy strict-origin-when-cross-origin
+          }
+
           file_server
         '';
 
@@ -519,4 +533,3 @@ in
   services.alloy.enable = true;
   services.alloy.hostLabel = "digdugdev";
 }
-
