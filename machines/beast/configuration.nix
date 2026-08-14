@@ -70,26 +70,9 @@ in
 
   services = {
     flatpak.enable = true;
-    pantheon.apps.enable = true;
-    xserver = {
-      enable = true;
-      displayManager = {
-        lightdm.enable = true;
-        lightdm.greeters.pantheon.enable = true;
-        lightdm.extraConfig = ''
-          logind-check-graphical=true
-        '';
-      };
-    };
-    desktopManager = {
-      pantheon = {
-        enable = true;
-        extraWingpanelIndicators = with pkgs; [
-          monitor
-          wingpanel-indicator-namarupa
-        ];
-      };
-    };
+    xserver.enable = true;
+    displayManager.gdm.enable = true;
+    desktopManager.gnome.enable = true;
   };
 
   # Configure keymap in X11
@@ -160,43 +143,21 @@ in
   environment.systemPackages = with pkgs; [
     cudaPkg.cudatoolkit
     cudaPkg.cudnn
-    appeditor # elementary OS menu editor
     celluloid # Video Player
-    formatter # elementary OS filesystem formatter
     gthumb # Image Viewer
     simple-scan # Scanning
-    indicator-application-gtk3 # App Indicator
-    pantheon.sideload # elementary OS Flatpak installer
-    pantheon-tweaks
+    gnome-tweaks
   ];
 
   programs = {
     gnome-disks.enable = true;
   };
 
-  environment.pantheon.excludePackages = with pkgs.pantheon; [
-    elementary-music
-    elementary-photos
-    elementary-videos
-    epiphany
+  # Exclude some default GNOME apps
+  environment.gnome.excludePackages = with pkgs; [
+    gnome-tour
+    epiphany # web browser
   ];
-
-  # App indicator
-  # - https://discourse.nixos.org/t/anyone-with-pantheon-de/28422
-  # - https://github.com/NixOS/nixpkgs/issues/144045#issuecomment-992487775
-  environment.pathsToLink = [ "/libexec" ];
-
-  # App indicator
-  # - https://github.com/NixOS/nixpkgs/issues/144045#issuecomment-992487775
-  systemd.user.services.indicatorapp = {
-    description = "indicator-application-gtk3";
-    wantedBy = [ "graphical-session.target" ];
-    partOf = [ "graphical-session.target" ];
-    serviceConfig = {
-      ExecStart = "${pkgs.indicator-application-gtk3}/libexec/indicator-application/indicator-application-service";
-    };
-  };
-
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -234,6 +195,10 @@ in
 
   services.sunshine = {
     enable = true;
+    package = nixpkgs-beast-pkgs.sunshine.override {
+      cudaSupport = true;
+      cudaPackages = nixpkgs-beast-pkgs.cudaPackages;
+    };
     autoStart = false;
     capSysAdmin = true; # only needed for Wayland -- omit this when using with Xorg
     openFirewall = true;
@@ -245,12 +210,12 @@ in
     settings = {
       host = "0.0.0.0";
       port = 8015;
-      model = "/opt/box/models/Qwen3.6-27B-UD-Q4_K_XL.gguf";
-      ctx-size = 32768;
-      temp = 0.6;
+      model = "/opt/box/models/Qwen3.8-27B-UD-Q4_K_XL.gguf";
+      ctx-size = 65536;
+      temp = 1.0;
       top-k = 20;
       min-p = 0;
-      top-p = 0.8;
+      top-p = 0.95;
       n-gpu-layers = 99;
       jinja = true;
       flash-attn = "on";
@@ -260,7 +225,7 @@ in
       sleep-idle-seconds = 300;
       spec-type = "draft-mtp";
       spec-draft-n-max = 2;
-      mmproj = "/opt/box/models/mmproj-BF16.gguf";
+      mmproj = "/opt/box/models/Qwen3.8-27B-mmproj-BF16.gguf";
       no-mmproj-offload = true;
     };
   };
