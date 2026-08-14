@@ -219,6 +219,8 @@ in
       n-gpu-layers = 99;
       jinja = true;
       flash-attn = "on";
+      cache-type-k = "q8_0";
+      cache-type-v = "q8_0";
       no-mmap = true;
       batch-size = 1024;
       ubatch-size = 1024;
