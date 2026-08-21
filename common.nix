@@ -7,7 +7,7 @@ in
 {
   _module.args.common = {
     inherit (constants) authorizedKeys authorizedKeysRec cacheSubstituters digdugdevKey trustedPublicKeys magicSubstituters magicTrustedPublicKeys communitySubstituters communityTrustedPublicKeys adaptiveReaderSubstituters adaptiveReaderTrustedPublicKeys;
-    inherit (pkgs.stdenv) isLinux isDarwin;
+    inherit (pkgs.stdenv.hostPlatform) isLinux isDarwin;
     inherit isGraphical;
     inherit isMinimal;
     inherit machineName;
