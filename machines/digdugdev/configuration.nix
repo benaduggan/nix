@@ -165,7 +165,7 @@ in
     {
       enable = true;
       inherit (common) email;
-      package = common.jacobi.zaddy;
+      package = common.jacobiLegacy.zaddy;
       globalConfig = ''
         security {
           oauth identity provider google {

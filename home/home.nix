@@ -1,9 +1,9 @@
 { pkgs, lib, common, ... }:
 let
-  inherit (common) isLinux isDarwin kwbauson jacobi isGraphical isMinimal;
+  inherit (common) isLinux isDarwin kwbauson jacobiPackages jacobiLegacy isGraphical isMinimal;
   optList = conditional: list: if conditional then list else [ ];
 
-  # myPogScripts = import ./pog/index.nix { inherit pkgs; inherit (jacobi.pkgs) pog; };
+  # myPogScripts = import ./pog/index.nix { inherit pkgs; inherit (jacobiLegacy.pkgs) pog; };
 in
 {
   # Let Home Manager install and manage itself.
@@ -57,8 +57,8 @@ in
           man-pages
         ])
 
-        (with jacobi; [
-          argus
+        (with jacobiLegacy; [
+          jacobiPackages.argus-rs
           nixup
           httptap
         ])
@@ -164,22 +164,57 @@ in
           ])
 
           # (if isDarwin then [
-          #   # jacobi.llama-cpp-latest
+          #   # jacobiLegacy.llama-cpp-latest
           # ] else [ ])
 
           # jacobi's stuff
-          (with jacobi; [
+          (with jacobiLegacy; [
             _dex
-            argus
+            jacobiPackages.argus-rs
             # aws_pog_scripts
             drm
             drmi
             dshell
-            ffmpeg_pog_scripts
-            general_pog_scripts
+
+            crop_video
+            cut_video
+            faxify
+            flip
+            scale
+            to_mp3
+
+            batwhich
+            get_cert
+            jql
+            jqf
+            json_envvars
+            jwtdecode
+            slack_meme
+            fif
+            rot13
+            sin
+            srv
+            sqlfmt
+            whatip
+            whereami
+            portwatch
+            pdfcat
+
             httptap
-            nix_pog_scripts
+            hex
+            hexcast
+            nixrender
+            ndiff
+            overlay-check
+            overlay-diff
             nixup
+            nixsum
+            nixcache
+            nupdate
+            nupdate_latest_github
+            generate_sglang_omni_lock
+            generate_uv_lock
+            y2n
 
           ])
         ])
@@ -214,7 +249,7 @@ in
     enable = true;
     enableBashIntegration = false;
     defaultCommand = "fd -tf -c always -H --ignore-file ${./ignore} -E .git";
-    defaultOptions = common.jacobi.hax.words "--ansi --reverse --multi --filepath-word";
+    defaultOptions = common.jacobiLegacy.hax.words "--ansi --reverse --multi --filepath-word";
   };
   programs.vscode.enable = isGraphical && !isDarwin;
   programs.htop.enable = true;
