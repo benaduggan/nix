@@ -31,7 +31,7 @@
     home = "/Users/${common.username}";
     openssh.authorizedKeys.keys = common.authorizedKeys;
     packages = [
-      common.jacobi.pkgs.llama-cpp-latest
+      common.jacobiLegacy.pkgs.llama-cpp-latest
     ];
   };
 
@@ -91,7 +91,7 @@
 
   services.llama-server =
     let
-      package = common.jacobi.pkgs.llama-cpp-latest;
+      package = common.jacobiLegacy.pkgs.llama-cpp-latest;
     in
     {
       servers = {
@@ -203,4 +203,3 @@
     # };
   };
 }
-

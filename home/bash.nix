@@ -1,6 +1,6 @@
 { config, common, lib, ... }:
 let
-  inherit (common) jacobi;
+  inherit (common) jacobiLegacy;
   inherit (common) machineName;
   perUser = if machineName == "paper" then "benduggan" else "bduggan";
 in
@@ -34,7 +34,7 @@ in
       space = "du -Sh | sort -rh | head -10";
       now = "date +%s";
       fzfp = "fzf --preview 'bat --style=numbers --color=always {}'";
-    } // jacobi.hax.docker_aliases // jacobi.hax.kubernetes_aliases;
+    } // jacobiLegacy.hax.docker_aliases // jacobiLegacy.hax.kubernetes_aliases;
 
     initExtra = ''
       shopt -s histappend

@@ -134,7 +134,7 @@ in
 
     containers.homeassistant = {
       # https://github.com/home-assistant/core
-      image = "ghcr.io/home-assistant/home-assistant:2025.12.5";
+      image = "ghcr.io/home-assistant/home-assistant:2026.8.3";
       volumes = [ "home-assistant:/config" ];
       environment.TZ = "US/Eastern";
       extraOptions = [

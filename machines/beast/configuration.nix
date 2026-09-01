@@ -241,7 +241,7 @@ in
 
   services.llama-cpp = {
     enable = true;
-    package = common.jacobi.pkgs.llama-cpp-cuda-latest;
+    package = common.jacobiLegacy.pkgs.llama-cpp-cuda-latest;
     settings = {
       host = "0.0.0.0";
       port = 8015;
