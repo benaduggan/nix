@@ -286,7 +286,7 @@
 
     containers.homeassistant = {
       # https://github.com/home-assistant/core
-      image = "ghcr.io/home-assistant/home-assistant:2026.5.4";
+      image = "ghcr.io/home-assistant/home-assistant:2026.8.3";
       volumes = [ "home-assistant:/config" ];
       environment.TZ = "US/Eastern";
       extraOptions = [
@@ -296,7 +296,7 @@
 
     containers.litellm = {
       # https://github.com/BerriAI/litellm/releases
-      image = "ghcr.io/berriai/litellm:main-v1.83.14-stable.patch.3";
+      image = "ghcr.io/berriai/litellm:main:v1.99.0";
       environmentFiles = [ config.age.secrets.litellm.path ];
       extraOptions = [
         "--network=host"
@@ -305,7 +305,7 @@
 
     containers.openwebui = {
       # https://github.com/open-webui/open-webui
-      image = "ghcr.io/open-webui/open-webui:v0.9.5";
+      image = "ghcr.io/open-webui/open-webui:v0.11.3";
       volumes = [ "open-webui:/app/backend/data" ];
       environmentFiles = [ config.age.secrets.openwebui.path ];
       extraOptions = [
@@ -315,7 +315,7 @@
 
     containers.n8n = {
       # https://github.com/n8n-io/n8n
-      image = "docker.n8n.io/n8nio/n8n:2.22.5";
+      image = "docker.n8n.io/n8nio/n8n:2.36.9";
       volumes = [
         "n8n_data:/home/node/.n8n"
         "/home/${common.username}/syncthing/obsidian/mindmap/n8n-drop:/n8n-drop"
