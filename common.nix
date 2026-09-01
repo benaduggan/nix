@@ -19,7 +19,7 @@ in
     stateVersion = "25.11";
     darwinStateVersion = 6;
 
-    jacobi = inputs.jacobi.packages.${sys};
+    jacobi = inputs.jacobi.legacyPackages.${sys};
     kwbauson = inputs.kwbauson.packages.${sys};
     agenix = inputs.agenix.packages.${sys}.default;
 
