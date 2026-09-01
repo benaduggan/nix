@@ -296,7 +296,7 @@
 
     containers.litellm = {
       # https://github.com/BerriAI/litellm/releases
-      image = "ghcr.io/berriai/litellm:main:v1.99.0";
+      image = "ghcr.io/berriai/litellm:v1.98.0";
       environmentFiles = [ config.age.secrets.litellm.path ];
       extraOptions = [
         "--network=host"

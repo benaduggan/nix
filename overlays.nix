@@ -40,11 +40,11 @@ with builtins; [
   (final: _prev:
     with final; with lib;
     {
-      requiredSubstitutes = optionalAttrs stdenv.isLinux {
+      requiredSubstitutes = optionalAttrs stdenv.hostPlatform.isLinux {
         inherit firefox-unwrapped ffmpeg-full;
         chromium = chromium.browser;
       };
-      requiredSubstitutes-beast = optionalAttrs stdenv.isLinux {
+      requiredSubstitutes-beast = optionalAttrs stdenv.hostPlatform.isLinux {
         inherit (beastPkgs) cudatoolkit;
         inherit (beastPkgs.cudaPackages) cudnn cuda_cudart;
       };
