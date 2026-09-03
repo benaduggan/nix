@@ -14,9 +14,14 @@ let
   };
 
   authorizedKeys = builtins.attrValues authorizedKeysRec;
+
+  homeServerVaultwardenArchiveDir = "/etc/vault/backups";
+  desktopVaultwardenArchiveDir = "/mnt/bigboi/vault-backups";
+  ardenVaultwardenArchiveDir = "/var/backup/vaultwarden";
 in
 {
   inherit authorizedKeys authorizedKeysRec;
+  inherit homeServerVaultwardenArchiveDir desktopVaultwardenArchiveDir ardenVaultwardenArchiveDir;
 
   digdugdevKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMBXiUz//dlW7zcblPxQZqgcmZ5KziuhDnnIbuFmOvOw";
 

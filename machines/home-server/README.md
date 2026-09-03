@@ -23,7 +23,35 @@
 - copy the files from the tar to the data directory `cp -r /path/to/backup/* /var/lib/vaultwarden`
 - chown the files to the vaultwarden user `chown -R vaultwarden:vaultwarden /var/lib/vaultwarden`
 - start the vaultwarden service and verify things are working as expected
-- swap out the caddy entry on digdugdev
+- Caddy failover is automatic; no proxy edit is normally required
+
+### automatic read-only failover
+
+The reusable `modules/vaultwarden-replication.nix` module gives a node either a
+`master` or `standby` role. Archive directory paths are shared through named
+constants so the master destinations and standby storage cannot drift, while
+roles, hostnames, ports, and Caddy ordering remain explicit in their host
+configurations. `home-server-1` is the master. It atomically ships a rolling
+snapshot to both `bduggan-desktop` and `arden` every hour, and separately keeps
+and ships a timestamped long-term archive once per day.
+
+Both standbys check their rolling snapshot every five minutes, validate its
+SQLite database, and restore it into Vaultwarden on port 8222. Their database
+files are not writable by the Vaultwarden user, and the entire data directory is
+also mounted read-only inside the service, so neither can become a second
+writable copy.
+
+Caddy on `digdugdev` prefers `home-server-1`, then `bduggan-desktop`, then
+`arden`, and automatically moves down that list when a node fails its health
+check. The standby web vault shows a persistent warning that it is an emergency,
+read-only copy. Writes from web, desktop, and mobile clients fail while a standby
+is active.
+
+Failback is automatic once `home-server-1` passes Caddy's health check again.
+There is no reverse database sync because the standby cannot accept changes.
+
+Deploy the standby configurations before the master so their upload directories
+exist before the first replication run.
 
 ## Grafana
 
