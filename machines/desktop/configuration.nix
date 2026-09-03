@@ -24,6 +24,11 @@ in
 
   nix.settings = common.nixSettings;
 
+  age = {
+    identityPaths = [ "/home/${common.username}/.ssh/id_ed25519" ];
+    secrets.vaultwarden.file = ../../secrets/vaultwarden.age;
+  };
+
 
   # Bootloader.
   boot.kernelPackages = nixpkgs-pascal-cuda-meme.linuxPackages;
@@ -179,6 +184,31 @@ in
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
+
+  # Temporary Vaultwarden failover while home-server is offline.
+  systemd.tmpfiles.rules = [
+    "d /etc/vault 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
+    "f /etc/default/vaultwarden 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
+  ];
+
+  services.vaultwarden = {
+    enable = true;
+    environmentFile = config.age.secrets.vaultwarden.path;
+    config = {
+      ROCKET_ADDRESS = "0.0.0.0";
+      DOMAIN = "https://vault.digdug.dev";
+      SIGNUPS_ALLOWED = false;
+      SENDS_ALLOWED = true;
+      EMERGENCY_ACCESS_ALLOWED = true;
+      ORG_EVENTS_ENABLED = true;
+      SIGNUPS_VERIFY = true;
+      INVITATIONS_ALLOWED = true;
+      PASSWORD_ITERATIONS = 600000;
+      PASSWORD_HINTS_ALLOWED = true;
+      WEBSOCKET_ENABLED = true;
+      ENABLE_WEBSOCKET = true;
+    };
+  };
 
   networking.firewall.enable = false;
 
