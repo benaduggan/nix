@@ -220,6 +220,45 @@ in
   boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
 
   systemd.services = {
+    backup-vault = {
+      path = [ pkgs.gnutar pkgs.sqlite pkgs.gzip ];
+      script = ''
+        set -euo pipefail
+
+        PREFIX=$(date -u +%Y-%m-%d-%H-%M)
+        DATA_FOLDER=/var/lib/vaultwarden
+        BACKUP_FOLDER=/etc/vault/backups/staging
+        ARCHIVE="/etc/vault/backups/$PREFIX-vault-backup.tar.gz"
+        SSH_OPTIONS="-o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/home/${common.username}/.ssh/known_hosts -i /home/${common.username}/.ssh/id_ed25519"
+
+        rm -rf "$BACKUP_FOLDER"
+        mkdir -p "$BACKUP_FOLDER"
+        trap 'rm -rf "$BACKUP_FOLDER"' EXIT
+
+        if [[ ! -f "$DATA_FOLDER/db.sqlite3" ]]; then
+          echo "Could not find SQLite database file '$DATA_FOLDER/db.sqlite3'" >&2
+          exit 1
+        fi
+
+        ${pkgs.sqlite}/bin/sqlite3 "$DATA_FOLDER/db.sqlite3" ".backup '$BACKUP_FOLDER/db.sqlite3'"
+        for payload in attachments sends; do
+          if [[ -d "$DATA_FOLDER/$payload" ]]; then
+            cp -r "$DATA_FOLDER/$payload" "$BACKUP_FOLDER/"
+          fi
+        done
+
+        ${pkgs.gnutar}/bin/tar -C "$BACKUP_FOLDER" -czf "$ARCHIVE" .
+        ${pkgs.openssh}/bin/ssh $SSH_OPTIONS ${common.username}@arden mkdir -p /home/${common.username}/vault-backups
+        ${pkgs.openssh}/bin/scp $SSH_OPTIONS "$ARCHIVE" ${common.username}@arden:/home/${common.username}/vault-backups/
+      '';
+      serviceConfig = {
+        User = "root";
+        Type = "oneshot";
+        UMask = "0077";
+      };
+      startAt = "*-*-* 02:00:00";
+    };
+
     calibre-web.serviceConfig = {
       ReadWritePaths = [
         "/var/lib/calibre-web" # Standard app.db location
