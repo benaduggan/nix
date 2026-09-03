@@ -24,6 +24,11 @@ in
 
   nix.settings = common.nixSettings;
 
+  age = {
+    identityPaths = [ "/home/${common.username}/.ssh/id_ed25519" ];
+    secrets.vaultwarden.file = ../../secrets/vaultwarden.age;
+  };
+
 
   # Bootloader.
   boot.kernelPackages = nixpkgs-pascal-cuda-meme.linuxPackages;
@@ -180,6 +185,31 @@ in
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 
+  # Temporary Vaultwarden failover while home-server is offline.
+  systemd.tmpfiles.rules = [
+    "d /etc/vault 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
+    "f /etc/default/vaultwarden 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
+  ];
+
+  services.vaultwarden = {
+    enable = true;
+    environmentFile = config.age.secrets.vaultwarden.path;
+    config = {
+      ROCKET_ADDRESS = "0.0.0.0";
+      DOMAIN = "https://vault.digdug.dev";
+      SIGNUPS_ALLOWED = false;
+      SENDS_ALLOWED = true;
+      EMERGENCY_ACCESS_ALLOWED = true;
+      ORG_EVENTS_ENABLED = true;
+      SIGNUPS_VERIFY = true;
+      INVITATIONS_ALLOWED = true;
+      PASSWORD_ITERATIONS = 600000;
+      PASSWORD_HINTS_ALLOWED = true;
+      WEBSOCKET_ENABLED = true;
+      ENABLE_WEBSOCKET = true;
+    };
+  };
+
   networking.firewall.enable = false;
 
   # enable tailscale and use as exit node
@@ -190,6 +220,45 @@ in
   boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
 
   systemd.services = {
+    backup-vault = {
+      path = [ pkgs.gnutar pkgs.sqlite pkgs.gzip ];
+      script = ''
+        set -euo pipefail
+
+        PREFIX=$(date -u +%Y-%m-%d-%H-%M)
+        DATA_FOLDER=/var/lib/vaultwarden
+        BACKUP_FOLDER=/etc/vault/backups/staging
+        ARCHIVE="/etc/vault/backups/$PREFIX-vault-backup.tar.gz"
+        SSH_OPTIONS="-o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/home/${common.username}/.ssh/known_hosts -i /home/${common.username}/.ssh/id_ed25519"
+
+        rm -rf "$BACKUP_FOLDER"
+        mkdir -p "$BACKUP_FOLDER"
+        trap 'rm -rf "$BACKUP_FOLDER"' EXIT
+
+        if [[ ! -f "$DATA_FOLDER/db.sqlite3" ]]; then
+          echo "Could not find SQLite database file '$DATA_FOLDER/db.sqlite3'" >&2
+          exit 1
+        fi
+
+        ${pkgs.sqlite}/bin/sqlite3 "$DATA_FOLDER/db.sqlite3" ".backup '$BACKUP_FOLDER/db.sqlite3'"
+        for payload in attachments sends; do
+          if [[ -d "$DATA_FOLDER/$payload" ]]; then
+            cp -r "$DATA_FOLDER/$payload" "$BACKUP_FOLDER/"
+          fi
+        done
+
+        ${pkgs.gnutar}/bin/tar -C "$BACKUP_FOLDER" -czf "$ARCHIVE" .
+        ${pkgs.openssh}/bin/ssh $SSH_OPTIONS ${common.username}@arden mkdir -p /home/${common.username}/vault-backups
+        ${pkgs.openssh}/bin/scp $SSH_OPTIONS "$ARCHIVE" ${common.username}@arden:/home/${common.username}/vault-backups/
+      '';
+      serviceConfig = {
+        User = "root";
+        Type = "oneshot";
+        UMask = "0077";
+      };
+      startAt = "*-*-* 02:00:00";
+    };
+
     calibre-web.serviceConfig = {
       ReadWritePaths = [
         "/var/lib/calibre-web" # Standard app.db location
