@@ -285,7 +285,10 @@ in
       systemd.services = {
         vaultwarden = {
           wantedBy = lib.mkForce [ ];
-          serviceConfig.ReadOnlyPaths = [ "/var/lib/vaultwarden" ];
+          serviceConfig = {
+            ReadOnlyPaths = [ "/var/lib/vaultwarden" ];
+            ReadWritePaths = [ "/var/lib/vaultwarden/tmp" ];
+          };
         };
 
         restore-vaultwarden-standby = {
@@ -310,7 +313,9 @@ in
             fi
 
             latest_hash="$(${pkgs.coreutils}/bin/sha256sum "$latest" | ${pkgs.coreutils}/bin/cut -d ' ' -f 1)"
+            ${pkgs.coreutils}/bin/install -d -o vaultwarden -g vaultwarden -m 0700 "$data_dir/tmp"
             if [[ -f "$marker" ]] && [[ "$(<"$marker")" == "$latest_hash" ]]; then
+              systemctl reset-failed vaultwarden.service
               systemctl start vaultwarden.service
               exit 0
             fi
@@ -350,6 +355,7 @@ in
               fi
             done
 
+            systemctl reset-failed vaultwarden.service
             systemctl start vaultwarden.service
             for attempt in {1..10}; do
               if ${pkgs.curl}/bin/curl --fail --silent http://127.0.0.1:${toString cfg.port}/alive >/dev/null; then
