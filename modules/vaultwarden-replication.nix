@@ -52,6 +52,20 @@ let
     fi
   '';
 
+  uploadHourly = destination: ''
+    hourly_name="$(${pkgs.coreutils}/bin/basename "$hourly_archive")"
+    hourly_remote_dir=${destination.directory}/hourly
+    if ${pkgs.openssh}/bin/ssh ${sshOptions} ${cfg.sshUser}@${destination.host} mkdir -p "$hourly_remote_dir" \
+      && ${pkgs.openssh}/bin/scp ${sshOptions} "$hourly_archive" ${cfg.sshUser}@${destination.host}:"$hourly_remote_dir/.vault-hourly.tar.gz.uploading" \
+      && ${pkgs.openssh}/bin/ssh ${sshOptions} ${cfg.sshUser}@${destination.host} mv "$hourly_remote_dir/.vault-hourly.tar.gz.uploading" "$hourly_remote_dir/$hourly_name" \
+      && ${pkgs.openssh}/bin/ssh ${sshOptions} ${cfg.sshUser}@${destination.host} "find '$hourly_remote_dir' -maxdepth 1 -type f -name '*-vault-hourly.tar.gz' -mmin +${toString (cfg.hourlyRetentionHours * 60)} -delete"; then
+      echo "Uploaded hourly Vaultwarden archive to ${destination.host}"
+    else
+      echo "Failed to update hourly Vaultwarden archives on ${destination.host}" >&2
+      upload_failed=1
+    fi
+  '';
+
   uploadArchive = destination: ''
     if ${pkgs.openssh}/bin/scp ${sshOptions} "$archive" ${cfg.sshUser}@${destination.host}:${destination.directory}/; then
       echo "Uploaded daily Vaultwarden archive to ${destination.host}"
@@ -89,6 +103,12 @@ in
       type = lib.types.str;
       default = if cfg.role == "master" then "/etc/vault/backups" else "/var/backup/vaultwarden";
       description = "Local directory for rolling snapshots and daily archives.";
+    };
+
+    hourlyRetentionHours = lib.mkOption {
+      type = lib.types.ints.positive;
+      default = 48;
+      description = "Number of hours to retain timestamped hourly snapshots.";
     };
 
     destinations = lib.mkOption {
@@ -160,9 +180,11 @@ in
           DATA_FOLDER=/var/lib/vaultwarden
           BACKUP_FOLDER=${cfg.archiveDir}/staging
           STANDBY_BACKUP=${cfg.archiveDir}/vault-standby.tar.gz
+          hourly_dir=${cfg.archiveDir}/hourly
+          hourly_archive="$hourly_dir/$(date -u +%Y-%m-%d-%H-%M)-vault-hourly.tar.gz"
           rm -rf "$BACKUP_FOLDER"
-          mkdir -p "$BACKUP_FOLDER"
-          trap 'rm -rf "$BACKUP_FOLDER" "$STANDBY_BACKUP.tmp"' EXIT
+          mkdir -p "$BACKUP_FOLDER" "$hourly_dir"
+          trap 'rm -rf "$BACKUP_FOLDER" "$STANDBY_BACKUP.tmp" "$hourly_archive.tmp"' EXIT
 
           if [[ ! -f "$DATA_FOLDER/db.sqlite3" ]]; then
             echo "Could not find SQLite database file '$DATA_FOLDER/db.sqlite3'" >&2
@@ -184,8 +206,13 @@ in
           ${pkgs.gnutar}/bin/tar -C "$BACKUP_FOLDER" -czf "$STANDBY_BACKUP.tmp" .
           mv "$STANDBY_BACKUP.tmp" "$STANDBY_BACKUP"
 
+          cp --reflink=auto "$STANDBY_BACKUP" "$hourly_archive.tmp"
+          mv "$hourly_archive.tmp" "$hourly_archive"
+          ${pkgs.findutils}/bin/find "$hourly_dir" -maxdepth 1 -type f -name '*-vault-hourly.tar.gz' -mmin +${toString (cfg.hourlyRetentionHours * 60)} -delete
+
           upload_failed=0
           ${lib.concatMapStringsSep "\n" uploadRolling cfg.destinations}
+          ${lib.concatMapStringsSep "\n" uploadHourly cfg.destinations}
           exit "$upload_failed"
         '';
         serviceConfig = {

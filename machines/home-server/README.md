@@ -32,8 +32,9 @@ The reusable `modules/vaultwarden-replication.nix` module gives a node either a
 constants so the master destinations and standby storage cannot drift, while
 roles, hostnames, ports, and Caddy ordering remain explicit in their host
 configurations. `home-server-1` is the master. It atomically ships a rolling
-snapshot to both `bduggan-desktop` and `arden` every hour, and separately keeps
-and ships a timestamped long-term archive once per day.
+snapshot to both `bduggan-desktop` and `arden` every hour, retains timestamped
+hourly snapshots for 48 hours under each node's `hourly/` archive directory,
+and separately keeps and ships a timestamped long-term archive once per day.
 
 Both standbys check their rolling snapshot every five minutes, validate its
 SQLite database, and restore it into Vaultwarden on port 8222. Their database

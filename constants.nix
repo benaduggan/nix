@@ -17,7 +17,7 @@ let
 
   homeServerVaultwardenArchiveDir = "/etc/vault/backups";
   desktopVaultwardenArchiveDir = "/mnt/bigboi/vault-backups";
-  ardenVaultwardenArchiveDir = "/var/backup/vaultwarden";
+  ardenVaultwardenArchiveDir = "/home/bduggan/vault-backups";
 in
 {
   inherit authorizedKeys authorizedKeysRec;
