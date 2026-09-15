@@ -26,7 +26,9 @@ let
       --replace-fail '</body>' '<div id="vaultwarden-failover-warning" role="alert">READ-ONLY EMERGENCY COPY: the home server is offline. You can view and copy existing passwords, but changes will fail. Data is from the latest backup.</div></body>'
   '';
 
-  sshOptions = ''-o UserKnownHostsFile=/home/${cfg.sshUser}/.ssh/known_hosts -i ${cfg.sshIdentityFile}'';
+  sshOptions = ''-o BatchMode=yes -o ConnectTimeout=10 -o ConnectionAttempts=1 -o UserKnownHostsFile=/home/${cfg.sshUser}/.ssh/known_hosts -i ${cfg.sshIdentityFile}'';
+
+  markUploadFailed = destination: lib.optionalString destination.required ''upload_failed=1'';
 
   # This file is intentionally loaded after the encrypted environment file.
   # Host-specific routing and read-only safety settings must not be overridden
@@ -43,12 +45,13 @@ let
   '';
 
   uploadRolling = destination: ''
-    if ${pkgs.openssh}/bin/scp ${sshOptions} "$STANDBY_BACKUP" ${cfg.sshUser}@${destination.host}:${destination.directory}/.vault-standby.tar.gz.uploading \
+    if ${pkgs.openssh}/bin/ssh ${sshOptions} ${cfg.sshUser}@${destination.host} mkdir -p ${destination.directory} \
+      && ${pkgs.openssh}/bin/scp ${sshOptions} "$STANDBY_BACKUP" ${cfg.sshUser}@${destination.host}:${destination.directory}/.vault-standby.tar.gz.uploading \
       && ${pkgs.openssh}/bin/ssh ${sshOptions} ${cfg.sshUser}@${destination.host} mv ${destination.directory}/.vault-standby.tar.gz.uploading ${destination.directory}/vault-standby.tar.gz; then
       echo "Updated Vaultwarden standby snapshot on ${destination.host}"
     else
       echo "Failed to update Vaultwarden standby snapshot on ${destination.host}" >&2
-      upload_failed=1
+      ${markUploadFailed destination}
     fi
   '';
 
@@ -62,7 +65,7 @@ let
       echo "Uploaded hourly Vaultwarden archive to ${destination.host}"
     else
       echo "Failed to update hourly Vaultwarden archives on ${destination.host}" >&2
-      upload_failed=1
+      ${markUploadFailed destination}
     fi
   '';
 
@@ -71,7 +74,7 @@ let
       echo "Uploaded daily Vaultwarden archive to ${destination.host}"
     else
       echo "Failed to upload daily Vaultwarden archive to ${destination.host}" >&2
-      upload_failed=1
+      ${markUploadFailed destination}
     fi
   '';
 in
@@ -102,7 +105,7 @@ in
     archiveDir = lib.mkOption {
       type = lib.types.str;
       default = if cfg.role == "master" then "/etc/vault/backups" else "/var/backup/vaultwarden";
-      description = "Local directory for rolling snapshots and daily archives.";
+      description = "Local directory for rolling, hourly, and daily archives.";
     };
 
     hourlyRetentionHours = lib.mkOption {
@@ -113,11 +116,16 @@ in
 
     destinations = lib.mkOption {
       default = [ ];
-      description = "Standby nodes that receive the rolling snapshot and daily archives.";
+      description = "Replication targets that receive backups; targets do not have to run a Vaultwarden standby.";
       type = lib.types.listOf (lib.types.submodule {
         options = {
           host = lib.mkOption { type = lib.types.str; };
           directory = lib.mkOption { type = lib.types.str; };
+          required = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "Whether an upload failure should fail the backup unit.";
+          };
         };
       });
     };
@@ -225,7 +233,7 @@ in
 
       systemd.services.archive-vault = {
         description = "Keep and ship the daily Vaultwarden archive";
-        requires = [ "backup-vault.service" ];
+        wants = [ "backup-vault.service" ];
         after = [ "backup-vault.service" ];
         path = [ pkgs.coreutils ];
         script = ''
@@ -234,6 +242,18 @@ in
           prefix="$(date -u +%Y-%m-%d-%H-%M)"
           source=${cfg.archiveDir}/vault-standby.tar.gz
           archive="${cfg.archiveDir}/$prefix-vault-backup.tar.gz"
+
+          if [[ ! -f "$source" ]]; then
+            echo "Could not find rolling Vaultwarden snapshot '$source'" >&2
+            exit 1
+          fi
+
+          snapshot_age=$(($(date -u +%s) - $(stat -c %Y "$source")))
+          if (( snapshot_age > 7200 )); then
+            echo "Rolling Vaultwarden snapshot is $snapshot_age seconds old; refusing to create a stale daily archive" >&2
+            exit 1
+          fi
+
           cp --reflink=auto "$source" "$archive"
 
           upload_failed=0

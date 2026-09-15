@@ -161,6 +161,11 @@
         host = "arden";
         directory = common.ardenVaultwardenArchiveDir;
       }
+      {
+        host = "bduggan-framework";
+        directory = common.frameworkVaultwardenArchiveDir;
+        required = false;
+      }
     ];
     settings = {
       SENDS_ALLOWED = true;

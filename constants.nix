@@ -18,10 +18,11 @@ let
   homeServerVaultwardenArchiveDir = "/etc/vault/backups";
   desktopVaultwardenArchiveDir = "/mnt/bigboi/vault-backups";
   ardenVaultwardenArchiveDir = "/home/bduggan/vault-backups";
+  frameworkVaultwardenArchiveDir = "/home/bduggan/vault-backups";
 in
 {
   inherit authorizedKeys authorizedKeysRec;
-  inherit homeServerVaultwardenArchiveDir desktopVaultwardenArchiveDir ardenVaultwardenArchiveDir;
+  inherit homeServerVaultwardenArchiveDir desktopVaultwardenArchiveDir ardenVaultwardenArchiveDir frameworkVaultwardenArchiveDir;
 
   digdugdevKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMBXiUz//dlW7zcblPxQZqgcmZ5KziuhDnnIbuFmOvOw";
 
