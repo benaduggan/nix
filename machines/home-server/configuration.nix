@@ -9,6 +9,7 @@
     [
       # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ../../modules/vaultwarden-replication.nix
     ];
 
   nix.settings = common.nixSettings;
@@ -26,7 +27,6 @@
     identityPaths = [ "/home/bduggan/.ssh/id_ed25519" ];
     secrets = {
       grafana.file = ../../secrets/grafana.age;
-      vaultwarden.file = ../../secrets/vaultwarden.age;
       ondeck.file = ../../secrets/ondeck-vars.age;
 
       litellm = {
@@ -143,20 +143,31 @@
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 
-  # Set up files/dirs for vaultwarden to work
   systemd.tmpfiles.rules = [
-    "d /etc/vault 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
-    "f /etc/default/vaultwarden 755 ${config.systemd.services.vaultwarden.serviceConfig.User} ${config.systemd.services.vaultwarden.serviceConfig.Group}"
     "d /home/${common.username}/syncthing/obsidian/mindmap/n8n-drop 0755 ${common.username} users -"
   ];
 
-  services.vaultwarden = {
+  services.vaultwardenReplication = {
     enable = true;
-    environmentFile = config.age.secrets.vaultwarden.path; # extra secrets in here for email
-    config = {
-      ROCKET_ADDRESS = "0.0.0.0";
-      DOMAIN = "https://vault.digdug.dev";
-      SIGNUPS_ALLOWED = false;
+    role = "master";
+    secretFile = ../../secrets/vaultwarden.age;
+    archiveDir = common.homeServerVaultwardenArchiveDir;
+    destinations = [
+      {
+        host = "bduggan-desktop";
+        directory = common.desktopVaultwardenArchiveDir;
+      }
+      {
+        host = "arden";
+        directory = common.ardenVaultwardenArchiveDir;
+      }
+      {
+        host = "bduggan-framework";
+        directory = common.frameworkVaultwardenArchiveDir;
+        required = false;
+      }
+    ];
+    settings = {
       SENDS_ALLOWED = true;
       EMERGENCY_ACCESS_ALLOWED = true;
       ORG_EVENTS_ENABLED = true;
@@ -164,7 +175,6 @@
       INVITATIONS_ALLOWED = true;
       PASSWORD_ITERATIONS = 600000;
       PASSWORD_HINTS_ALLOWED = true;
-      WEBSOCKET_ENABLED = true;
     };
   };
 
@@ -192,38 +202,6 @@
   boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
 
   systemd.services = {
-    backup-vault = {
-      path = [ pkgs.gnutar pkgs.sqlite pkgs.gzip ];
-      script = ''
-        PREFIX=`date -u +%Y-%m-%d-%H-%M`
-        DATA_FOLDER=/var/lib/vaultwarden
-        BACKUP_FOLDER=/etc/vault/backups/staging
-        mkdir -p $BACKUP_FOLDER
-
-        if [[ ! -f "$DATA_FOLDER"/db.sqlite3 ]]; then
-          echo "Could not find SQLite database file '$DATA_FOLDER/db.sqlite3'" >&2
-          exit 1
-        fi
-
-        ${pkgs.sqlite}/bin/sqlite3 "$DATA_FOLDER"/db.sqlite3 ".backup '$BACKUP_FOLDER/db.sqlite3'"
-        cp -r "$DATA_FOLDER"/attachments "$BACKUP_FOLDER"
-        cp -r "$DATA_FOLDER"/sends "$BACKUP_FOLDER"
-
-        # Used to sign JWTs of logged in users. Deleting logs out users
-        # cp "$DATA_FOLDER"/rsa_key.{der,pem,pub.der} "$BACKUP_FOLDER"
-
-        ${pkgs.gnutar}/bin/tar czf "/etc/vault/backups/$PREFIX-vault-backup.tar.gz" $BACKUP_FOLDER
-        ${pkgs.openssh}/bin/scp -o UserKnownHostsFile=/home/${common.username}/.ssh/known_hosts -i /home/${common.username}/.ssh/id_ed25519 "/etc/vault/backups/$PREFIX-vault-backup.tar.gz" ${common.username}@bduggan-desktop:/mnt/bigboi/vault-backups/
-
-        rm -rf $BACKUP_FOLDER
-      '';
-      serviceConfig = {
-        User = "root";
-        Type = "oneshot";
-      };
-      startAt = "*-*-* 02:00:00";
-    };
-
     # engineer-on-deck = {
     #   path = [ pkgs.gawk pkgs.gnugrep pkgs.curlMinimal ];
     #   script = ''

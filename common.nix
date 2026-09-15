@@ -11,6 +11,7 @@ in
     inherit isGraphical;
     inherit isMinimal;
     inherit machineName;
+    inherit (constants) homeServerVaultwardenArchiveDir desktopVaultwardenArchiveDir ardenVaultwardenArchiveDir frameworkVaultwardenArchiveDir;
 
     email = "benaduggan@gmail.com";
     firstName = "Ben";

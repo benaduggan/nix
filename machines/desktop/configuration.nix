@@ -14,12 +14,14 @@ let
     }:${
       lib.makeLibraryPath [ nixpkgs-pascal-cuda-meme.stdenv.cc.cc.lib cuda.lib ]
     }";
+
 in
 {
   imports =
     [
       # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ../../modules/vaultwarden-replication.nix
     ];
 
   nix.settings = common.nixSettings;
@@ -179,6 +181,13 @@ in
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
+
+  services.vaultwardenReplication = {
+    enable = true;
+    role = "standby";
+    secretFile = ../../secrets/vaultwarden.age;
+    archiveDir = common.desktopVaultwardenArchiveDir;
+  };
 
   networking.firewall.enable = false;
 

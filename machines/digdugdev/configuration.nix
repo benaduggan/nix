@@ -334,11 +334,15 @@ in
         # Misc
         "vault.digdug.dev".extraConfig = ''
           reverse_proxy /* {
-            to home-server-1:8000
-          }
-
-          reverse_proxy /notifications/hub {
-            to home-server-1:3012
+            to home-server-1:8000 bduggan-desktop:8222 arden:8222
+            lb_policy first
+            fail_duration 30s
+            max_fails 1
+            lb_try_duration 5s
+            lb_try_interval 250ms
+            health_uri /alive
+            health_interval 10s
+            health_timeout 3s
           }
         '';
         "grafana.digdug.dev".extraConfig = ''
