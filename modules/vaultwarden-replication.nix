@@ -23,7 +23,7 @@ let
     cp ${failoverWarningCss} "$out/share/vaultwarden/vault/failover-warning.css"
     substituteInPlace "$out/share/vaultwarden/vault/index.html" \
       --replace-fail '</head>' '<link rel="stylesheet" href="failover-warning.css"></head>' \
-      --replace-fail '</body>' '<div id="vaultwarden-failover-warning" role="alert">READ-ONLY EMERGENCY COPY: the home server is offline. You can view and copy existing passwords, but changes will fail. Data is from the latest backup.</div></body>'
+      --replace-fail '</body>' '<div id="vaultwarden-failover-warning" role="alert">EMERGENCY FAILOVER COPY: the home server is offline. Changes made here are not replicated back and will be lost on restore or failback.</div></body>'
   '';
 
   sshOptions = ''-o BatchMode=yes -o ConnectTimeout=10 -o ConnectionAttempts=1 -o UserKnownHostsFile=/home/${cfg.sshUser}/.ssh/known_hosts -i ${cfg.sshIdentityFile}'';
@@ -31,14 +31,14 @@ let
   markUploadFailed = destination: lib.optionalString destination.required ''upload_failed=1'';
 
   # This file is intentionally loaded after the encrypted environment file.
-  # Host-specific routing and read-only safety settings must not be overridden
-  # by an older ROCKET_PORT or DATABASE_URL left in the shared secret.
+  # Host-specific routing and failover settings must not be overridden by an
+  # older ROCKET_PORT or DATABASE_URL left in the shared secret.
   roleEnvironmentFile = pkgs.writeText "vaultwarden-${cfg.role}-environment" ''
     ROCKET_ADDRESS=0.0.0.0
     ROCKET_PORT=${toString cfg.port}
     DOMAIN=${cfg.domain}
     ${lib.optionalString (cfg.role == "standby") ''
-      DATABASE_URL=sqlite:///var/lib/vaultwarden/db.sqlite3?mode=ro
+      DATABASE_URL=sqlite:///var/lib/vaultwarden/db.sqlite3
       SIGNUPS_ALLOWED=false
       INVITATIONS_ALLOWED=false
     ''}
@@ -80,7 +80,7 @@ let
 in
 {
   options.services.vaultwardenReplication = {
-    enable = lib.mkEnableOption "replicated Vaultwarden with read-only standbys";
+    enable = lib.mkEnableOption "replicated Vaultwarden with restored failover standbys";
 
     role = lib.mkOption {
       type = lib.types.enum [ "master" "standby" ];
@@ -273,7 +273,6 @@ in
       services.vaultwarden = {
         webVaultPackage = failoverWebVault;
         config = {
-          DATABASE_URL = "sqlite:///var/lib/vaultwarden/db.sqlite3?mode=ro";
           INVITATIONS_ALLOWED = false;
         };
       };
@@ -285,10 +284,6 @@ in
       systemd.services = {
         vaultwarden = {
           wantedBy = lib.mkForce [ ];
-          serviceConfig = {
-            ReadOnlyPaths = [ "/var/lib/vaultwarden" ];
-            ReadWritePaths = [ "/var/lib/vaultwarden/tmp" ];
-          };
         };
 
         restore-vaultwarden-standby = {
@@ -313,8 +308,9 @@ in
             fi
 
             latest_hash="$(${pkgs.coreutils}/bin/sha256sum "$latest" | ${pkgs.coreutils}/bin/cut -d ' ' -f 1)"
+            marker_value="writable-v1:$latest_hash"
             ${pkgs.coreutils}/bin/install -d -o vaultwarden -g vaultwarden -m 0700 "$data_dir/tmp"
-            if [[ -f "$marker" ]] && [[ "$(<"$marker")" == "$latest_hash" ]]; then
+            if [[ -f "$marker" ]] && [[ "$(<"$marker")" == "$marker_value" ]]; then
               systemctl reset-failed vaultwarden.service
               systemctl start vaultwarden.service
               exit 0
@@ -338,11 +334,12 @@ in
             staged_dir="$(${pkgs.coreutils}/bin/dirname "$staged_db")"
             systemctl stop vaultwarden.service
             ${pkgs.coreutils}/bin/install -d -o vaultwarden -g vaultwarden -m 0700 "$data_dir"
-            ${pkgs.coreutils}/bin/install -o root -g vaultwarden -m 0440 "$staged_db" "$data_dir/db.sqlite3"
+            ${pkgs.coreutils}/bin/rm -f "$data_dir/db.sqlite3-wal" "$data_dir/db.sqlite3-shm"
+            ${pkgs.coreutils}/bin/install -o vaultwarden -g vaultwarden -m 0600 "$staged_db" "$data_dir/db.sqlite3"
 
             for key in "$staged_dir"/rsa_key*; do
               if [[ -f "$key" ]]; then
-                ${pkgs.coreutils}/bin/install -o root -g vaultwarden -m 0440 "$key" "$data_dir/$(${pkgs.coreutils}/bin/basename "$key")"
+                ${pkgs.coreutils}/bin/install -o vaultwarden -g vaultwarden -m 0600 "$key" "$data_dir/$(${pkgs.coreutils}/bin/basename "$key")"
               fi
             done
 
@@ -350,8 +347,8 @@ in
               ${pkgs.coreutils}/bin/rm -rf "$data_dir/$payload"
               if [[ -d "$staged_dir/$payload" ]]; then
                 ${pkgs.coreutils}/bin/cp -a "$staged_dir/$payload" "$data_dir/$payload"
-                ${pkgs.coreutils}/bin/chown -R root:vaultwarden "$data_dir/$payload"
-                ${pkgs.coreutils}/bin/chmod -R u=rwX,g=rX,o= "$data_dir/$payload"
+                ${pkgs.coreutils}/bin/chown -R vaultwarden:vaultwarden "$data_dir/$payload"
+                ${pkgs.coreutils}/bin/chmod -R u=rwX,go= "$data_dir/$payload"
               fi
             done
 
@@ -359,7 +356,7 @@ in
             systemctl start vaultwarden.service
             for attempt in {1..10}; do
               if ${pkgs.curl}/bin/curl --fail --silent http://127.0.0.1:${toString cfg.port}/alive >/dev/null; then
-                printf '%s\n' "$latest_hash" > "$marker"
+                printf '%s\n' "$marker_value" > "$marker"
                 exit 0
               fi
               sleep 1

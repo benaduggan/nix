@@ -25,7 +25,7 @@
 - start the vaultwarden service and verify things are working as expected
 - Caddy failover is automatic; no proxy edit is normally required
 
-### automatic read-only failover
+### automatic failover
 
 The reusable `modules/vaultwarden-replication.nix` module gives a node either a
 `master` or `standby` role. Archive directory paths are shared through named
@@ -43,16 +43,15 @@ earlier one is unavailable. Required destination failures mark the hourly job
 failed for visibility, but do not prevent creation of a fresh daily archive.
 
 Both standbys check their rolling snapshot every five minutes, validate its
-SQLite database, and restore it into Vaultwarden on port 8222. Their database
-files are not writable by the Vaultwarden user, and the entire data directory is
-also mounted read-only inside the service, so neither can become a second
-writable copy.
+SQLite database, and restore it into Vaultwarden on port 8222. Vaultwarden
+requires a writable database for WAL, migrations, and normal request handling,
+so these are writable emergency copies rather than true read-only replicas.
 
 Caddy on `digdugdev` prefers `home-server-1`, then `bduggan-desktop`, then
 `arden`, and automatically moves down that list when a node fails its health
-check. The standby web vault shows a persistent warning that it is an emergency,
-read-only copy. Writes from web, desktop, and mobile clients fail while a standby
-is active.
+check. The standby web vault shows a persistent warning that it is an emergency
+copy. Changes accepted by a standby are local only and will be discarded when
+the next master snapshot is restored or traffic fails back to the master.
 
 Failback is automatic once `home-server-1` passes Caddy's health check again.
 There is no reverse database sync because the standby cannot accept changes.
