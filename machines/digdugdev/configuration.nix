@@ -264,7 +264,7 @@ in
         # Content Hosting
         "audio.digdug.dev".extraConfig = ''
           reverse_proxy /* {
-            to bduggan-desktop:8000
+            to beast:8000
           }
         '';
         "java.digdug.dev".extraConfig = ''
@@ -292,7 +292,7 @@ in
         '';
         "books.digdug.dev".extraConfig = ''
           reverse_proxy /* {
-            to bduggan-desktop:8083
+            to beast:8083
           }
         '';
         "assets.digdug.dev".extraConfig = ''
