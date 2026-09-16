@@ -22,6 +22,8 @@ in
     [
       # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ../../modules/audiobookshelf.nix
+      ../../modules/calibre-web.nix
     ];
 
   nix.settings = common.nixSettings;
@@ -230,6 +232,16 @@ in
     openFirewall = true;
     dataDir = "/mnt/massive/jellyfin";
     cacheDir = "/mnt/massive/jellyfin/cache";
+  };
+
+  services.audiobookshelf = {
+    enable = true;
+    libraryDir = "/mnt/massive/books/audiobookshelf";
+  };
+
+  services.calibre-web = {
+    enable = true;
+    libraryDir = "/mnt/massive/books/calibre/cl";
   };
 
   services.sunshine = {

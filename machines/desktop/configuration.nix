@@ -199,13 +199,6 @@ in
   boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
 
   systemd.services = {
-    calibre-web.serviceConfig = {
-      ReadWritePaths = [
-        "/var/lib/calibre-web" # Standard app.db location
-        "/mnt/bigboi/calibre/cl" # Your actual library location
-      ];
-    };
-
     unifi-manager-service =
       let
         myPython = pkgs.python313.withPackages (p: with p; [
@@ -258,19 +251,6 @@ in
     }];
   };
 
-  # storing stuff on /mnt/bigboi/audiobookshelf
-  services.audiobookshelf = {
-    enable = true;
-    host = "0.0.0.0";
-  };
-
-  services.calibre-web = {
-    enable = true;
-    listen.ip = "0.0.0.0";
-    options = {
-      enableBookUploading = true;
-    };
-  };
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ 1080 ];
   # networking.firewall.allowedUDPPorts = [ ... ];
