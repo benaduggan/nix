@@ -16,7 +16,7 @@ let
   authorizedKeys = builtins.attrValues authorizedKeysRec;
 
   homeServerVaultwardenArchiveDir = "/etc/vault/backups";
-  desktopVaultwardenArchiveDir = "/mnt/bigboi/vault-backups";
+  desktopVaultwardenArchiveDir = "/home/bduggan/standby-vault-backups";
   ardenVaultwardenArchiveDir = "/home/bduggan/vault-backups";
   frameworkVaultwardenArchiveDir = "/home/bduggan/vault-backups";
 in
