@@ -313,7 +313,7 @@ in
             marker_value="writable-v3:$latest_hash"
             ${pkgs.coreutils}/bin/install -d -o vaultwarden -g vaultwarden -m 0700 "$data_dir/tmp"
             if [[ -f "$marker" ]] && [[ "$(<"$marker")" == "$marker_value" ]]; then
-              systemctl reset-failed vaultwarden.service
+              systemctl reset-failed vaultwarden.service || true
               systemctl start vaultwarden.service
               exit 0
             fi
@@ -385,7 +385,7 @@ in
             done
 
             echo "Starting the restored Vaultwarden standby"
-            systemctl reset-failed vaultwarden.service
+            systemctl reset-failed vaultwarden.service || true
             systemctl start vaultwarden.service
             for attempt in {1..10}; do
               if ${pkgs.curl}/bin/curl --fail --silent http://127.0.0.1:${toString cfg.port}/alive >/dev/null; then
