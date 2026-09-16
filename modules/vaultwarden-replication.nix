@@ -289,7 +289,7 @@ in
         restore-vaultwarden-standby = {
           description = "Restore the latest Vaultwarden backup into the read-only standby";
           unitConfig.RequiresMountsFor = [ cfg.archiveDir ];
-          path = [ pkgs.coreutils pkgs.findutils pkgs.gnutar pkgs.gzip pkgs.sqlite pkgs.systemd pkgs.curl ];
+          path = [ pkgs.coreutils pkgs.findutils pkgs.gnutar pkgs.gzip pkgs.sqlite pkgs.systemd pkgs.curl pkgs.util-linux ];
           script = ''
             set -euo pipefail
 
@@ -308,7 +308,7 @@ in
             fi
 
             latest_hash="$(${pkgs.coreutils}/bin/sha256sum "$latest" | ${pkgs.coreutils}/bin/cut -d ' ' -f 1)"
-            marker_value="writable-v1:$latest_hash"
+            marker_value="writable-v2:$latest_hash"
             ${pkgs.coreutils}/bin/install -d -o vaultwarden -g vaultwarden -m 0700 "$data_dir/tmp"
             if [[ -f "$marker" ]] && [[ "$(<"$marker")" == "$marker_value" ]]; then
               systemctl reset-failed vaultwarden.service
@@ -336,6 +336,15 @@ in
             ${pkgs.coreutils}/bin/install -d -o vaultwarden -g vaultwarden -m 0700 "$data_dir"
             ${pkgs.coreutils}/bin/rm -f "$data_dir/db.sqlite3-wal" "$data_dir/db.sqlite3-shm"
             ${pkgs.coreutils}/bin/install -o vaultwarden -g vaultwarden -m 0600 "$staged_db" "$data_dir/db.sqlite3"
+
+            # Authentication refreshes and new logins update Vaultwarden's device
+            # table. The standby database therefore has to be writable internally,
+            # even though Caddy prevents clients from sending vault mutations to it.
+            # Probe it as the service user so a stale read-only restore cannot pass
+            # the HTTP /alive check and enter the failover pool.
+            ${pkgs.util-linux}/bin/runuser -u vaultwarden -- \
+              ${pkgs.sqlite}/bin/sqlite3 "$data_dir/db.sqlite3" \
+              'BEGIN IMMEDIATE; ROLLBACK;'
 
             for key in "$staged_dir"/rsa_key*; do
               if [[ -f "$key" ]]; then
