@@ -291,7 +291,9 @@ in
           unitConfig.RequiresMountsFor = [ cfg.archiveDir ];
           path = [ pkgs.coreutils pkgs.findutils pkgs.gnutar pkgs.gzip pkgs.sqlite pkgs.systemd pkgs.curl pkgs.util-linux ];
           script = ''
-            set -euo pipefail
+            set -Eeuo pipefail
+
+            trap 'rc=$?; printf "Restore command failed (exit %s) at line %s: %s\n" "$rc" "$LINENO" "$BASH_COMMAND" >&2' ERR
 
             backup_dir=${cfg.archiveDir}
             data_dir=/var/lib/vaultwarden
@@ -362,6 +364,7 @@ in
             echo "Stopping Vaultwarden to activate the validated snapshot"
             systemctl stop vaultwarden.service
             restart_required=1
+            echo "Replacing the active database"
             ${pkgs.coreutils}/bin/rm -f "$data_dir/db.sqlite3-wal" "$data_dir/db.sqlite3-shm"
             ${pkgs.coreutils}/bin/mv "$next_db" "$data_dir/db.sqlite3"
 
@@ -371,6 +374,7 @@ in
               fi
             done
 
+            echo "Replacing attachment and send payloads"
             for payload in attachments sends; do
               ${pkgs.coreutils}/bin/rm -rf "$data_dir/$payload"
               if [[ -d "$staged_dir/$payload" ]]; then
@@ -380,6 +384,7 @@ in
               fi
             done
 
+            echo "Starting the restored Vaultwarden standby"
             systemctl reset-failed vaultwarden.service
             systemctl start vaultwarden.service
             for attempt in {1..10}; do
