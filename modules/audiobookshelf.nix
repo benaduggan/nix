@@ -15,8 +15,7 @@ in
 
     systemd.tmpfiles.settings."10-audiobookshelf".${cfg.libraryDir}.d = {
       mode = "0750";
-      user = cfg.user;
-      group = cfg.group;
+      inherit (cfg) user group;
     };
 
     # The library directory still needs to be selected in Audiobookshelf's UI.

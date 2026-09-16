@@ -21,8 +21,7 @@ in
 
     systemd.tmpfiles.settings."10-calibre-web".${cfg.libraryDir}.d = {
       mode = "0750";
-      user = cfg.user;
-      group = cfg.group;
+      inherit (cfg) user group;
     };
 
     systemd.services.calibre-web = {
