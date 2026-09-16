@@ -291,7 +291,9 @@ in
           unitConfig.RequiresMountsFor = [ cfg.archiveDir ];
           path = [ pkgs.coreutils pkgs.findutils pkgs.gnutar pkgs.gzip pkgs.sqlite pkgs.systemd pkgs.curl pkgs.util-linux ];
           script = ''
-            set -euo pipefail
+            set -Eeuo pipefail
+
+            trap 'rc=$?; printf "Restore command failed (exit %s) at line %s: %s\n" "$rc" "$LINENO" "$BASH_COMMAND" >&2' ERR
 
             backup_dir=${cfg.archiveDir}
             data_dir=/var/lib/vaultwarden
@@ -308,16 +310,29 @@ in
             fi
 
             latest_hash="$(${pkgs.coreutils}/bin/sha256sum "$latest" | ${pkgs.coreutils}/bin/cut -d ' ' -f 1)"
-            marker_value="writable-v2:$latest_hash"
+            marker_value="writable-v3:$latest_hash"
             ${pkgs.coreutils}/bin/install -d -o vaultwarden -g vaultwarden -m 0700 "$data_dir/tmp"
             if [[ -f "$marker" ]] && [[ "$(<"$marker")" == "$marker_value" ]]; then
-              systemctl reset-failed vaultwarden.service
+              systemctl reset-failed vaultwarden.service || true
               systemctl start vaultwarden.service
               exit 0
             fi
 
             work_dir="$(${pkgs.coreutils}/bin/mktemp -d)"
-            trap '${pkgs.coreutils}/bin/rm -rf "$work_dir"' EXIT
+            next_db="$data_dir/.db.sqlite3.next"
+            restart_required=0
+            cleanup() {
+              rc=$?
+              ${pkgs.coreutils}/bin/rm -rf "$work_dir"
+              ${pkgs.coreutils}/bin/rm -f "$next_db" "$next_db-wal" "$next_db-shm"
+              if (( restart_required )); then
+                echo "Restore failed after stopping Vaultwarden; attempting to bring the standby back online" >&2
+                systemctl reset-failed vaultwarden.service || true
+                systemctl start vaultwarden.service || true
+              fi
+              exit "$rc"
+            }
+            trap cleanup EXIT
             ${pkgs.gnutar}/bin/tar -xzf "$latest" -C "$work_dir"
 
             staged_db="$(${pkgs.findutils}/bin/find "$work_dir" -type f -name db.sqlite3 -print -quit)"
@@ -332,19 +347,26 @@ in
             fi
 
             staged_dir="$(${pkgs.coreutils}/bin/dirname "$staged_db")"
-            systemctl stop vaultwarden.service
             ${pkgs.coreutils}/bin/install -d -o vaultwarden -g vaultwarden -m 0700 "$data_dir"
-            ${pkgs.coreutils}/bin/rm -f "$data_dir/db.sqlite3-wal" "$data_dir/db.sqlite3-shm"
-            ${pkgs.coreutils}/bin/install -o vaultwarden -g vaultwarden -m 0600 "$staged_db" "$data_dir/db.sqlite3"
+            echo "Staging and validating the replacement database as the vaultwarden user"
+            ${pkgs.coreutils}/bin/install -o vaultwarden -g vaultwarden -m 0600 "$staged_db" "$next_db"
 
             # Authentication refreshes and new logins update Vaultwarden's device
             # table. The standby database therefore has to be writable internally,
             # even though Caddy prevents clients from sending vault mutations to it.
             # Probe it as the service user so a stale read-only restore cannot pass
             # the HTTP /alive check and enter the failover pool.
-            ${pkgs.util-linux}/bin/runuser -u vaultwarden -- \
-              ${pkgs.sqlite}/bin/sqlite3 "$data_dir/db.sqlite3" \
+            ${pkgs.util-linux}/bin/setpriv \
+              --reuid=vaultwarden --regid=vaultwarden --init-groups \
+              ${pkgs.sqlite}/bin/sqlite3 "$next_db" \
               'BEGIN IMMEDIATE; ROLLBACK;'
+
+            echo "Stopping Vaultwarden to activate the validated snapshot"
+            systemctl stop vaultwarden.service
+            restart_required=1
+            echo "Replacing the active database"
+            ${pkgs.coreutils}/bin/rm -f "$data_dir/db.sqlite3-wal" "$data_dir/db.sqlite3-shm"
+            ${pkgs.coreutils}/bin/mv "$next_db" "$data_dir/db.sqlite3"
 
             for key in "$staged_dir"/rsa_key*; do
               if [[ -f "$key" ]]; then
@@ -352,6 +374,7 @@ in
               fi
             done
 
+            echo "Replacing attachment and send payloads"
             for payload in attachments sends; do
               ${pkgs.coreutils}/bin/rm -rf "$data_dir/$payload"
               if [[ -d "$staged_dir/$payload" ]]; then
@@ -361,11 +384,13 @@ in
               fi
             done
 
-            systemctl reset-failed vaultwarden.service
+            echo "Starting the restored Vaultwarden standby"
+            systemctl reset-failed vaultwarden.service || true
             systemctl start vaultwarden.service
             for attempt in {1..10}; do
               if ${pkgs.curl}/bin/curl --fail --silent http://127.0.0.1:${toString cfg.port}/alive >/dev/null; then
                 printf '%s\n' "$marker_value" > "$marker"
+                restart_required=0
                 exit 0
               fi
               sleep 1
