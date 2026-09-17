@@ -209,7 +209,7 @@ in
     enable = true;
     package = nixpkgs-beast-pkgs.sunshine.override {
       cudaSupport = true;
-      cudaPackages = nixpkgs-beast-pkgs.cudaPackages;
+      inherit (nixpkgs-beast-pkgs) cudaPackages;
     };
     autoStart = false;
     capSysAdmin = true; # only needed for Wayland -- omit this when using with Xorg
