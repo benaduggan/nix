@@ -22,12 +22,10 @@ in
     packages = with lib;
       with pkgs;
       lib.flatten [
-        biome
         # myPogScripts.spelltree
         common.agenix
         bashInteractive
         bash-completion
-        pnpm-shell-completion
         coreutils-full
         curl
         jnv
@@ -36,7 +34,6 @@ in
         moreutils
         nano
         nix
-        q
         tealdeer
         wget
         rrsync
@@ -47,6 +44,7 @@ in
         nil
         difftastic
         docker-client
+        httptap
         (writeShellApplication {
           name = "git-clean-merged";
           runtimeInputs = [ git ];
@@ -60,14 +58,11 @@ in
         (with jacobiLegacy; [
           jacobiPackages.argus-rs
           nixup
-          httptap
         ])
 
         (optList (!isMinimal) [
           (optList (isLinux && isGraphical) [
-            parsec-bin
             vlc
-            # authy
             firefox
             discord
             spotify
@@ -86,31 +81,24 @@ in
               open --hide --background -a Docker
             '')
           ])
-
           claude-code
-          esbuild
+          codex
           amazon-ecr-credential-helper
           atool
           bat
-          bc
-          biome
+          bun
           bzip2
           cachix
-          codex
           diffutils
           dos2unix
-          ed
-          fd
           file
           gawk
-          google-cloud-sdk
           gnumake
           gnugrep
           gnused
           gron
           gzip
           less
-          libarchive
           libnotify
           lolcat
           netcat-gnu
@@ -120,14 +108,9 @@ in
           nix-prefetch-scripts
           nix-tree
           nmap
-          nodejs
           openssh
           p7zip
           patch
-          perl
-          php
-          pigz
-          pssh
           procps
           pv
           ranger
@@ -136,29 +119,25 @@ in
           rlwrap
           rsync
           scc
-          screen
           sd
           shellcheck
           shfmt
           socat
           sox
           spacer
-          swaks
           time
           unzip
           watch
           watchexec
           which
           xterm
-          xxd
           xz
           zip
-          (python3.withPackages (pkgs: with pkgs; [ black mypy ipdb ]))
+          python3
 
           # # chief keef's stuff
           (with kwbauson; [
             better-comma
-            # nle
             fordir
             git-trim
           ])
@@ -170,8 +149,6 @@ in
           # jacobi's stuff
           (with jacobiLegacy; [
             _dex
-            jacobiPackages.argus-rs
-            # aws_pog_scripts
             drm
             drmi
             dshell
@@ -200,25 +177,20 @@ in
             portwatch
             pdfcat
 
-            httptap
             hex
             hexcast
             nixrender
             ndiff
             overlay-check
             overlay-diff
-            nixup
             nixsum
             nixcache
             nupdate
             nupdate_latest_github
             generate_sglang_omni_lock
             generate_uv_lock
-            y2n
-
           ])
         ])
-
       ];
 
     file.sqliterc = {
