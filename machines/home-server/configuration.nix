@@ -41,6 +41,10 @@
         file = ../../secrets/n8n.age;
         mode = "644";
       };
+      executor = {
+        file = ../../secrets/executor.age;
+        mode = "644";
+      };
       magicRunnerToken = {
         file = ../../secrets/home-magic-runner.age;
         mode = "644";
@@ -312,7 +316,21 @@
         "--network=host"
       ];
     };
-
+    containers.executor = {
+      # https://github.com/UsefulSoftwareCo/executor
+      image = "ghcr.io/rhyssullivan/executor-selfhost:v1.6.10";
+      volumes = [
+        "executor-data:/data"
+      ];
+      ports = [ "4788:4788" ];
+      environment = {
+        EXECUTOR_WEB_BASE_URL = "https://executor.example.com";
+      };
+      environmentFiles = [ config.age.secrets.executor.path ];
+      extraOptions = [
+        "--network=host"
+      ];
+    };
   };
 
   # currently being used for litellm backend -- no backups or anything 😅
