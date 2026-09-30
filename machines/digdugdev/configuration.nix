@@ -329,6 +329,11 @@ in
             to home-server-1:8123
           }
         '';
+        "mcp.digdug.dev".extraConfig = ''
+          reverse_proxy /* {
+            to home-server-1:4788
+          }
+        '';
 
 
         # Misc
