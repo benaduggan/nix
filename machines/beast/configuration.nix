@@ -110,7 +110,7 @@ in
     bduggan = {
       isNormalUser = true;
       description = "ben";
-      extraGroups = [ "networkmanager" "wheel" ];
+      extraGroups = [ "networkmanager" "wheel" "podman" "docker" ];
       openssh.authorizedKeys.keys = common.authorizedKeys;
       packages = with pkgs; [
         #  thunderbird
