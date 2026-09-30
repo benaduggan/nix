@@ -186,6 +186,7 @@ in
       open = false;
       package = config.boot.kernelPackages.nvidiaPackages.production;
     };
+    # nvidia-container-toolkit.enable = true;
   };
 
   services.jellyfin = {
@@ -245,6 +246,18 @@ in
   };
 
   services.alloy.enable = true;
+
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
+    defaultNetwork.settings.dns_enabled = true;
+    dockerSocket.enable = true;
+  };
+
+  # just adding this so I don't forget in the future
+  # virtualisation.oci-containers = {
+  #   backend = "podman";
+  # };
 
   system.stateVersion = common.stateVersion;
 }
