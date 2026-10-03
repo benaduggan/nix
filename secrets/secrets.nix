@@ -15,6 +15,7 @@ in
 
   # n8n
   "n8n.age".publicKeys = constants.authorizedKeys;
+  "executor.age".publicKeys = constants.authorizedKeys;
 
   # digdugdev
   "board.age".publicKeys = constants.authorizedKeys ++ [ constants.digdugdevKey ];
