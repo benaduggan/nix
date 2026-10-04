@@ -56,6 +56,17 @@ in
         ssh.allowedSignersFile = "~/.ssh/allowed_signers";
       };
     };
+    ignores = [
+      "*.pcap"
+      "*.swp"
+      "*~"
+      "SPEC.md"
+      "TODO.md"
+      "result*"
+      ".direnv/"
+      ".local-docs"
+      ".scratch"
+    ];
   };
 
   programs.difftastic = {

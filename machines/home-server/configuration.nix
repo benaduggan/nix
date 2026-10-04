@@ -323,9 +323,7 @@
         "executor-data:/data"
       ];
       ports = [ "4788:4788" ];
-      environment = {
-        EXECUTOR_WEB_BASE_URL = "https://executor.example.com";
-      };
+      environment = { };
       environmentFiles = [ config.age.secrets.executor.path ];
       extraOptions = [
         "--network=host"
