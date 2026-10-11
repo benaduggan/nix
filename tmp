@@ -1,0 +1,38 @@
+      services.mosquitto = {
+        enable = true;
+        listeners = [{
+          port = 1883;
+          address = "0.0.0.0"; # so the HA container can reach it
+          users.z2m = {
+            passwordFile = "/etc/default/zigbee/mqtt-z2m";
+            acl = [ "readwrite #" ];
+          };
+          users.homeassistant = {
+            passwordFile = "/etc/default/zigbee/mqtt-ha";
+            acl = [ "readwrite #" ];
+          };
+        }];
+      };
+
+      services.zigbee2mqtt = {
+        enable = true;
+        settings = {
+          homeassistant = nixpkgs.lib.mkForce true;
+          frontend = {
+            enabled = true;
+            host = "100.64.214.128";
+            port = 8091; # the Z2M web UI
+          };
+          serial = {
+            port = "tcp://192.168.1.84:7638"; # the CC2652P7 socket
+            adapter = "zstack";
+            baudrate = 115200;
+          };
+          mqtt = {
+            server = "mqtt://127.0.0.1:1883"; # Z2M + broker both on the host
+            user = "z2m";
+            password = "!/etc/default/zigbee/secret.yaml password";
+            base_topic = "zigbee2mqtt";
+          };
+        };
+      };
