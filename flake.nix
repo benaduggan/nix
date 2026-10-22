@@ -56,6 +56,7 @@
       inherit (nixpkgs) lib;
       inherit (nix-darwin.lib) darwinSystem;
       inherit (nixpkgs.lib) mapAttrs attrValues optionalAttrs singleton;
+      caBlacklistModule = ./modules/ca-blacklist.nix;
 
       # Configuration for `nixpkgs`
       nixpkgsConfig = {
@@ -103,6 +104,7 @@
             system = "aarch64-darwin";
             modules = [
               commonMbp
+              caBlacklistModule
               "${self.inputs.jacobi}/hosts/modules/darwin/llama-server.nix"
               ./machines/paper/darwin-configuration.nix
               home-manager.darwinModules.home-manager
@@ -119,6 +121,7 @@
             system = "aarch64-darwin";
             modules = [
               commonMagic
+              caBlacklistModule
               "${self.inputs.jacobi}/hosts/modules/darwin/llama-server.nix"
               ./machines/magic-mbp/darwin-configuration.nix
               home-manager.darwinModules.home-manager
@@ -140,6 +143,7 @@
           system = "x86_64-linux";
           modules = [
             common
+            caBlacklistModule
             ./modules/alloy.nix
             ./modules/node-exporter.nix
             ./machines/framework/configuration.nix
@@ -171,6 +175,7 @@
           specialArgs = { nixpkgs-beast-pkgs = beastPkgs; };
           modules = [
             common
+            caBlacklistModule
             ./modules/alloy.nix
             ./modules/node-exporter.nix
             ./machines/beast/configuration.nix
@@ -201,6 +206,7 @@
           system = "x86_64-linux";
           modules = [
             common
+            caBlacklistModule
             agenix.nixosModules.default
             ./modules/alloy.nix
             ./modules/node-exporter.nix
@@ -239,6 +245,7 @@
           specialArgs = { inherit nixpkgs-pascal-cuda-meme; };
           modules = [
             common
+            caBlacklistModule
             agenix.nixosModules.default
             ./modules/alloy.nix
             ./modules/node-exporter.nix
@@ -269,6 +276,7 @@
           system = "x86_64-linux";
           modules = [
             common
+            caBlacklistModule
             agenix.nixosModules.default
             ./modules/alloy.nix
             ./modules/node-exporter.nix
@@ -299,6 +307,7 @@
           system = "x86_64-linux";
           modules = [
             common
+            caBlacklistModule
             agenix.nixosModules.default
             ./modules/alloy.nix
             ./modules/node-exporter.nix
@@ -330,6 +339,7 @@
       #     specialArgs = { inherit inputs; };
       #     modules = [
       #       common
+      #       caBlacklistModule
       #       nixos-wsl.nixosModules.wsl
       #       ./machines/wsl/configuration.nix
       #       home-manager.nixosModules.home-manager
@@ -355,6 +365,7 @@
           specialArgs = { inherit inputs; };
           modules = [
             common
+            caBlacklistModule
             agenix.nixosModules.default
             ./modules/alloy.nix
             ./modules/node-exporter.nix
@@ -381,6 +392,7 @@
         system = "x86_64-linux";
         format = "do";
         modules = [
+          caBlacklistModule
           ./generators/do-builder/configuration.nix
         ];
       };
