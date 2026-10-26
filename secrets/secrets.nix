@@ -6,7 +6,6 @@ in
   "grafana.age".publicKeys = constants.authorizedKeys;
   "vaultwarden.age".publicKeys = constants.authorizedKeys;
   "ondeck-vars.age".publicKeys = constants.authorizedKeys;
-  "home-magic-runner.age".publicKeys = constants.authorizedKeys;
   "home-self-runner.age".publicKeys = constants.authorizedKeys;
 
   # litellm

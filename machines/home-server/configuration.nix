@@ -45,10 +45,6 @@
         file = ../../secrets/executor.age;
         mode = "644";
       };
-      magicRunnerToken = {
-        file = ../../secrets/home-magic-runner.age;
-        mode = "644";
-      };
       homeRunnerToken = {
         file = ../../secrets/home-self-runner.age;
         mode = "644";
@@ -248,7 +244,7 @@
           echo "no changes to commit"
           exit 0
         fi
-        git -c user.name="home-server" -c user.email="ben@adaptivereader.com" \
+        git -c user.name="home-server" -c user.email="${common.email}" \
           commit -m "auto: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
         git push
       '';
@@ -268,7 +264,7 @@
 
     containers.homeassistant = {
       # https://github.com/home-assistant/core
-      image = "ghcr.io/home-assistant/home-assistant:2026.8.3";
+      image = "ghcr.io/home-assistant/home-assistant:2026.10.4";
       volumes = [ "home-assistant:/config" ];
       environment.TZ = "US/Eastern";
       extraOptions = [
@@ -278,7 +274,7 @@
 
     containers.litellm = {
       # https://github.com/BerriAI/litellm/releases
-      image = "ghcr.io/berriai/litellm:v1.98.0";
+      image = "ghcr.io/berriai/litellm:v1.106.4";
       environmentFiles = [ config.age.secrets.litellm.path ];
       extraOptions = [
         "--network=host"
@@ -287,7 +283,7 @@
 
     containers.openwebui = {
       # https://github.com/open-webui/open-webui
-      image = "ghcr.io/open-webui/open-webui:v0.11.3";
+      image = "ghcr.io/open-webui/open-webui:v0.12.4";
       volumes = [ "open-webui:/app/backend/data" ];
       environmentFiles = [ config.age.secrets.openwebui.path ];
       extraOptions = [
@@ -297,7 +293,7 @@
 
     containers.n8n = {
       # https://github.com/n8n-io/n8n
-      image = "docker.n8n.io/n8nio/n8n:2.36.9";
+      image = "docker.n8n.io/n8nio/n8n:2.44.6";
       volumes = [
         "n8n_data:/home/node/.n8n"
         "/home/${common.username}/syncthing/obsidian/mindmap/n8n-drop:/n8n-drop"
@@ -524,15 +520,6 @@
   };
 
   services.github-runners = {
-    magic = {
-      enable = true;
-      nodeRuntimes = [ "node24" ];
-      extraLabels = [ "nix" ];
-      extraPackages = with pkgs; [ gh cachix gnused ];
-      replace = true;
-      tokenFile = config.age.secrets.magicRunnerToken.path;
-      url = "https://github.com/MagicSchoolAi/MagicSchoolAi/";
-    };
     nix-repo = {
       enable = true;
       nodeRuntimes = [ "node24" ];
