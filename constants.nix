@@ -44,13 +44,4 @@ in
   communityTrustedPublicKeys = [
     "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
   ];
-
-  magicSubstituters = [
-    "https://magic-school-ai.cachix.org"
-  ];
-
-  magicTrustedPublicKeys = [
-    "magic-school-ai.cachix.org-1:EcAHj+Bu7cr7tnrIXr4W2hiSQMOvswmV/o8Qi9shmFQ="
-  ];
-
 }

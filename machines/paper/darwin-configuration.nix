@@ -3,8 +3,6 @@
 
   nix.settings = common.nixSettings // {
     trusted-users = [ "benduggan" ];
-    extra-substituters = common.nixSettings.extra-substituters ++ common.magicSubstituters;
-    extra-trusted-public-keys = common.nixSettings.extra-trusted-public-keys ++ common.magicTrustedPublicKeys;
   };
 
   documentation.enable = true;

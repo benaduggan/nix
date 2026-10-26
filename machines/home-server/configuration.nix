@@ -45,10 +45,6 @@
         file = ../../secrets/executor.age;
         mode = "644";
       };
-      magicRunnerToken = {
-        file = ../../secrets/home-magic-runner.age;
-        mode = "644";
-      };
       homeRunnerToken = {
         file = ../../secrets/home-self-runner.age;
         mode = "644";
@@ -524,15 +520,6 @@
   };
 
   services.github-runners = {
-    magic = {
-      enable = true;
-      nodeRuntimes = [ "node24" ];
-      extraLabels = [ "nix" ];
-      extraPackages = with pkgs; [ gh cachix gnused ];
-      replace = true;
-      tokenFile = config.age.secrets.magicRunnerToken.path;
-      url = "https://github.com/MagicSchoolAi/MagicSchoolAi/";
-    };
     nix-repo = {
       enable = true;
       nodeRuntimes = [ "node24" ];
