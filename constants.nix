@@ -53,11 +53,4 @@ in
     "magic-school-ai.cachix.org-1:EcAHj+Bu7cr7tnrIXr4W2hiSQMOvswmV/o8Qi9shmFQ="
   ];
 
-  adaptiveReaderSubstituters = [
-    "https://adaptivereader.cachix.org"
-  ];
-
-  adaptiveReaderTrustedPublicKeys = [
-    "adaptivereader.cachix.org-1:AoiyYyEjcXjS0Ci77VIubWfUKOusjweA7S43UYkC/sw="
-  ];
 }
