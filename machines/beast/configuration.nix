@@ -217,6 +217,12 @@ in
     openFirewall = true;
   };
 
+  # Sunshine's CUDA package wraps the binary in a shell script. The
+  # privileged NixOS wrapper must target the ELF binary directly.
+  security.wrappers.sunshine.source = lib.mkForce "${config.services.sunshine.package}/bin/.sunshine-wrapped";
+  systemd.user.services.sunshine.environment.LD_LIBRARY_PATH =
+    lib.makeLibraryPath [ nixpkgs-beast-pkgs.vulkan-loader ];
+
   services.llama-cpp = {
     enable = true;
     package = common.jacobiLegacy.pkgs.llama-cpp-cuda-latest;
