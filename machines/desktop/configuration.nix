@@ -160,14 +160,9 @@ in
     };
     nvidia = {
       open = false;
-      # Use nvidia driver from pinned nixpkgs, built for current kernel
-      package =
-        let
-          base = (nixpkgs-pascal-cuda-meme.linuxKernel.packagesFor config.boot.kernelPackages.kernel).nvidiaPackages.stable;
-        in
-        base.overrideAttrs (old: {
-          passthru = old.passthru // { mod = base; };
-        });
+      # Keep the Pascal-compatible 580 driver on the current kernel's
+      # module packaging, including its module certificates.
+      package = config.boot.kernelPackages.nvidiaPackages.legacy_580;
     };
   };
 
