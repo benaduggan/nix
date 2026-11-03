@@ -28,7 +28,9 @@ in
 
 
   # Bootloader.
-  boot.kernelPackages = nixpkgs-pascal-cuda-meme.linuxPackages;
+  # Keep the 6.12 kernel series while using the module layout expected by
+  # the current nixpkgs module aggregator.
+  boot.kernelPackages = pkgs.linuxPackages_6_12;
   hardware.deviceTree.enable = false;
   system.boot.loader.kernelFile = "bzImage";
   boot.loader.systemd-boot.enable = true;
