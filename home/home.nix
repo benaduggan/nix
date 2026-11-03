@@ -44,7 +44,6 @@ in
         nil
         difftastic
         docker-client
-        httptap
         (writeShellApplication {
           name = "git-clean-merged";
           runtimeInputs = [ git ];
@@ -52,6 +51,7 @@ in
         })
         (optList isLinux [
           gnutar
+          httptap
           man-pages
         ])
 
