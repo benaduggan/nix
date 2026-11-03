@@ -31,6 +31,9 @@ in
   # Keep the 6.12 kernel series while using the module layout expected by
   # the current nixpkgs module aggregator.
   boot.kernelPackages = pkgs.linuxPackages_6_12;
+  # The NVIDIA module only autoloads with X enabled; this machine uses the
+  # GPU for CUDA without enabling the X server.
+  boot.kernelModules = [ "nvidia" ];
   hardware.deviceTree.enable = false;
   system.boot.loader.kernelFile = "bzImage";
   boot.loader.systemd-boot.enable = true;
