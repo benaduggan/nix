@@ -229,13 +229,28 @@ in
     settings = {
       host = "0.0.0.0";
       port = 8015;
-      model = "/opt/box/models/Qwen3.8-27B-UD-Q4_K_XL.gguf";
+      # No top-level model: Pi's /llama needs the multi-model router.
+      no-models-autoload = true;
+      # Presets pair the existing flat model files with their projector without
+      # exposing the projector as a separate model. Downloads use LLAMA_CACHE.
+      models-preset = pkgs.writeText "llama-cpp-models.ini" ''
+        version = 1
+
+        [Qwen3.8-27B-UD-Q4_K_XL]
+        model = /opt/box/models/Qwen3.8-27B-UD-Q4_K_XL.gguf
+        mmproj = /opt/box/models/Qwen3.8-27B-mmproj-BF16.gguf
+        no-mmproj-offload = true
+        temp = 1.0
+        top-k = 20
+        min-p = 0
+        top-p = 0.95
+        spec-type = draft-mtp
+        spec-draft-n-max = 2
+      '';
       ctx-size = 65536;
-      temp = 1.0;
-      top-k = 20;
-      min-p = 0;
-      top-p = 0.95;
-      n-gpu-layers = 99;
+      n-gpu-layers = "all";
+      ctx-checkpoints = 32;
+      checkpoint-min-step = 0;
       jinja = true;
       flash-attn = "on";
       cache-type-k = "q8_0";
@@ -244,10 +259,6 @@ in
       batch-size = 1024;
       ubatch-size = 1024;
       sleep-idle-seconds = 300;
-      spec-type = "draft-mtp";
-      spec-draft-n-max = 2;
-      mmproj = "/opt/box/models/Qwen3.8-27B-mmproj-BF16.gguf";
-      no-mmproj-offload = true;
     };
   };
 
