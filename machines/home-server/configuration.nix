@@ -45,6 +45,12 @@
         file = ../../secrets/executor.age;
         mode = "644";
       };
+      obsidianMcp = {
+        file = ../../secrets/obsidian-mcp.age;
+        mode = "400";
+        owner = "root";
+        group = "root";
+      };
       homeRunnerToken = {
         file = ../../secrets/home-self-runner.age;
         mode = "644";
@@ -252,7 +258,7 @@
         User = common.username;
         Type = "oneshot";
       };
-      startAt = "hourly";
+      startAt = "*:0/15";
     };
   };
 
@@ -323,6 +329,61 @@
       environmentFiles = [ config.age.secrets.executor.path ];
       extraOptions = [
         "--network=host"
+      ];
+    };
+
+    # Two separate MCP integrations for the Obsidian vault. Point Executor at
+    # http://127.0.0.1:8787/mcp for the read-only integration and
+    # http://127.0.0.1:8788/mcp for the authoring integration.
+    containers.obsidian-mcp-read = {
+      # https://github.com/es617/obsidian-sync-mcp
+      image = "ghcr.io/es617/obsidian-sync-mcp:v0.9.0";
+      volumes = [
+        "obsidian-mcp-read:/data"
+        "/home/${common.username}/syncthing/obsidian/mindmap:/vault:ro"
+      ];
+      environment = {
+        DATA_DIR = "/data";
+        VAULT_PATH = "/vault";
+        VAULT_NAME = "mindmap";
+        HOST = "127.0.0.1";
+        PORT = "8787";
+        READ_ONLY = "true";
+      };
+      environmentFiles = [ config.age.secrets.obsidianMcp.path ];
+      extraOptions = [
+        "--network=host"
+        "--read-only"
+        "--tmpfs=/tmp:rw,nosuid,nodev,size=64m"
+        "--cap-drop=ALL"
+        "--security-opt=no-new-privileges:true"
+      ];
+    };
+
+    containers.obsidian-mcp-author = {
+      # See obsidian-mcp-read above. Keep both instances on the same version.
+      image = "ghcr.io/es617/obsidian-sync-mcp:v0.9.0";
+      volumes = [
+        "obsidian-mcp-author:/data"
+        "/home/${common.username}/syncthing/obsidian/mindmap:/vault:ro"
+        "/home/${common.username}/syncthing/obsidian/mindmap/.claude/commands:/vault/.claude/commands"
+        "/home/${common.username}/syncthing/obsidian/mindmap/.claude/skills:/vault/.claude/skills"
+      ];
+      environment = {
+        DATA_DIR = "/data";
+        VAULT_PATH = "/vault";
+        VAULT_NAME = "mindmap";
+        HOST = "127.0.0.1";
+        PORT = "8788";
+        WRITE_FOLDERS = ".claude/commands,.claude/skills";
+      };
+      environmentFiles = [ config.age.secrets.obsidianMcp.path ];
+      extraOptions = [
+        "--network=host"
+        "--read-only"
+        "--tmpfs=/tmp:rw,nosuid,nodev,size=64m"
+        "--cap-drop=ALL"
+        "--security-opt=no-new-privileges:true"
       ];
     };
   };
