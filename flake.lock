@@ -356,11 +356,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793193205,
-        "narHash": "sha256-X6xa6sGA7RnJQuZGbFMC+K+KToWAlBDCCjJXfTwEPsw=",
+        "lastModified": 1793979366,
+        "narHash": "sha256-7OoWDsYO9teiPxl0QdlS5lYE20Pue8/5mpscSL32FUA=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "095fef2f265c3c0da4fe315efba8f8a04495ab34",
+        "rev": "2c0c1f01521469cf0271180c453c79782d53c2f6",
         "type": "github"
       },
       "original": {
@@ -419,11 +419,11 @@
         "vscode-server": "vscode-server"
       },
       "locked": {
-        "lastModified": 1793725050,
-        "narHash": "sha256-K2E3yAsSBQt9kDJMBbT49z6tLjAZMQzXG4EB1rMj2pw=",
+        "lastModified": 1793975353,
+        "narHash": "sha256-+2iGm3iRh1f6+sJF6BKofhySwBFB4vyeVmLvbDjrzfk=",
         "owner": "jpetrucciani",
         "repo": "nix",
-        "rev": "5dcda2cc60e931e43b3929857553d5410a035e2a",
+        "rev": "c10b3c6b0883441231d1bcd243ecd35a80d963f8",
         "type": "github"
       },
       "original": {
@@ -451,11 +451,11 @@
         "nixvim": "nixvim"
       },
       "locked": {
-        "lastModified": 1793060542,
-        "narHash": "sha256-7g03O3vUwqjhOKSHpbov9KPemGQ3NrG3JUuPJGSSdKc=",
+        "lastModified": 1793892128,
+        "narHash": "sha256-V/gieHEohRolpzFUd0OJqTmuGW2FixDhVeAApLUB/Gs=",
         "ref": "refs/heads/main",
-        "rev": "f47653145742174c8e34265c9cc2261aac921c6a",
-        "revCount": 4497,
+        "rev": "9fd3a2eb24e9e9ff36734c891bbc38bacc47f90a",
+        "revCount": 4503,
         "submodules": true,
         "type": "git",
         "url": "https://github.com/kwbauson/cfg"
@@ -582,11 +582,11 @@
         "nixpkgs": "nixpkgs_8"
       },
       "locked": {
-        "lastModified": 1793355509,
-        "narHash": "sha256-/Zs18x+IW4LuVH0rKxra0WPRgsk0DQsi0Bwkf8sOC5c=",
+        "lastModified": 1794051415,
+        "narHash": "sha256-mJok3uMK0awq2MPKdSnvTxm3UD89KD3LclQzASgtY1s=",
         "owner": "NixOS",
         "repo": "nixos-hardware",
-        "rev": "04c6b94fa104bc23650983a4513aea196794d321",
+        "rev": "1a8ff4f57ffe1f732beaa1db842247a381ea471d",
         "type": "github"
       },
       "original": {
@@ -825,11 +825,11 @@
     },
     "nixpkgs_9": {
       "locked": {
-        "lastModified": 1793695785,
-        "narHash": "sha256-Q0DnmuiqFRtoyPzc7RnSRXrsT87bpzPoRTrOq/InMgQ=",
-        "rev": "8a800ddb3729088f11277ef0d20fbc59085bce3d",
+        "lastModified": 1794070417,
+        "narHash": "sha256-6NCYl4eLJCZjT/WvgPGWkh1Q0aEfU7HBRR3tBuSOgyg=",
+        "rev": "d63e5b96ca17ae27b5d248d29564e31ff7a83f02",
         "type": "tarball",
-        "url": "https://releases.nixos.org/nixos/unstable-small/nixos-26.11pre1107507.8a800ddb3729/nixexprs.tar.zst"
+        "url": "https://releases.nixos.org/nixos/unstable-small/nixos-26.11pre1113519.d63e5b96ca17/nixexprs.tar.zst"
       },
       "original": {
         "id": "nixpkgs",
@@ -1203,11 +1203,11 @@
         "flake-parts": "flake-parts_2"
       },
       "locked": {
-        "lastModified": 1792669057,
-        "narHash": "sha256-3dBWR7+z35n1Rrg68MghpGEUu9RnlKRzSDrkCzKXj7Q=",
+        "lastModified": 1794081290,
+        "narHash": "sha256-vJCjuYXp06XZ9rufttvv/W3mkzQzefYxEvmmsZfUmvw=",
         "owner": "msteen",
         "repo": "nixos-vscode-server",
-        "rev": "442c629540ed1e85cd2aed813a65b7eaa7ff27c5",
+        "rev": "e8aac40ed8d76486859741b1608badeca3475943",
         "type": "github"
       },
       "original": {
