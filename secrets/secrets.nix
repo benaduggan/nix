@@ -23,4 +23,8 @@ in
 
   # ntfy
   "ntfy.age".publicKeys = constants.authorizedKeys;
+
+  # Pebble Index webhook and local Hermes webhook adapter
+  "pebble-webhook-secret.age".publicKeys = constants.authorizedKeys;
+  "hermes-webhook-secret.age".publicKeys = constants.authorizedKeys;
 }
