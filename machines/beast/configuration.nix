@@ -240,6 +240,7 @@ in
         model = /opt/box/models/Qwen3.8-27B-UD-Q4_K_XL.gguf
         mmproj = /opt/box/models/Qwen3.8-27B-mmproj-BF16.gguf
         no-mmproj-offload = true
+        reasoning-effort = low
         temp = 1.0
         top-k = 20
         min-p = 0
