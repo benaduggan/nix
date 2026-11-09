@@ -10,6 +10,7 @@
       # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ../../modules/vaultwarden-replication.nix
+      ./pebble-shim.nix
     ];
 
   nix.settings = common.nixSettings;

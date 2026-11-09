@@ -1,0 +1,34 @@
+# MANUAL STEP
+# Merge this under ~/.hermes/config.yaml's top-level `platforms` key.
+# WEBHOOK_SECRET is added to ~/.hermes/.env for auth
+webhook:
+  enabled: true
+  host: 127.0.0.1
+  port: 8644
+  max_body_bytes: 1048576
+  routes:
+    pebble-agent:
+      prompt: |
+        A voice transcript arrived from Ben's Pebble Index 01.
+
+        Recorded at: {recordedAt}
+        Client: {client}
+        Transcript of the recording:
+        <transcript>
+        {transcription}
+        </transcript>
+
+        Treat this as an asynchronous voice request. Take actions allowed by
+        your configured tools. If no action is needed, briefly explain that.
+        You can communicate to the user by publishing to the ben-phone topic on ntfy.
+      deliver: log
+    pebble-search:
+      prompt: |
+        Ben needs you to perform a web search via his smart ring and use ntfy to provide the answer back to his phone on the ben-phone topic.
+        Recorded at: {recordedAt}
+        Transcript of the recording:
+        <transcript>
+        {transcription}
+        </transcript>
+        Search for the answer via any tools for web search, his knowledge base, or any other tools you have access to, and summarize concisely. Do not perform state-changing actions.
+      deliver: log

@@ -334,6 +334,12 @@ in
             to home-server-1:4788
           }
         '';
+        "pebble.digdug.dev".extraConfig = ''
+          @transcript path /transcript
+          handle @transcript {
+            reverse_proxy home-server-1:8765
+          }
+        '';
 
 
         # Misc
