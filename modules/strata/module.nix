@@ -1,28 +1,14 @@
-# services.strata: the local OpenAI/Anthropic-compatible API for Qwen3.8-Flash-Next
-# (125B MoE), written for the one host that runs it: beast (RTX 3090, 128 GB RAM).
-# The package, the CUDA arch (sm_86) and the sandbox shape are fixed here instead of
-# parameterised - another machine would want its own packages.nix call, not more options.
+# services.strata: local OpenAI/Anthropic-compatible API for Qwen3.8-Flash-Next (125B MoE),
+# pinned for beast (RTX 3090, sm_86).
 #
-# ## config.json is generated, not managed
-# The pre-start job (strata-prefetch) rewrites <stateDir>/config.json on every start from
-# the options below, so these options are the only source of truth:
-#   - edits made on the server's /config web page are lost at the next restart;
-#   - avoid the web UI's "update & restart": strata_control/updater.py rewrites config.json
-#     and picks a *random free* port, which then disagrees with the unit's --port (the unit
-#     wins after the next restart). Rebuild the system instead.
-# host and port also go on strata-serve's command line: the server binds the port from
-# there (it never reads one out of config.json) and only falls back to config.json for
-# --host, so a stale config.json cannot move the API somewhere nobody expects.
-# When apiKeyFile is set, prefetch.py writes the key into that file in plaintext (the file
-# is 0600, inside stateDir, which is 0750 strata).
-# nixpkgs-beast-pkgs and inputs come from this machine's specialArgs in flake.nix.
+# strata-prefetch regenerates <stateDir>/config.json on every start from these options, so
+# web UI /config edits are overwritten and the UI's "update & restart" (which picks a random
+# port) will conflict with the unit's --port. --host and --port are passed directly to strata-serve.
 { pkgs, config, lib, inputs, nixpkgs-beast-pkgs, ... }:
 let
   cfg = config.services.strata;
 
-  # Built against beast's nixpkgs, not the system's: the engine's cudart has to match the
-  # CUDA stack beast runs (same reason configuration.nix uses nixpkgs-beast-pkgs for
-  # sunshine), and the kernels are compiled for its GPU. See packages.nix.
+  # Built against nixpkgs-beast-pkgs so cudart matches beast's NVIDIA driver.
   strataPkgs = import ./packages.nix {
     pkgs = nixpkgs-beast-pkgs;
     src = inputs.strata;
@@ -30,31 +16,46 @@ let
   };
   pkg = strataPkgs.strata;
 
-  # Everything the module pushes into config.json, as a list so no fragment has to worry
-  # about shell line continuations.
   prefetchArgs = [
-    "--family ${lib.escapeShellArg cfg.family}"
-    "--model ${lib.escapeShellArg cfg.model}"
-    "--context ${toString cfg.context}"
-    "--data-dir \"${cfg.stateDir}\""
-    "--emit-config \"${cfg.stateDir}/config.json\""
-    "--engine ${lib.escapeShellArg (toString pkg.passthru.engine)}/bin/strata"
-    "--host ${lib.escapeShellArg cfg.host}"
-    # the port lands in config.json only so Strata's own helpers (calibration, the web
-    # UI) aim at it; what actually binds is the --port on strata-serve's command line
-    "--port ${toString cfg.port}"
+    "--family"
+    cfg.family
+    "--model"
+    cfg.model
+    "--context"
+    (toString cfg.context)
+    "--data-dir"
+    cfg.stateDir
+    "--emit-config"
+    "${cfg.stateDir}/config.json"
+    "--engine"
+    "${pkg.passthru.engine}/bin/strata"
+    "--host"
+    cfg.host
+    "--port"
+    (toString cfg.port)
   ]
   ++ lib.optionals (cfg.sampling != { }) [
-    "--sampling-json ${pkgs.writeText "strata-sampling.json" (builtins.toJSON cfg.sampling)}"
+    "--sampling-json"
+    (pkgs.writeText "strata-sampling.json" (builtins.toJSON cfg.sampling))
   ]
-  # the key itself goes in as a systemd credential, never on the command line (ps)
-  # and never as a path in the store
-  ++ lib.optional (cfg.apiKeyFile != null) ''--api-key-file "/run/credentials/strata.service/api-key"''
-  # '=' and not a space: an engine flag starts with "--" itself, and prefetch.py's argparse
-  # reads "--extra-arg --kv" as a missing value and stops the pre-start job. A whole item may
-  # name a flag and its value ("--kv q4_0"): prefetch.py splits it into argv tokens, which is
-  # what the engine wants (it compares argv with a plain string compare).
-  ++ map (x: "--extra-arg=${lib.escapeShellArg x}") cfg.extraEngineArgs;
+  ++ lib.optionals (cfg.mcpServers != { }) [
+    "--mcp-json"
+    (pkgs.writeText "strata-mcp.json" (builtins.toJSON cfg.mcpServers))
+  ]
+  ++ lib.optionals (cfg.gpu != null) [ "--gpu" cfg.gpu ]
+  ++ lib.optionals (cfg.lowRam != null) [ "--low-ram" cfg.lowRam ]
+  ++ lib.optionals (cfg.ggufDir != null) [ "--gguf-dir" (toString cfg.ggufDir) ]
+  # Read via systemd credentials so keys never appear in `ps` or the Nix store.
+  ++ lib.optionals (cfg.apiKeyFile != null) [
+    "--api-key-file"
+    "/run/credentials/strata.service/api-key"
+  ]
+  ++ lib.optionals (cfg.hfTokenFile != null) [
+    "--hf-token-file"
+    "/run/credentials/strata.service/hf-token"
+  ]
+  # Use = because engine flags start with "--" and argparse would misparse "--extra-arg --kv".
+  ++ map (x: "--extra-arg=${x}") cfg.extraEngineArgs;
 in
 {
   options.services.strata = {
@@ -144,6 +145,36 @@ in
       '';
     };
 
+    mcpServers = lib.mkOption {
+      type = lib.types.attrsOf lib.types.anything;
+      default = { };
+      description = "MCP server definitions written to config.json as `mcp_servers`.";
+    };
+
+    gpu = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "GPU selector written to config.json (null lets the engine pick the most-VRAM card).";
+    };
+
+    lowRam = lib.mkOption {
+      type = lib.types.nullOr (lib.types.enum [ "on" "off" ]);
+      default = null;
+      description = "Force mmap experts (`on`/`off`), or null for auto based on system RAM.";
+    };
+
+    ggufDir = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = "Directory of pre-downloaded GGUF shards to use instead of downloading from Hugging Face.";
+    };
+
+    hfTokenFile = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "File holding a Hugging Face token for downloads, passed via a systemd credential.";
+    };
+
     extraEngineArgs = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
@@ -159,21 +190,16 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # An OpenAI-compatible API on a reachable port with no key means anyone who can reach
-    # it can spend this GPU. Warn rather than refuse: an unauthenticated port on the
-    # tailnet is usually the intent, and there is no key file in this repo to require.
     warnings = lib.optionals
       (cfg.apiKeyFile == null && !(lib.elem cfg.host [ "127.0.0.1" "localhost" "::1" ]))
       [
         ''
-          services.strata: host = "${cfg.host}" with apiKeyFile unset, so the API on port
-          ${toString cfg.port} answers to anyone who can reach it. Set an apiKeyFile, or
-          host = "127.0.0.1", if that is not intended.
+          services.strata: host = "${cfg.host}" with apiKeyFile unset exposes the API on port
+          ${toString cfg.port} without authentication. Set apiKeyFile or host = "127.0.0.1".
         ''
       ];
 
-    # A static user: a dynamic one's UID changes on every start (70 GB of weights would
-    # need re-owning) and its strict device policy would keep the engine off /dev/nvidia*.
+    # Static user so weight ownership persists and /dev/nvidia* access isn't blocked by DynamicUser.
     users.groups.strata = { };
     users.users.strata = {
       isSystemUser = true;
@@ -181,27 +207,16 @@ in
       description = "Strata inference service";
     };
 
-    systemd.tmpfiles.rules = [ "d ${cfg.stateDir} 0750 strata strata -" ];
-
-    # Create the state dir ahead of strata.service, unsandboxed: the directory has to
-    # exist before strata.service's mount namespace - which ReadWritePaths= and
-    # WorkingDirectory= depend on - is built. This is what used to fail the boot with
-    # status=226/NAMESPACE on the automounted data disk (27 times) until the restart loop
-    # happened to win the race.
+    # Create stateDir before strata.service builds its mount namespace (ReadWritePaths/WorkingDirectory).
     systemd.services.strata-initdir = {
       description = "Create the Strata state directory ${cfg.stateDir}";
-      # pulled in by strata.service, not wanted by multi-user.target: nothing to do while
-      # the service is off
       requiredBy = [ "strata.service" ];
       before = [ "strata.service" ];
-      # nofail + x-systemd.automount means the filesystem may not be up when the unit
-      # queue reaches Strata; wait for it. RequiresMountsFor= is a [Unit] setting, so it
-      # goes in unitConfig, not serviceConfig.
       unitConfig.RequiresMountsFor = [ cfg.stateDir ];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
-        ExecStart = "${pkgs.coreutils}/bin/install -d -o strata -g strata -m 0750 ${cfg.stateDir}";
+        ExecStart = "${pkgs.coreutils}/bin/install -d -o strata -g strata -m 0750 ${lib.escapeShellArg cfg.stateDir}";
       };
     };
 
@@ -213,42 +228,38 @@ in
       after = [ "network-online.target" ];
       path = [ pkg ];
 
-      # Bound the retries: with Restart=on-failure and TimeoutStartSec=0 a start that is
-      # genuinely broken looped forever instead of ever showing up as failed.
+      # Bound retries so a broken config fails instead of looping forever with TimeoutStartSec=0.
       unitConfig = {
         StartLimitIntervalSec = 300;
         StartLimitBurst = 5;
       };
 
-      # Downloads/repairs the model files and rewrites config.json (resumable; everything
-      # already present is skipped by a .done mark).
-      preStart = toString (pkgs.writeShellScript "strata-prestart" ''
-        set -euo pipefail
-        exec ${pkg}/bin/strata-prefetch ${lib.concatStringsSep " \\\n  " prefetchArgs}
-      '');
+      preStart = "exec ${pkg}/bin/strata-prefetch ${lib.escapeShellArgs prefetchArgs}";
 
       serviceConfig = {
         Type = "simple";
         User = "strata";
         Group = "strata";
-        # First start downloads ~70 GB and builds the pack: the default 90 s
-        # TimeoutStartSec kills it mid-download (it is resumable, but converge in one pass)
-        TimeoutStartSec = "0";
+        TimeoutStartSec = "0"; # First start downloads ~70 GB and builds the pack
         WorkingDirectory = cfg.stateDir;
         UMask = "0077";
         Restart = "on-failure";
         RestartSec = 10;
-        LoadCredential = lib.optional (cfg.apiKeyFile != null) "api-key:${cfg.apiKeyFile}";
-        # host and port are always on the command line; see the note at the top of the file
-        ExecStart = lib.concatStringsSep " " [
+        LoadCredential =
+          lib.optional (cfg.apiKeyFile != null) "api-key:${cfg.apiKeyFile}"
+          ++ lib.optional (cfg.hfTokenFile != null) "hf-token:${cfg.hfTokenFile}";
+        ExecStart = lib.escapeShellArgs [
           "${pkg}/bin/strata-serve"
-          "--engine strata"
-          "--config ${cfg.stateDir}/config.json"
-          "--host ${lib.escapeShellArg cfg.host}"
-          "--port ${toString cfg.port}"
+          "--engine"
+          "strata"
+          "--config"
+          "${cfg.stateDir}/config.json"
+          "--host"
+          cfg.host
+          "--port"
+          (toString cfg.port)
         ];
         NoNewPrivileges = true;
-        # ProtectSystem=strict makes / read-only; the state dir is the one writable path
         ProtectSystem = "strict";
         ReadWritePaths = [ cfg.stateDir ];
         ProtectHome = true;

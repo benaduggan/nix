@@ -69,11 +69,11 @@ FAMILIES = {
 }
 
 QUANTS = {
-    "Q2_0": {"arena_gb": 34.0, "ram_gb": 48},
-    "IQ2_XS": {"arena_gb": 35.5, "ram_gb": 48},
-    "IQ3_XXS": {"arena_gb": 42.9, "ram_gb": 60},
-    "IQ3_S": {"arena_gb": 50.3, "ram_gb": 62, "families": ("qwen",)},
-    "IQ1_M": {"arena_gb": 23.4, "ram_gb": 32, "families": ("coder",)},
+    "Q2_0": {"ram_gb": 48},
+    "IQ2_XS": {"ram_gb": 48},
+    "IQ3_XXS": {"ram_gb": 60},
+    "IQ3_S": {"ram_gb": 62, "families": ("qwen",)},
+    "IQ1_M": {"ram_gb": 32, "families": ("coder",)},
 }
 
 
@@ -100,11 +100,8 @@ def mark(path: Path):
     path.with_name(path.name + ".done").write_text(time.strftime("%Y-%m-%d %H:%M"), encoding="utf-8")
 
 
-def token_headers() -> dict:
-    tok = ""
-    for env in HF_TOKEN_ENV:
-        if os.environ.get(env):
-            tok = os.environ[env]
+def token_headers(token: str | None = None) -> dict:
+    tok = token or next((os.environ[e] for e in HF_TOKEN_ENV if os.environ.get(e)), "")
     return {"Authorization": f"Bearer {tok}", "User-Agent": "strata-nix"} if tok else {"User-Agent": "strata-nix"}
 
 
@@ -114,9 +111,7 @@ def download(url: str, dst: Path, what: str, token=None) -> None:
     if dst.exists() and done(dst):
         ok(f"{what} already present")
         return
-    headers = token_headers()
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
+    headers = token_headers(token)
     total = 0
     for attempt in range(5):
         try:
@@ -166,8 +161,8 @@ def download(url: str, dst: Path, what: str, token=None) -> None:
     ok(f"{what} downloaded")
 
 
-def check_shard(shard: Path) -> None:
-    """The shard is present and whole: its header must not name tensors running past the file's end."""
+def check_shard(shard: Path):
+    """Verify the shard is present and its header does not reference tensors past EOF."""
     import gguf_reader as G
     if not shard.exists():
         fail(f"missing {shard}")
@@ -179,6 +174,7 @@ def check_shard(shard: Path) -> None:
     if shard.stat().st_size < need:
         fail(f"{shard.name} is short: {shard.stat().st_size:,} of {need:,} bytes",
              "delete it and run again (or put a whole shard into --gguf-dir)")
+    return g
 
 
 def run_tool(script: str, *args, env=None) -> None:
@@ -190,9 +186,10 @@ def run_tool(script: str, *args, env=None) -> None:
 
 
 def mem_total_gb() -> float:
-    for line in open("/proc/meminfo"):
-        if line.startswith("MemTotal"):
-            return int(line.split()[1]) * 1024 / 2**30
+    with open("/proc/meminfo") as f:
+        for line in f:
+            if line.startswith("MemTotal"):
+                return int(line.split()[1]) * 1024 / 2**30
     return 0.0
 
 
@@ -207,10 +204,7 @@ def main() -> int:
     ap.add_argument("--low-ram", choices=["on", "off"], help="default: on when the experts would not fit the RAM")
     ap.add_argument("--emit-config")
     ap.add_argument("--engine")
-    # both land in the emitted config; serve/server.py takes --host from its own command
-    # line and falls back to this, and reads the port only from its command line, so the
-    # systemd unit passes both. The port here is for Strata's own helpers (calibration,
-    # the update/restart button in the web app), which do read config.json.
+    # Written to config.json for Strata's helpers; strata-serve takes --port from its own CLI.
     ap.add_argument("--host")
     ap.add_argument("--port", type=int)
     ap.add_argument("--gpu")
@@ -246,13 +240,9 @@ def main() -> int:
             download(base + s.name, s, label, token=token)
 
     shard1 = shards[0]
-    for s in shards:
-        check_shard(s)
+    ggufs = [check_shard(s) for s in shards]
 
-    # the PLE table's shard: found by scanning the GGUF headers (shard 2 for qwen/coder, 1 for swift)
-    import gguf_reader as G
-    ple = next((s for s in shards if any(t.name == "per_layer_token_embd.weight" for t in G.GGUFFile(s).tensors)),
-               None)
+    ple = next((s for s, g in zip(shards, ggufs) if any(t.name == "per_layer_token_embd.weight" for t in g.tensors)), None)
     if ple is None:
         fail("the model has no per_layer_token_embd tensor (is this a Qwen3.8-Flash-Next GGUF?)")
 
@@ -277,34 +267,16 @@ def main() -> int:
         run_tool("mtp_fetch.py", "fetch", "--out", mtp)
         run_tool("mtp_pack.py", "--src", mtp, "--experts", "q2_0", "--out", mtp / "mtp-q2_0.gguf")
         run_tool("mtp_rt.py", "--gguf", mtp / "mtp-q2_0.gguf", "--out", rt)
-        if not (rt / "draft_vocab.bin").exists():
-            shutil.copyfile(SHARE / "data" / "draft_vocab.bin", rt / "draft_vocab.bin")
         ok(f"MTP ready: {rt}")
     else:
-        if not (rt / "draft_vocab.bin").exists():
-            shutil.copyfile(SHARE / "data" / "draft_vocab.bin", rt / "draft_vocab.bin")
         ok(f"MTP already prepared: {rt}")
+    if not (rt / "draft_vocab.bin").exists():
+        shutil.copyfile(SHARE / "data" / "draft_vocab.bin", rt / "draft_vocab.bin")
 
-    # What each extra --extra-arg holds is argv, and the engine matches its flags with a plain
-    # string compare, so one item may carry a flag and its value ("--kv k8v4"): split it the way
-    # a shell would, quotes inside the string still keep a path with spaces in one token.
     extra = [tok for x in a.extra_arg for tok in shlex.split(x)]
 
-    # The MTP draft layer stays ON. It costs about 1.1 GiB of the card (drafting.py DRAFTER_MIB:
-    # 1,082 MiB - 786 MiB of weights, +218 MiB for the draft head, plus its own K/V growing with
-    # the context), and the engine only gives that up as a last resort: the one place it drops
-    # the layer by itself says so as "this start runs without the draft layer (decode is slower)"
-    # (generate.cpp:7150-7168, for a card that cannot hold it). Measured here on the 3090 +
-    # IQ3_S: taking it out of the generated args cost a third of decode, about 120 -> 80 tok/s.
-    # The A/B in the docs that makes it look free is an 8 GB card, where that 1 GiB of expert
-    # cache buys more than the drafts do; on 24 GB of VRAM with 128 GB of RAM it does not follow.
-    # If the card ever runs short, the engine drops it on its own and logs why - the trade to
-    # make by hand is the VRAM back that --kv k8v4 gives (~550 MB), not the drafter.
-    # --spec is NOT optional: the CUDA build leaves it 0 and a native (IQ) pack refuses to start
-    # below 2 ("is a native (IQ) pack: it needs --native SHARD1, --spec T (T >= 2) and --prefill
-    # CHUNK", exit 2). --spec-min-p 0.5 stays because the engine's own default is 0.0 - take
-    # every draft in the window - and 0.5 is what keeps a weak guess from routing more experts
-    # over PCIe (docs/DETAILS.md, 0.1.16).
+    # --spec >= 2 is required for native IQ packs; --spec-min-p 0.5 overrides the 0.0 default
+    # to avoid routing weak draft guesses over PCIe. MTP (~1.1 GiB) stays on unless VRAM is tight.
     args = [
         "--pack", str(pack),
         "--native", str(shard1),
@@ -322,9 +294,7 @@ def main() -> int:
     if low_ram == "on":
         args += ["--mmap-experts"]
     if a.context > 262144 and not any(x == "--rope-scaling" for x in extra):
-        # over the trained 262144 the engine wants a scaling that covers it: yarn,
-        # factor = final / trained, like upstream setup does.
-        # An explicit --rope-scaling among the extra args takes over.
+        # Enable YaRN scaling past the 262144 trained context unless overridden in extraEngineArgs.
         args += ["--rope-scaling", "yarn", "--rope-scale", f"{a.context / 262144:g}"]
     args += extra
 
@@ -347,8 +317,8 @@ def main() -> int:
             cfg["gpu"] = a.gpu
         if a.api_key_file:
             cfg["api_key"] = Path(a.api_key_file).read_text(encoding="utf-8").strip()
-        # if a.sampling_json:
-        #     cfg["sampling"] = json.loads(Path(a.sampling_json).read_text(encoding="utf-8"))
+        if a.sampling_json:
+            cfg["sampling"] = json.loads(Path(a.sampling_json).read_text(encoding="utf-8"))
         if a.mcp_json:
             cfg["mcp_servers"] = json.loads(Path(a.mcp_json).read_text(encoding="utf-8"))
         out = Path(a.emit_config)

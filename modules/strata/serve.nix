@@ -19,21 +19,6 @@ let
     pillow
     psutil
   ]);
-
-  share = stdenvNoCC.mkDerivation {
-    pname = "strata-share";
-    inherit version;
-    src = strataSrc;
-    phases = [ "installPhase" ];
-    installPhase = ''
-      mkdir -p $out
-      cp -rL ${strataSrc}/. $out/
-      chmod -R u+w $out
-      rm -rf $out/bench $out/docs $out/ref $out/third_party $out/.gitattributes $out/.gitignore
-      mkdir -p $out/third_party/llama.cpp
-      cp -rL ${llamaSrc}/gguf-py $out/third_party/llama.cpp/gguf-py
-    '';
-  };
 in
 stdenvNoCC.mkDerivation {
   pname = "strata";
@@ -43,9 +28,12 @@ stdenvNoCC.mkDerivation {
 
   installPhase = ''
     runHook preInstall
-    mkdir -p $out/bin $out/share
-    cp -r ${share} $out/share/strata
+    mkdir -p $out/bin $out/share/strata/third_party/llama.cpp
+    cp -rL ${strataSrc}/. $out/share/strata/
     chmod -R u+w $out/share/strata
+    rm -rf $out/share/strata/{bench,docs,ref,third_party,.gitattributes,.gitignore}
+    mkdir -p $out/share/strata/third_party/llama.cpp
+    cp -rL ${llamaSrc}/gguf-py $out/share/strata/third_party/llama.cpp/gguf-py
     install -Dm644 ${./prefetch.py} $out/share/strata/prefetch.py
     makeWrapper ${py}/bin/python $out/bin/strata-serve \
       --add-flags "$out/share/strata/serve/server.py"
@@ -58,7 +46,7 @@ stdenvNoCC.mkDerivation {
   '';
 
   passthru = {
-    inherit engine share py;
+    inherit engine py;
   };
 
   meta = {
