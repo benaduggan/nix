@@ -50,7 +50,11 @@ let
   # the key itself goes in as a systemd credential, never on the command line (ps)
   # and never as a path in the store
   ++ lib.optional (cfg.apiKeyFile != null) ''--api-key-file "/run/credentials/strata.service/api-key"''
-  ++ map (x: "--extra-arg ${lib.escapeShellArg x}") cfg.extraEngineArgs;
+  # '=' and not a space: an engine flag starts with "--" itself, and prefetch.py's argparse
+  # reads "--extra-arg --kv" as a missing value and stops the pre-start job. A whole item may
+  # name a flag and its value ("--kv q4_0"): prefetch.py splits it into argv tokens, which is
+  # what the engine wants (it compares argv with a plain string compare).
+  ++ map (x: "--extra-arg=${lib.escapeShellArg x}") cfg.extraEngineArgs;
 in
 {
   options.services.strata = {
@@ -131,18 +135,26 @@ in
 
     sampling = lib.mkOption {
       type = lib.types.attrsOf lib.types.anything;
-      default = { temperature = 0.8; top_p = 0.95; top_k = 20; reasoning_effort = "low"; };
+      default = { };
       description = ''
         Sampling defaults for requests that leave the fields out. Copied into config.json
         verbatim and checked by the server when it starts, so a typo here shows up in the
         journal rather than at eval time.
+        eg { temperature = 0.8; top_p = 0.95; top_k = 20; reasoning_effort = "low"; }
       '';
     };
 
     extraEngineArgs = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
-      description = "Extra arguments appended to the engine command line (e.g. --kv q4_0).";
+      description = ''
+        Extra arguments appended to the engine command line, e.g. `[ "--kv q4_0" "--prompt-cache-spread" ]`.
+        Each item is split into argv tokens with shell quoting rules, so a flag and its value
+        may sit in one item or in two. They go after the generated arguments, and for a flag
+        the engine takes once the last one it reads wins, so this is how a machine overrides
+        something strata-prefetch picked for it. An unknown flag is an engine that does not
+        start: check `strata --help` of the pinned version before adding one.
+      '';
     };
   };
 

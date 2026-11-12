@@ -278,6 +278,33 @@ in
     host = "0.0.0.0";
     port = 8015;
     # gpus = [ ]; # default: engine picks the most-VRAM card (the 3090)
+    # Two flags worth their cost on this box (24 GB card, experts in DDR4, long pi sessions).
+    # Both are upstream measurements for this shape of machine, not forum lore; each is one
+    # line to take back out if it ever earns its keep the other way.
+    extraEngineArgs = [
+      # INT8 keys (the attention scores stay exact) + Hadamard-rotated Q4_0 values: 816 B per
+      # KV cell per attention layer where fp16 costs 2,112 (strata_control/vram_fit.py), and
+      # this family is full attention only every 4th layer (docs/DETAILS.md). So the
+      # --kv-resident 32768 tier keeps ~350 MB in VRAM instead of ~900 - some 550 MB back to
+      # expert slots, a dozen IQ3_S blobs on a card that has none to spare - and the pinned
+      # host copy the stream keeps shrinks by the same factor. Measured on a 3090 at 198K
+      # context: 85 -> 99 tok/s out, same needle results, prompts 2-5% slower (docs/DETAILS.md
+      # 0.1.25). K8V4 streams with --kv-resident in the CUDA build
+      # (include/strata/core/layer.hpp: "streams with --kv-resident too", and the stream has
+      # its own three runs for it); the "k8v4 does not stream" note in docs/INTEL.md is the
+      # SYCL build. What it cannot be is the K/V ring state (kv_mode 2 in that header, the
+      # drafter's window - src/core/conversation_snapshot.cpp refuses the combination), one
+      # more reason that drafter stays off. Prompt checkpoints and SAVE files written in
+      # another KV format do not restore - the engine drops them, it does not fail to start.
+      "--kv k8v4"
+      # Keep the six prompt checkpoints spread back from the conversation's end instead of the
+      # six most recent ones. pi rewrites its history (compaction, dropped tool output, edits),
+      # and with the default the next turn resumes at the system-prompt checkpoint and reads
+      # the whole conversation again. Upstream measured exactly this: a pi coding-agent turn
+      # rewritten a few steps back went 40.0 s of re-read -> 10.2 s (docs/DETAILS.md). Same
+      # RAM, same bits, nothing else moves.
+      "--prompt-cache-spread"
+    ];
   };
 
   virtualisation.podman = {
