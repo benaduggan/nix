@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
-      - run: nix flake update $(nix flake metadata --json 2>/dev/null | nix run nixpkgs#jq -- -r '.locks.nodes.root.inputs | keys[] | select(. != "nixpkgs-beast" and . != "nixpkgs-pascal-cuda")')
+      - run: nix flake update $(nix flake metadata --json 2>/dev/null | nix run nixpkgs#jq -- -r '.locks.nodes.root.inputs | keys[] | select(. != "nixpkgs-beast" and . != "nixpkgs-pascal-cuda" and . != "strata" and . != "llama-pinned")')
       - uses: peter-evans/create-pull-request@v8.1.1
         id: cpr
         with:
@@ -30,13 +30,18 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
-      - run: nix flake update nixpkgs-beast
+      - run: nix flake update nixpkgs-beast strata llama-pinned
+      # strata and its ggml/llama.cpp pin are only used by beast, so they move with its
+      # nixpkgs. strata tracks a branch while llama-pinned is a fixed rev, so a strata bump
+      # alone can strand the pin: modules/strata/packages.nix throws when the two disagree.
+      # Gate the auto-merge on the config still evaluating (eval only, nothing is built).
+      - run: nix eval --raw .#nixosConfigurations.beast.config.systemd.services.strata.serviceConfig.ExecStart > /dev/null
       - uses: peter-evans/create-pull-request@v8.1.1
         id: cpr
         with:
           author: Ben Duggan <benaduggan@gmail.com>
-          title: "Flake update (beast nixpkgs)"
-          commit-message: "Update flake.lock (nixpkgs-beast)"
+          title: "Flake update (beast: nixpkgs, strata, ggml pin)"
+          commit-message: "Update flake.lock (beast nixpkgs, strata, llama-pinned)"
           branch: updates-beast
           token: ${{ secrets.PAT }}
       - if: steps.cpr.outputs.pull-request-number

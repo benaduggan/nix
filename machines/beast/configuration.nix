@@ -24,6 +24,7 @@ in
       ./hardware-configuration.nix
       ../../modules/audiobookshelf.nix
       ../../modules/calibre-web.nix
+      ../../modules/strata/module.nix
     ];
 
   nix.settings = common.nixSettings;
@@ -224,7 +225,7 @@ in
     lib.makeLibraryPath [ nixpkgs-beast-pkgs.vulkan-loader ];
 
   services.llama-cpp = {
-    enable = true;
+    enable = false;
     package = common.jacobiLegacy.pkgs.llama-cpp-cuda-latest;
     settings = {
       host = "0.0.0.0";
@@ -264,6 +265,20 @@ in
   };
 
   services.alloy.enable = true;
+
+  # Local Qwen3.8-Flash-Next (125B MoE) over an OpenAI/Anthropic-compatible API.
+  # The 3090 (24 GB) takes the weights that fit; the rest lives in RAM.
+  # First start downloads ~70 GB of model weights into stateDir.
+  services.strata = {
+    enable = true;
+    family = "qwen"; # original Qwen3.8-Flash-Next ("swift" is the ~1.8x faster distill)
+    model = "IQ3_S"; # best quality (~62 GB RAM; beast has 128 GB)
+    context = 131072; # 128k
+    stateDir = "/mnt/massive/strata"; # ~70 GB of weights on the data partition, not /
+    host = "0.0.0.0";
+    port = 8015;
+    # gpus = [ ]; # default: engine picks the most-VRAM card (the 3090)
+  };
 
   virtualisation.podman = {
     enable = true;

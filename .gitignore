@@ -5,3 +5,4 @@ result/*
 result/
 *result*
 *result/*
+__pycache__/
