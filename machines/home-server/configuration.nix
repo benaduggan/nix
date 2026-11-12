@@ -4,6 +4,9 @@
 
 { common, config, pkgs, ... }:
 
+let
+  obsidianVaultDir = "/home/${common.username}/syncthing/obsidian/mindmap";
+in
 {
   imports =
     [
@@ -341,7 +344,7 @@
       image = "ghcr.io/es617/obsidian-sync-mcp:v0.9.0";
       volumes = [
         "obsidian-mcp-read:/data"
-        "/home/${common.username}/syncthing/obsidian/mindmap:/vault:ro"
+        "${obsidianVaultDir}:/vault:ro"
       ];
       environment = {
         DATA_DIR = "/data";
@@ -366,9 +369,7 @@
       image = "ghcr.io/es617/obsidian-sync-mcp:v0.9.0";
       volumes = [
         "obsidian-mcp-author:/data"
-        "/home/${common.username}/syncthing/obsidian/mindmap:/vault:ro"
-        "/home/${common.username}/syncthing/obsidian/mindmap/.claude/commands:/vault/.claude/commands"
-        "/home/${common.username}/syncthing/obsidian/mindmap/.claude/skills:/vault/.claude/skills"
+        "${obsidianVaultDir}:/vault"
       ];
       environment = {
         DATA_DIR = "/data";
@@ -376,7 +377,6 @@
         VAULT_NAME = "mindmap";
         HOST = "127.0.0.1";
         PORT = "8788";
-        WRITE_FOLDERS = ".claude/commands,.claude/skills";
       };
       environmentFiles = [ config.age.secrets.obsidianMcp.path ];
       extraOptions = [
