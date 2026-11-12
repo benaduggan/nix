@@ -290,20 +290,21 @@ def main() -> int:
     # a shell would, quotes inside the string still keep a path with spaces in one token.
     extra = [tok for x in a.extra_arg for tok in shlex.split(x)]
 
-    # No --mtp: the draft layer costs ~1 GB of the 24 GB (786 MiB of weights, +218 MiB for its
-    # draft head, plus K/V that grows with the context: strata_control/draft_layer.py, and
-    # drafting.py prices it at 1,082 MiB), and that GB goes straight to the expert cache, which
-    # is what this machine is short of - an IQ3_S blob is ~45 MB. The app does exactly this
-    # itself on a card that is short ("mtp": false strips --mtp / --spec-min-p / --batch-mtp and
-    # keeps --spec: "Without it the engine still guesses ahead from the text already in the
-    # conversation (--spec with prompt lookup), which is why --spec stays").
-    # --spec is NOT optional: the CUDA build leaves it 0, and a native (IQ) pack refuses to
-    # start below 2 ("is a native (IQ) pack: it needs --native SHARD1, --spec T (T >= 2) and
-    # --prefill CHUNK", exit 2), so dropping it fails the unit rather than turning speculation
-    # off. --spec-min-p 0.5 stays even though upstream drops it with the layer: the engine's own
-    # default is 0.0, and 0.5 is what stops a weak guess from routing more experts over PCIe
-    # (docs/DETAILS.md, 0.1.16). The layer is still fetched and packed, so an extraEngineArgs
-    # item of "--mtp <stateDir>/mtp/rt" is all it takes to put it back for an A/B.
+    # The MTP draft layer stays ON. It costs about 1.1 GiB of the card (drafting.py DRAFTER_MIB:
+    # 1,082 MiB - 786 MiB of weights, +218 MiB for the draft head, plus its own K/V growing with
+    # the context), and the engine only gives that up as a last resort: the one place it drops
+    # the layer by itself says so as "this start runs without the draft layer (decode is slower)"
+    # (generate.cpp:7150-7168, for a card that cannot hold it). Measured here on the 3090 +
+    # IQ3_S: taking it out of the generated args cost a third of decode, about 120 -> 80 tok/s.
+    # The A/B in the docs that makes it look free is an 8 GB card, where that 1 GiB of expert
+    # cache buys more than the drafts do; on 24 GB of VRAM with 128 GB of RAM it does not follow.
+    # If the card ever runs short, the engine drops it on its own and logs why - the trade to
+    # make by hand is the VRAM back that --kv k8v4 gives (~550 MB), not the drafter.
+    # --spec is NOT optional: the CUDA build leaves it 0 and a native (IQ) pack refuses to start
+    # below 2 ("is a native (IQ) pack: it needs --native SHARD1, --spec T (T >= 2) and --prefill
+    # CHUNK", exit 2). --spec-min-p 0.5 stays because the engine's own default is 0.0 - take
+    # every draft in the window - and 0.5 is what keeps a weak guess from routing more experts
+    # over PCIe (docs/DETAILS.md, 0.1.16).
     args = [
         "--pack", str(pack),
         "--native", str(shard1),
@@ -313,6 +314,7 @@ def main() -> int:
         "--prefill", "auto",
         "--spec", "4",
         "--spec-min-p", "0.5",
+        "--mtp", str(rt),
         "--max-context", str(a.context),
     ]
     if a.context >= 65536 and low_ram != "on":
