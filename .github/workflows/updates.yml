@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
       - run: nix flake update $(nix flake metadata --json 2>/dev/null | nix run nixpkgs#jq -- -r '.locks.nodes.root.inputs | keys[] | select(. != "nixpkgs-beast" and . != "nixpkgs-pascal-cuda" and . != "strata" and . != "llama-pinned")')
-      - uses: peter-evans/create-pull-request@v8.1.1
+      - uses: peter-evans/create-pull-request@v8.1.2
         id: cpr
         with:
           author: Ben Duggan <benaduggan@gmail.com>
@@ -36,7 +36,7 @@ jobs:
       # alone can strand the pin: modules/strata/packages.nix throws when the two disagree.
       # Gate the auto-merge on the config still evaluating (eval only, nothing is built).
       - run: nix eval --raw .#nixosConfigurations.beast.config.systemd.services.strata.serviceConfig.ExecStart > /dev/null
-      - uses: peter-evans/create-pull-request@v8.1.1
+      - uses: peter-evans/create-pull-request@v8.1.2
         id: cpr
         with:
           author: Ben Duggan <benaduggan@gmail.com>
