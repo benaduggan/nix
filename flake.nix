@@ -48,6 +48,21 @@
 
     # Separate nixpkgs for beast's NVIDIA/CUDA deps (updated independently)
     nixpkgs-beast.url = "nixpkgs/nixos-unstable";
+
+    # Strata: local Qwen3.8-Flash-Next inference (modules/strata/). Tracks a branch, so it is
+    # bumped in the updates-beast CI job next to nixpkgs-beast, not in the all-inputs one
+    # (see .github/workflows/updates.yml).
+    strata = {
+      url = "github:Niko1221/Strata/main";
+      flake = false;
+    };
+    llama-pinned = {
+      # The ggml commit Strata pins in its third_party/ggml/VERSION.txt; packages.nix throws
+      # at eval time when the two disagree. That file is a rev, not something a flake can
+      # follow, so when strata moves this URL has to be re-pointed by hand to the rev in it.
+      url = "github:ggml-org/llama.cpp/3cf03257f219afbe7334045ff7c6a06ac68c627d";
+      flake = false;
+    };
   };
 
   # deadnix: skip
@@ -172,7 +187,7 @@
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          specialArgs = { nixpkgs-beast-pkgs = beastPkgs; };
+          specialArgs = { nixpkgs-beast-pkgs = beastPkgs; inherit inputs; };
           modules = [
             common
             caBlacklistModule
