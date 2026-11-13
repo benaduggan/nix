@@ -345,11 +345,13 @@ in
           handle_path /padre/webhook* {
             reverse_proxy pi-memes:8091
           }
-          handle_path /padre/dashboard* {
-            reverse_proxy pi-memes:42617
-          }
         '';
 
+        "padre.digdug.dev".extraConfig = ''
+          reverse_proxy /* {
+            to pi-memes:42617
+          }
+        '';
 
         # Misc
         "vault.digdug.dev".extraConfig = ''
