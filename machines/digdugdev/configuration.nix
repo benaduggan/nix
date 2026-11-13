@@ -342,8 +342,11 @@ in
 
           # Brian's Pebble Index app, served by the pi-memes node on the tailnet.
           # handle_path strips the /memes prefix so the app can serve from its own root.
-          handle_path /padre* {
+          handle_path /padre/webhook* {
             reverse_proxy pi-memes:8091
+          }
+          handle_path /padre/dashboard* {
+            reverse_proxy pi-memes:42617
           }
         '';
 
