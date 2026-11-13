@@ -72,6 +72,7 @@
       inherit (nix-darwin.lib) darwinSystem;
       inherit (nixpkgs.lib) mapAttrs attrValues optionalAttrs singleton;
       caBlacklistModule = ./modules/ca-blacklist.nix;
+      vscodeServerFix = import ./modules/vscode-server-fix.nix { inherit vscode-server; };
 
       # Configuration for `nixpkgs`
       nixpkgsConfig = {
@@ -164,6 +165,7 @@
             ./machines/framework/configuration.nix
             nixos-hardware.nixosModules.framework-11th-gen-intel
             vscode-server.nixosModule
+            vscodeServerFix
             (_: {
               services.vscode-server.enable = true;
             })
@@ -195,6 +197,7 @@
             ./modules/node-exporter.nix
             ./machines/beast/configuration.nix
             vscode-server.nixosModule
+            vscodeServerFix
             (_: {
               services.vscode-server.enable = true;
             })
@@ -227,6 +230,7 @@
             ./modules/node-exporter.nix
             ./machines/home-server/configuration.nix
             vscode-server.nixosModule
+            vscodeServerFix
             (_: {
               services.vscode-server.enable = true;
             })
@@ -266,6 +270,7 @@
             ./modules/node-exporter.nix
             ./machines/desktop/configuration.nix
             vscode-server.nixosModule
+            vscodeServerFix
             (_: {
               services.vscode-server.enable = true;
             })
@@ -297,6 +302,7 @@
             ./modules/node-exporter.nix
             ./machines/arden/configuration.nix
             vscode-server.nixosModule
+            vscodeServerFix
             (_: {
               services.vscode-server.enable = true;
             })
@@ -328,6 +334,7 @@
             ./modules/node-exporter.nix
             ./machines/springfield/configuration.nix
             vscode-server.nixosModule
+            vscodeServerFix
             (_: {
               services.vscode-server.enable = true;
             })
@@ -387,6 +394,7 @@
             ./machines/digdugdev/configuration.nix
             home-manager.nixosModules.home-manager
             vscode-server.nixosModule
+            vscodeServerFix
             (_: {
               services.vscode-server.enable = true;
             })

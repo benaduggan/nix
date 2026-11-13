@@ -339,6 +339,12 @@ in
           handle @transcript {
             reverse_proxy home-server-1:8765
           }
+
+          # Brian's Pebble Index app, served by the pi-memes node on the tailnet.
+          # handle_path strips the /memes prefix so the app can serve from its own root.
+          handle_path /padre* {
+            reverse_proxy pi-memes:8091
+          }
         '';
 
 
