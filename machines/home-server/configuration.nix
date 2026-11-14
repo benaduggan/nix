@@ -6,6 +6,11 @@
 
 let
   obsidianVaultDir = "/home/${common.username}/syncthing/obsidian/mindmap";
+  obsidianMcpImage = "ghcr.io/es617/obsidian-sync-mcp:v0.9.0";
+  vaultUserCfg = config.users.users.${common.username};
+  vaultUid = if vaultUserCfg.uid == null then 1000 else vaultUserCfg.uid;
+  vaultGid = config.users.groups.${vaultUserCfg.group}.gid;
+  vaultUidGid = "${toString vaultUid}:${toString vaultGid}";
 in
 {
   imports =
@@ -341,11 +346,12 @@ in
     # http://127.0.0.1:8788/mcp for the authoring integration.
     containers.obsidian-mcp-read = {
       # https://github.com/es617/obsidian-sync-mcp
-      image = "ghcr.io/es617/obsidian-sync-mcp:v0.9.0";
+      image = obsidianMcpImage;
       volumes = [
         "obsidian-mcp-read:/data"
         "${obsidianVaultDir}:/vault:ro"
       ];
+      user = vaultUidGid;
       environment = {
         DATA_DIR = "/data";
         VAULT_PATH = "/vault";
@@ -365,12 +371,12 @@ in
     };
 
     containers.obsidian-mcp-author = {
-      # See obsidian-mcp-read above. Keep both instances on the same version.
-      image = "ghcr.io/es617/obsidian-sync-mcp:v0.9.0";
+      image = obsidianMcpImage;
       volumes = [
         "obsidian-mcp-author:/data"
         "${obsidianVaultDir}:/vault"
       ];
+      user = vaultUidGid;
       environment = {
         DATA_DIR = "/data";
         VAULT_PATH = "/vault";
