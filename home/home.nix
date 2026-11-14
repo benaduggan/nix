@@ -93,6 +93,7 @@ in
           dos2unix
           file
           gawk
+          gh
           gnumake
           gnugrep
           gnused
