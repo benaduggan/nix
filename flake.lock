@@ -672,11 +672,11 @@
     },
     "nixpkgs-beast": {
       "locked": {
-        "lastModified": 1784497964,
-        "narHash": "sha256-WhdsTtaih3DgTPP/PX023b36UNQyMzEoi6GkPyGx0y4=",
-        "rev": "241313f4e8e508cb9b13278c2b0fa25b9ca27163",
+        "lastModified": 1794386569,
+        "narHash": "sha256-W60urNAgQVS8bhNWH0bQsYoiagds8m38oTDUjEOM9FE=",
+        "rev": "d4f25a3e562008648d45bcf2d70bcc7422cad84e",
         "type": "tarball",
-        "url": "https://releases.nixos.org/nixos/unstable/nixos-26.11pre1037713.241313f4e8e5/nixexprs.tar.xz"
+        "url": "https://releases.nixos.org/nixos/unstable/nixos-26.11pre1117658.d4f25a3e5620/nixexprs.tar.zst"
       },
       "original": {
         "id": "nixpkgs",
@@ -1057,11 +1057,11 @@
     "strata": {
       "flake": false,
       "locked": {
-        "lastModified": 1794239753,
-        "narHash": "sha256-AP6j9BXBpzYkRkH34KWUhDVqTNtLwbF9fF1nkB2aeRE=",
+        "lastModified": 1794464318,
+        "narHash": "sha256-50Z0ks2k6f+UsSJwOq528l4eIUnh+12/PH/KU+5sR0Y=",
         "owner": "Niko1221",
         "repo": "Strata",
-        "rev": "504b143342a9fe1aa8320a7b31e11f5c0ac265c3",
+        "rev": "13eedf552417a6a791a7d13c6597e24300ee3a09",
         "type": "github"
       },
       "original": {
