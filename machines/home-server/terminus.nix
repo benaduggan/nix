@@ -37,7 +37,6 @@ in
       environmentFiles = [ config.age.secrets.terminus.path ];
       volumes = appVolumes;
       extraOptions = [ "--network=host" "--init" ];
-      restartPolicy = "unless-stopped";
     };
 
     terminus-worker = {
@@ -47,7 +46,6 @@ in
       environmentFiles = [ config.age.secrets.terminus.path ];
       volumes = appVolumes;
       extraOptions = [ "--network=host" "--init" ];
-      restartPolicy = "unless-stopped";
     };
 
     terminus-db = {
@@ -62,21 +60,23 @@ in
       cmd = [ "-p" (toString dbPort) "-c" "listen_addresses=127.0.0.1" ];
       volumes = [ "terminus-db-data:/var/lib/postgresql" ];
       extraOptions = [ "--network=host" ];
-      restartPolicy = "unless-stopped";
     };
 
     terminus-kv = {
       image = "valkey/valkey:9.1-alpine";
       cmd = [
         "valkey-server"
-        "--port" (toString kvPort)
-        "--bind" "127.0.0.1"
-        "--maxmemory" "256mb"
-        "--maxmemory-policy" "noeviction"
+        "--port"
+        (toString kvPort)
+        "--bind"
+        "127.0.0.1"
+        "--maxmemory"
+        "256mb"
+        "--maxmemory-policy"
+        "noeviction"
       ];
       volumes = [ "terminus-kv-data:/data" ];
       extraOptions = [ "--network=host" ];
-      restartPolicy = "unless-stopped";
     };
   };
 }
