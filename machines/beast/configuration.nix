@@ -24,7 +24,7 @@ in
       ./hardware-configuration.nix
       ../../modules/audiobookshelf.nix
       ../../modules/calibre-web.nix
-      ../../modules/strata/module.nix
+      ../../modules/strata.nix
     ];
 
   nix.settings = common.nixSettings;
