@@ -24,7 +24,7 @@ in
       ./hardware-configuration.nix
       ../../modules/audiobookshelf.nix
       ../../modules/calibre-web.nix
-      ../../modules/strata/module.nix
+      ../../modules/strata.nix
     ];
 
   nix.settings = common.nixSettings;
@@ -209,10 +209,7 @@ in
 
   services.sunshine = {
     enable = true;
-    package = nixpkgs-beast-pkgs.sunshine.override {
-      cudaSupport = true;
-      inherit (nixpkgs-beast-pkgs) cudaPackages;
-    };
+    package = nixpkgs-beast-pkgs.sunshine;
     autoStart = false;
     capSysAdmin = true; # only needed for Wayland -- omit this when using with Xorg
     openFirewall = true;

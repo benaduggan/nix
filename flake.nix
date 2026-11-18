@@ -48,21 +48,6 @@
 
     # Separate nixpkgs for beast's NVIDIA/CUDA deps (updated independently)
     nixpkgs-beast.url = "nixpkgs/nixos-unstable";
-
-    # Strata: local Qwen3.8-Flash-Next inference (modules/strata/). Tracks a branch, so it is
-    # bumped in the updates-beast CI job next to nixpkgs-beast, not in the all-inputs one
-    # (see .github/workflows/updates.yml).
-    strata = {
-      url = "github:Niko1221/Strata/main";
-      flake = false;
-    };
-    llama-pinned = {
-      # The ggml commit Strata pins in its third_party/ggml/VERSION.txt; packages.nix throws
-      # at eval time when the two disagree. That file is a rev, not something a flake can
-      # follow, so when strata moves this URL has to be re-pointed by hand to the rev in it.
-      url = "github:ggml-org/llama.cpp/3cf03257f219afbe7334045ff7c6a06ac68c627d";
-      flake = false;
-    };
   };
 
   # deadnix: skip
@@ -93,6 +78,20 @@
           allowUnfree = true;
           cudaCapabilities = [ "8.6" ];
         };
+        overlays = [
+          (final: prev:
+            let
+              strata = inputs.jacobi.legacyPackages.x86_64-linux.strata.ampere;
+            in
+            {
+              sunshine = prev.sunshine.override {
+                cudaSupport = true;
+                inherit (final) cudaPackages;
+              };
+              inherit strata;
+              strata-engine = strata.engine;
+            })
+        ];
       };
 
     in
@@ -107,6 +106,14 @@
             x86_64-darwin = (self.darwinConfigurations.us-mbp-benduggan.override { system = "x86_64-darwin"; }).system;
             aarch64-darwin = self.darwinConfigurations.us-mbp-benduggan.system;
           }.${system};
+          # Everything except `beast`, for the general CI build job.
+          general = {
+            x86_64-linux = pkgs.linkFarmFromDrvs "build" (attrValues (mapAttrs (_: value: value.config.system.build.toplevel) (builtins.removeAttrs self.nixosConfigurations [ "beast" ])));
+            x86_64-darwin = (self.darwinConfigurations.us-mbp-benduggan.override { system = "x86_64-darwin"; }).system;
+            aarch64-darwin = self.darwinConfigurations.us-mbp-benduggan.system;
+          }.${system};
+        } // optionalAttrs (system == "x86_64-linux") {
+          beast = self.nixosConfigurations.beast.config.system.build.toplevel;
         }
       );
 
@@ -189,7 +196,7 @@
         in
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          specialArgs = { nixpkgs-beast-pkgs = beastPkgs; inherit inputs; };
+          specialArgs = { nixpkgs-beast-pkgs = beastPkgs; };
           modules = [
             common
             caBlacklistModule

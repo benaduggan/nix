@@ -1,61 +1,90 @@
 # services.strata: local OpenAI/Anthropic-compatible API for Qwen3.8-Flash-Next (125B MoE),
-# pinned for beast (RTX 3090, sm_86).
+# using jacobi's `strata.ampere` package (cached in https://cache.g7c.us for sm_86 / RTX 3090).
 #
-# strata-prefetch regenerates <stateDir>/config.json on every start from these options, so
-# web UI /config edits are overwritten and the UI's "update & restart" (which picks a random
-# port) will conflict with the unit's --port. --host and --port are passed directly to strata-serve.
-{ pkgs, config, lib, inputs, nixpkgs-beast-pkgs, ... }:
+# strata-prepare regenerates <stateDir>/strata-<tag>.json on start, and preStart layers
+# extraEngineArgs, sampling, mcpServers, and apiKeyFile into <stateDir>/config.json.
+{ pkgs, config, lib, nixpkgs-beast-pkgs, ... }:
 let
   cfg = config.services.strata;
+  pkg = nixpkgs-beast-pkgs.strata;
 
-  # Built against nixpkgs-beast-pkgs so cudart matches beast's NVIDIA driver.
-  strataPkgs = import ./packages.nix {
-    pkgs = nixpkgs-beast-pkgs;
-    src = inputs.strata;
-    llamaSrc = inputs.llama-pinned;
-  };
-  pkg = strataPkgs.strata;
+  familyTag = {
+    qwen = "";
+    swift = "swift-";
+    abliterated = "abliterated-";
+    coder = "coder-";
+  }.${cfg.family};
+  tag = "${familyTag}${cfg.model}";
+  preparedConfig = "${cfg.stateDir}/strata-${lib.toLower tag}.json";
+  runConfig = "${cfg.stateDir}/config.json";
 
-  prefetchArgs = [
+  prepareArgs = [
+    "--yes"
     "--family"
     cfg.family
     "--model"
     cfg.model
     "--context"
     (toString cfg.context)
-    "--data-dir"
-    cfg.stateDir
-    "--emit-config"
-    "${cfg.stateDir}/config.json"
-    "--engine"
-    "${pkg.passthru.engine}/bin/strata"
     "--host"
     cfg.host
     "--port"
     (toString cfg.port)
-  ]
-  ++ lib.optionals (cfg.sampling != { }) [
-    "--sampling-json"
-    (pkgs.writeText "strata-sampling.json" (builtins.toJSON cfg.sampling))
-  ]
-  ++ lib.optionals (cfg.mcpServers != { }) [
-    "--mcp-json"
-    (pkgs.writeText "strata-mcp.json" (builtins.toJSON cfg.mcpServers))
+    "--no-browser"
+    "--data-dir"
+    (toString cfg.stateDir)
   ]
   ++ lib.optionals (cfg.gpu != null) [ "--gpu" cfg.gpu ]
   ++ lib.optionals (cfg.lowRam != null) [ "--low-ram" cfg.lowRam ]
-  ++ lib.optionals (cfg.ggufDir != null) [ "--gguf-dir" (toString cfg.ggufDir) ]
-  # Read via systemd credentials so keys never appear in `ps` or the Nix store.
-  ++ lib.optionals (cfg.apiKeyFile != null) [
-    "--api-key-file"
-    "/run/credentials/strata.service/api-key"
-  ]
-  ++ lib.optionals (cfg.hfTokenFile != null) [
-    "--hf-token-file"
-    "/run/credentials/strata.service/hf-token"
-  ]
-  # Use = because engine flags start with "--" and argparse would misparse "--extra-arg --kv".
-  ++ map (x: "--extra-arg=${x}") cfg.extraEngineArgs;
+  ++ lib.optionals (cfg.ggufDir != null) [ "--gguf-dir" (toString cfg.ggufDir) ];
+
+  patchConfigScript = pkgs.writeText "strata-patch-config.py" ''
+    import json
+    import os
+    import shlex
+    import stat
+    import sys
+    from pathlib import Path
+
+    src_path = Path(sys.argv[1])
+    dst_path = Path(sys.argv[2])
+    cfg = json.loads(src_path.read_text(encoding="utf-8-sig"))
+
+    extra_raw = ${builtins.toJSON cfg.extraEngineArgs}
+    extra = [tok for item in extra_raw for tok in shlex.split(item)]
+    override_flags = {
+        extra[i]
+        for i in range(len(extra) - 1)
+        if extra[i].startswith("--") and not extra[i + 1].startswith("--")
+    }
+    cleaned = []
+    skip = False
+    base_args = cfg.get("args", [])
+    for i, tok in enumerate(base_args):
+        if skip:
+            skip = False
+            continue
+        if tok in override_flags and i + 1 < len(base_args) and not base_args[i + 1].startswith("--"):
+            skip = True
+            continue
+        cleaned.append(tok)
+    cfg["args"] = cleaned + extra
+
+    sampling = ${builtins.toJSON cfg.sampling}
+    if sampling:
+        cfg["sampling"] = sampling
+
+    mcp_servers = ${builtins.toJSON cfg.mcpServers}
+    if mcp_servers:
+        cfg["mcp_servers"] = mcp_servers
+
+    api_key_cred = Path("/run/credentials/strata.service/api-key")
+    if ${if cfg.apiKeyFile != null then "True" else "False"} and api_key_cred.is_file():
+        cfg["api_key"] = api_key_cred.read_text(encoding="utf-8").strip()
+
+    dst_path.write_text(json.dumps(cfg, indent=2) + "\n", encoding="utf-8")
+    os.chmod(dst_path, stat.S_IRUSR | stat.S_IWUSR)
+  '';
 in
 {
   options.services.strata = {
@@ -77,7 +106,7 @@ in
       description = ''
         Quantization size: Q2_0 (fastest), IQ2_XS (recommended), IQ3_XXS (better, slower),
         IQ3_S (best, qwen only, ~62 GB RAM), IQ1_M (coder only, ~32 GB RAM).
-        strata-prefetch refuses a quant the family does not publish.
+        strata-prepare refuses a quant the family does not publish.
       '';
     };
 
@@ -86,7 +115,7 @@ in
       default = 32768;
       description = ''
         Context window in tokens. From 64K on, the KV cache streams from RAM.
-        Past 262144 (the trained length) strata-prefetch turns yarn on by itself
+        Past 262144 (the trained length) strata-prepare turns yarn on by itself
         and derives the factor; extraEngineArgs can override.
       '';
     };
@@ -108,7 +137,7 @@ in
       default = "0.0.0.0";
       description = ''
         Listen address: `127.0.0.1` this machine only, `0.0.0.0` also the LAN/tailnet,
-        `::` all IPv6 interfaces. Passed to strata-serve as `--host` and written into
+        `::` all IPv6 interfaces. Passed to `strata serve` as `--host` and written into
         config.json, so the two cannot disagree. Non-loopback without apiKeyFile warns.
       '';
     };
@@ -117,7 +146,7 @@ in
       type = lib.types.port;
       default = 8015;
       description = ''
-        TCP port, passed as `--port` (strata-serve has no way to take it from config.json).
+        TCP port, passed to `strata serve` as `--port` and written into config.json.
         8015 is the port services.llama-cpp is configured with here too; that service stays
         off while strata is on, so one of the two holds it.
       '';
@@ -158,9 +187,9 @@ in
     };
 
     lowRam = lib.mkOption {
-      type = lib.types.nullOr (lib.types.enum [ "on" "off" ]);
+      type = lib.types.nullOr (lib.types.enum [ "auto" "on" "off" "resident" "mmap" ]);
       default = null;
-      description = "Force mmap experts (`on`/`off`), or null for auto based on system RAM.";
+      description = "Low-RAM expert mode (`auto`/`on`/`off`/`resident`/`mmap`), or null for strata-prepare's default.";
     };
 
     ggufDir = lib.mkOption {
@@ -181,10 +210,10 @@ in
       description = ''
         Extra arguments appended to the engine command line, e.g. `[ "--kv q4_0" "--prompt-cache-spread" ]`.
         Each item is split into argv tokens with shell quoting rules, so a flag and its value
-        may sit in one item or in two. They go after the generated arguments, and for a flag
-        the engine takes once the last one it reads wins, so this is how a machine overrides
-        something strata-prefetch picked for it. An unknown flag is an engine that does not
-        start: check `strata --help` of the pinned version before adding one.
+        may sit in one item or in two. They go after the generated arguments (replacing any matching
+        single-value flag from strata-prepare), so this is how a machine overrides something
+        strata-prepare picked for it. An unknown flag is an engine that does not start: check
+        `strata-engine --help` of the pinned version before adding one.
       '';
     };
   };
@@ -226,7 +255,13 @@ in
       wantedBy = [ "multi-user.target" ];
       wants = [ "network-online.target" ];
       after = [ "network-online.target" ];
-      path = [ pkg ];
+      path = [ pkg config.hardware.nvidia.package ];
+
+      environment = {
+        HOME = toString cfg.stateDir;
+        STRATA_INSTALL_DIR = toString cfg.stateDir;
+        PYTHONUNBUFFERED = "1";
+      };
 
       # Bound retries so a broken config fails instead of looping forever with TimeoutStartSec=0.
       unitConfig = {
@@ -234,13 +269,34 @@ in
         StartLimitBurst = 5;
       };
 
-      preStart = "exec ${pkg}/bin/strata-prefetch ${lib.escapeShellArgs prefetchArgs}";
+      preStart = ''
+        set -euo pipefail
+        ${lib.optionalString (cfg.hfTokenFile != null) ''
+          if [[ -f /run/credentials/strata.service/hf-token ]]; then
+            export HF_TOKEN="$(< /run/credentials/strata.service/hf-token)"
+          fi
+        ''}
+        # Migrate any flat <stateDir>/models/*.gguf shards from the older prefetch layout
+        # into <stateDir>/models/<tag>/ so strata-prepare reuses them without re-downloading.
+        shopt -s nullglob
+        flat_shards=(${lib.escapeShellArg "${cfg.stateDir}/models"}/*.gguf)
+        if (( ''${#flat_shards[@]} > 0 )); then
+          mkdir -p ${lib.escapeShellArg "${cfg.stateDir}/models/${tag}"}
+          for f in "''${flat_shards[@]}"; do
+            mv -n "$f" ${lib.escapeShellArg "${cfg.stateDir}/models/${tag}/"}
+            [[ -f "$f.done" ]] && mv -n "$f.done" ${lib.escapeShellArg "${cfg.stateDir}/models/${tag}/"} || true
+          done
+        fi
+        ${pkg}/bin/strata-prepare ${lib.escapeShellArgs prepareArgs}
+        ${pkgs.python3}/bin/python3 ${patchConfigScript} ${lib.escapeShellArg preparedConfig} ${lib.escapeShellArg runConfig}
+      '';
 
       serviceConfig = {
         Type = "simple";
         User = "strata";
         Group = "strata";
         TimeoutStartSec = "0"; # First start downloads ~70 GB and builds the pack
+        LimitMEMLOCK = "infinity";
         WorkingDirectory = cfg.stateDir;
         UMask = "0077";
         Restart = "on-failure";
@@ -249,11 +305,10 @@ in
           lib.optional (cfg.apiKeyFile != null) "api-key:${cfg.apiKeyFile}"
           ++ lib.optional (cfg.hfTokenFile != null) "hf-token:${cfg.hfTokenFile}";
         ExecStart = lib.escapeShellArgs [
-          "${pkg}/bin/strata-serve"
-          "--engine"
-          "strata"
+          "${pkg}/bin/strata"
+          "serve"
           "--config"
-          "${cfg.stateDir}/config.json"
+          runConfig
           "--host"
           cfg.host
           "--port"
