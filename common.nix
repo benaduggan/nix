@@ -43,6 +43,7 @@ in
       prometheus = 2343;
       loki = 3100;
       home-assistant = 8123;
+      terminus = 2300;
       prometheus_node_exporter = 9002;
       alloy = 12345;
     };
