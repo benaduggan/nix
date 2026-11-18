@@ -8,9 +8,6 @@ let
   webPort = common.ports.terminus;
   dbPort = 5433; # host postgres already owns 5432
   kvPort = 6379;
-  # Must EXACTLY match the host the Kindles dial in the TRMNL captive-portal setup.
-  # trmnl.digdug.dev is the Caddy front-end on digdugdev (tailscale) that
-  # reverse-proxies here; both Kindles pair into this one endpoint.
   apiUri = "https://trmnl.digdug.dev";
   appEnv = {
     HANAMI_PORT = toString webPort;

@@ -334,7 +334,6 @@ in
             to home-server-1:4788
           }
         '';
-        # TRMNL Terminus BYOS (jailbroken Kindles; one endpoint, devices pair into it)
         "trmnl.digdug.dev".extraConfig = ''
           reverse_proxy * {
             to home-server-1:2300
