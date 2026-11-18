@@ -66,13 +66,14 @@ in
             firefox
             discord
             spotify
-            ungoogled-chromium
           ])
 
           (optList isLinux [
             binutils
             ncdu
             figlet
+            ungoogled-chromium
+            ffmpeg
           ])
 
           (optList isDarwin [
