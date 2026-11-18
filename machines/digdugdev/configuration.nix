@@ -334,6 +334,17 @@ in
             to home-server-1:4788
           }
         '';
+        # TRMNL Terminus BYOS (jailbroken Kindles; both front the same backend)
+        "trmnl1.digdug.dev".extraConfig = ''
+          reverse_proxy * {
+            to home-server-1:2300
+          }
+        '';
+        "trmnl2.digdug.dev".extraConfig = ''
+          reverse_proxy * {
+            to home-server-1:2300
+          }
+        '';
         "pebble.digdug.dev".extraConfig = ''
           @transcript path /transcript
           handle @transcript {
