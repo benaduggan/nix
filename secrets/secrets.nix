@@ -27,4 +27,7 @@ in
   # Pebble Index webhook and local Hermes webhook adapter
   "pebble-webhook-secret.age".publicKeys = constants.authorizedKeys;
   "hermes-webhook-secret.age".publicKeys = constants.authorizedKeys;
+
+  # TRMNL Terminus app env (APP_SECRET, POSTGRES_PASSWORD, DATABASE_URL, KEYVALUE_URL)
+  "terminus.age".publicKeys = constants.authorizedKeys;
 }

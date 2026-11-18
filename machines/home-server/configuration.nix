@@ -19,6 +19,7 @@ in
       ./hardware-configuration.nix
       ../../modules/vaultwarden-replication.nix
       ./pebble-shim.nix
+      ./terminus.nix
     ];
 
   nix.settings = common.nixSettings;
