@@ -93,6 +93,24 @@
           allowUnfree = true;
           cudaCapabilities = [ "8.6" ];
         };
+        overlays = [
+          (final: prev:
+            let
+              strataPkgs = import ./modules/strata/packages.nix {
+                pkgs = final;
+                src = inputs.strata;
+                llamaSrc = inputs.llama-pinned;
+              };
+            in
+            {
+              sunshine = prev.sunshine.override {
+                cudaSupport = true;
+                inherit (final) cudaPackages;
+              };
+              inherit (strataPkgs) strata;
+              strata-engine = strataPkgs.strata.passthru.engine;
+            })
+        ];
       };
 
     in
@@ -107,6 +125,14 @@
             x86_64-darwin = (self.darwinConfigurations.us-mbp-benduggan.override { system = "x86_64-darwin"; }).system;
             aarch64-darwin = self.darwinConfigurations.us-mbp-benduggan.system;
           }.${system};
+          # Everything except `beast`, for the general CI build job.
+          general = {
+            x86_64-linux = pkgs.linkFarmFromDrvs "build" (attrValues (mapAttrs (_: value: value.config.system.build.toplevel) (builtins.removeAttrs self.nixosConfigurations [ "beast" ])));
+            x86_64-darwin = (self.darwinConfigurations.us-mbp-benduggan.override { system = "x86_64-darwin"; }).system;
+            aarch64-darwin = self.darwinConfigurations.us-mbp-benduggan.system;
+          }.${system};
+        } // optionalAttrs (system == "x86_64-linux") {
+          beast = self.nixosConfigurations.beast.config.system.build.toplevel;
         }
       );
 

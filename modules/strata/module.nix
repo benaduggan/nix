@@ -4,17 +4,12 @@
 # strata-prefetch regenerates <stateDir>/config.json on every start from these options, so
 # web UI /config edits are overwritten and the UI's "update & restart" (which picks a random
 # port) will conflict with the unit's --port. --host and --port are passed directly to strata-serve.
-{ pkgs, config, lib, inputs, nixpkgs-beast-pkgs, ... }:
+{ pkgs, config, lib, nixpkgs-beast-pkgs, ... }:
 let
   cfg = config.services.strata;
 
-  # Built against nixpkgs-beast-pkgs so cudart matches beast's NVIDIA driver.
-  strataPkgs = import ./packages.nix {
-    pkgs = nixpkgs-beast-pkgs;
-    src = inputs.strata;
-    llamaSrc = inputs.llama-pinned;
-  };
-  pkg = strataPkgs.strata;
+  # Built against nixpkgs-beast-pkgs (overlay in flake.nix) so cudart matches beast's NVIDIA driver.
+  pkg = nixpkgs-beast-pkgs.strata;
 
   prefetchArgs = [
     "--family"

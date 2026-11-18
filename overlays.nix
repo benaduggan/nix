@@ -45,8 +45,8 @@ with builtins; [
         chromium = chromium.browser;
       };
       requiredSubstitutes-beast = optionalAttrs stdenv.hostPlatform.isLinux {
-        inherit (beastPkgs) cudatoolkit sunshine strata-engine;
-        inherit (beastPkgs.cudaPackages) cudnn cuda_cudart;
+        inherit (beastPkgs) sunshine strata-engine;
+        inherit (beastPkgs.cudaPackages) cudatoolkit cudnn cuda_cudart;
       };
     })
 ]
