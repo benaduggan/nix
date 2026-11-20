@@ -18,6 +18,7 @@ _:
       unbind %
 
       set-option -g mouse on
+      set -g allow-passthrough on
       set -g default-terminal "xterm-256color"
       set-window-option -q -g utf8 on
     '';

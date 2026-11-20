@@ -28,6 +28,7 @@ in
         bash-completion
         coreutils-full
         curl
+        jetmux
         jnv
         jq
         lsof
@@ -61,6 +62,9 @@ in
         ])
 
         (optList (!isMinimal) [
+          (optList isGraphical [
+            jet-terminal
+          ])
           (optList (isLinux && isGraphical) [
             vlc
             firefox
