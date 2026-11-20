@@ -58,6 +58,7 @@
       inherit (nixpkgs.lib) mapAttrs attrValues optionalAttrs singleton;
       caBlacklistModule = ./modules/ca-blacklist.nix;
       vscodeServerFix = import ./modules/vscode-server-fix.nix { inherit vscode-server; };
+      pkgsOverlayModule = { nixpkgs.overlays = [ self.overlays.pkgs ]; };
 
       # Configuration for `nixpkgs`
       nixpkgsConfig = {
@@ -103,13 +104,11 @@
         pkgs // {
           default = {
             x86_64-linux = pkgs.linkFarmFromDrvs "build" (attrValues (mapAttrs (_: value: value.config.system.build.toplevel) self.nixosConfigurations));
-            x86_64-darwin = (self.darwinConfigurations.us-mbp-benduggan.override { system = "x86_64-darwin"; }).system;
             aarch64-darwin = self.darwinConfigurations.us-mbp-benduggan.system;
           }.${system};
           # Everything except `beast`, for the general CI build job.
           general = {
             x86_64-linux = pkgs.linkFarmFromDrvs "build" (attrValues (mapAttrs (_: value: value.config.system.build.toplevel) (builtins.removeAttrs self.nixosConfigurations [ "beast" ])));
-            x86_64-darwin = (self.darwinConfigurations.us-mbp-benduggan.override { system = "x86_64-darwin"; }).system;
             aarch64-darwin = self.darwinConfigurations.us-mbp-benduggan.system;
           }.${system};
         } // optionalAttrs (system == "x86_64-linux") {
@@ -167,6 +166,7 @@
           modules = [
             common
             caBlacklistModule
+            pkgsOverlayModule
             ./modules/alloy.nix
             ./modules/node-exporter.nix
             ./machines/framework/configuration.nix
@@ -200,6 +200,7 @@
           modules = [
             common
             caBlacklistModule
+            pkgsOverlayModule
             ./modules/alloy.nix
             ./modules/node-exporter.nix
             ./machines/beast/configuration.nix
@@ -232,6 +233,7 @@
           modules = [
             common
             caBlacklistModule
+            pkgsOverlayModule
             agenix.nixosModules.default
             ./modules/alloy.nix
             ./modules/node-exporter.nix
@@ -272,6 +274,7 @@
           modules = [
             common
             caBlacklistModule
+            pkgsOverlayModule
             agenix.nixosModules.default
             ./modules/alloy.nix
             ./modules/node-exporter.nix
@@ -304,6 +307,7 @@
           modules = [
             common
             caBlacklistModule
+            pkgsOverlayModule
             agenix.nixosModules.default
             ./modules/alloy.nix
             ./modules/node-exporter.nix
@@ -336,6 +340,7 @@
           modules = [
             common
             caBlacklistModule
+            pkgsOverlayModule
             agenix.nixosModules.default
             ./modules/alloy.nix
             ./modules/node-exporter.nix
@@ -395,6 +400,7 @@
           modules = [
             common
             caBlacklistModule
+            pkgsOverlayModule
             agenix.nixosModules.default
             ./modules/alloy.nix
             ./modules/node-exporter.nix
@@ -428,6 +434,7 @@
       };
 
       overlays = {
+        pkgs = import ./pkgs;
         apple-silicon = _final: prev: optionalAttrs (prev.stdenv.hostPlatform.system == "aarch64-darwin") {
           # Useful on Macs with Apple Silicon
           # Adds access to x86 packages system is running Apple Silicon

@@ -57,6 +57,17 @@ in
       source /etc/profiles/per-user/${perUser}/share/bash-completion/completions/docker
       complete -F _docker d
 
+      # jet terminal OSC 7 (cwd) & OSC 1337 status bar variables
+      source ${./scripts/jet-status.bash}
+      if [ -n "''${STARSHIP_SHELL:-}" ] || command -v starship >/dev/null 2>&1; then
+        starship_precmd_user_func="__jet_status"
+      else
+        case "''${PROMPT_COMMAND:-}" in
+          *__jet_status*) ;;
+          *) PROMPT_COMMAND="__jet_status''${PROMPT_COMMAND:+;$PROMPT_COMMAND}" ;;
+        esac
+      fi
+
       gu() {
         MSG="guh"
         if [ $# -gt 0 ] ; then

@@ -1,0 +1,29 @@
+name: update-pkgs
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+jobs:
+  update-pkgs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+      - run: nix run .#update-pkgs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: peter-evans/create-pull-request@v8.1.3
+        id: cpr
+        with:
+          author: Ben Duggan <benaduggan@gmail.com>
+          title: "Update custom packages"
+          commit-message: "Update custom packages"
+          branch: updates-pkgs
+          delete-branch: true
+          token: ${{ secrets.PAT }}
+      - if: steps.cpr.outputs.pull-request-number
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          token: ${{ secrets.PAT }}
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: squash

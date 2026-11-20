@@ -3,7 +3,7 @@ _:
   programs.tmux = {
     enable = true;
     historyLimit = 500000;
-    shortcut = "j";
+    shortcut = "b";
     extraConfig = ''
       # ijkl arrow key style pane selection
       bind -n M-j select-pane -L
@@ -18,6 +18,7 @@ _:
       unbind %
 
       set-option -g mouse on
+      set -g allow-passthrough on
       set -g default-terminal "xterm-256color"
       set-window-option -q -g utf8 on
     '';
