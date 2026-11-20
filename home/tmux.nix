@@ -3,7 +3,7 @@ _:
   programs.tmux = {
     enable = true;
     historyLimit = 500000;
-    shortcut = "j";
+    shortcut = "b";
     extraConfig = ''
       # ijkl arrow key style pane selection
       bind -n M-j select-pane -L
