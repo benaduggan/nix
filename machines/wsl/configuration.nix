@@ -5,7 +5,7 @@
 # NixOS-WSL specific options are documented on the NixOS-WSL repository:
 # https://github.com/nix-community/NixOS-WSL
 
-{ config, common, lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
   cuda = pkgs.cudaPackages.cudatoolkit;
   CUDA_PATH = cuda.outPath;
@@ -22,7 +22,6 @@ let
     }";
 in
 {
-  nixpkgs.config.allowUnfree = true;
   wsl.enable = true;
   wsl.defaultUser = "nixos";
   users.users.nixos = {
@@ -32,7 +31,6 @@ in
   };
 
   programs.command-not-found.enable = false;
-  programs.nix-ld.enable = true;
 
   environment = {
     systemPackages = with pkgs; [
@@ -75,6 +73,4 @@ in
       package = config.boot.kernelPackages.nvidiaPackages.stable;
     };
   };
-
-  system.stateVersion = common.stateVersion;
 }
