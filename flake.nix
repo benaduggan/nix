@@ -127,6 +127,7 @@
             modules = [
               commonMbp
               caBlacklistModule
+              ./modules/openssh-darwin.nix
               "${self.inputs.jacobi}/hosts/modules/darwin/llama-server.nix"
               ./machines/paper/darwin-configuration.nix
               home-manager.darwinModules.home-manager
@@ -144,6 +145,7 @@
             modules = [
               commonMagic
               caBlacklistModule
+              ./modules/openssh-darwin.nix
               "${self.inputs.jacobi}/hosts/modules/darwin/llama-server.nix"
               ./machines/magic-mbp/darwin-configuration.nix
               home-manager.darwinModules.home-manager
@@ -169,6 +171,7 @@
             pkgsOverlayModule
             ./modules/alloy.nix
             ./modules/node-exporter.nix
+            ./modules/openssh.nix
             ./machines/framework/configuration.nix
             nixos-hardware.nixosModules.framework-11th-gen-intel
             vscode-server.nixosModule
@@ -203,6 +206,7 @@
             pkgsOverlayModule
             ./modules/alloy.nix
             ./modules/node-exporter.nix
+            ./modules/openssh.nix
             ./machines/beast/configuration.nix
             vscode-server.nixosModule
             vscodeServerFix
@@ -238,6 +242,7 @@
             "${self.inputs.jacobi}/hosts/modules/servers/hermes-agent.nix"
             ./modules/alloy.nix
             ./modules/node-exporter.nix
+            ./modules/openssh.nix
             ./machines/home-server/configuration.nix
             vscode-server.nixosModule
             vscodeServerFix
@@ -279,6 +284,7 @@
             agenix.nixosModules.default
             ./modules/alloy.nix
             ./modules/node-exporter.nix
+            ./modules/openssh.nix
             ./machines/desktop/configuration.nix
             vscode-server.nixosModule
             vscodeServerFix
@@ -312,6 +318,7 @@
             agenix.nixosModules.default
             ./modules/alloy.nix
             ./modules/node-exporter.nix
+            ./modules/openssh.nix
             ./machines/arden/configuration.nix
             vscode-server.nixosModule
             vscodeServerFix
@@ -345,6 +352,7 @@
             agenix.nixosModules.default
             ./modules/alloy.nix
             ./modules/node-exporter.nix
+            ./modules/openssh.nix
             ./machines/springfield/configuration.nix
             vscode-server.nixosModule
             vscodeServerFix
@@ -405,6 +413,7 @@
             agenix.nixosModules.default
             ./modules/alloy.nix
             ./modules/node-exporter.nix
+            ./modules/openssh.nix
             ./machines/digdugdev/configuration.nix
             home-manager.nixosModules.home-manager
             vscode-server.nixosModule
