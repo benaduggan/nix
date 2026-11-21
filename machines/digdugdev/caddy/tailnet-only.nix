@@ -10,12 +10,14 @@ let
     greenhouse = "${home}:7000";
   };
 
-  routeHandlers = lib.concatStringsSep "\n" (lib.mapAttrsToList (name: target: ''
-    @${name} host ${name}.ts.digdug.dev
-    handle @${name} {
-      reverse_proxy ${target}
-    }
-  '') routes);
+  routeHandlers = lib.concatStringsSep "\n" (lib.mapAttrsToList
+    (name: target: ''
+      @${name} host ${name}.ts.digdug.dev
+      handle @${name} {
+        reverse_proxy ${target}
+      }
+    '')
+    routes);
 in
 {
   # Tailnet-only wildcard (*.ts.digdug.dev -> 100.113.75.95 via DO DNS-01)

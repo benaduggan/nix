@@ -17,13 +17,15 @@ let
     "fisherrjd@gmail.com" = defaultRoles;
   };
 
-  userTransforms = lib.concatStringsSep "\n" (lib.mapAttrsToList (email: roles: ''
-    transform user {
-      match realm google
-      match email ${email}
-      ${lib.concatMapStringsSep "\n      " (role: "action add role ${role}") roles}
-    }
-  '') users);
+  userTransforms = lib.concatStringsSep "\n" (lib.mapAttrsToList
+    (email: roles: ''
+      transform user {
+        match realm google
+        match email ${email}
+        ${lib.concatMapStringsSep "\n      " (role: "action add role ${role}") roles}
+      }
+    '')
+    users);
 in
 {
   services.caddy = {
