@@ -23,8 +23,6 @@ in
       ./terminus.nix
     ];
 
-  nix.settings = common.nixSettings;
-  programs.nix-ld.enable = true;
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -33,39 +31,35 @@ in
   networking.hostName = "home-server"; # Define your hostname.
   networking.nameservers = [ "1.1.1.1" "1.0.0.1" ];
 
+  age.secrets = {
+    grafana.file = ../../secrets/grafana.age;
+    ondeck.file = ../../secrets/ondeck-vars.age;
 
-  age = {
-    identityPaths = [ "/home/bduggan/.ssh/id_ed25519" ];
-    secrets = {
-      grafana.file = ../../secrets/grafana.age;
-      ondeck.file = ../../secrets/ondeck-vars.age;
-
-      litellm = {
-        file = ../../secrets/litellm.age;
-        mode = "644";
-      };
-      openwebui = {
-        file = ../../secrets/openwebui.age;
-        mode = "644";
-      };
-      n8n = {
-        file = ../../secrets/n8n.age;
-        mode = "644";
-      };
-      executor = {
-        file = ../../secrets/executor.age;
-        mode = "644";
-      };
-      obsidianMcp = {
-        file = ../../secrets/obsidian-mcp.age;
-        mode = "400";
-        owner = "root";
-        group = "root";
-      };
-      homeRunnerToken = {
-        file = ../../secrets/home-self-runner.age;
-        mode = "644";
-      };
+    litellm = {
+      file = ../../secrets/litellm.age;
+      mode = "644";
+    };
+    openwebui = {
+      file = ../../secrets/openwebui.age;
+      mode = "644";
+    };
+    n8n = {
+      file = ../../secrets/n8n.age;
+      mode = "644";
+    };
+    executor = {
+      file = ../../secrets/executor.age;
+      mode = "644";
+    };
+    obsidianMcp = {
+      file = ../../secrets/obsidian-mcp.age;
+      mode = "400";
+      owner = "root";
+      group = "root";
+    };
+    homeRunnerToken = {
+      file = ../../secrets/home-self-runner.age;
+      mode = "644";
     };
   };
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -81,21 +75,6 @@ in
   # Set your time zone.
   time.timeZone = "America/Indiana/Indianapolis";
 
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
-  };
-
   # Enable the X11 windowing system.
   services.xserver.enable = false;
 
@@ -109,24 +88,7 @@ in
     xkb.variant = "";
   };
 
-  # Enable CUPS to print documents.
-  # services.printing.enable = true;
-
-  # Enable sound with pipewire.
-  services.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
-  };
+  services.pipewire.enable = true;
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
@@ -145,7 +107,6 @@ in
 
   services.displayManager.autoLogin.enable = true;
   services.displayManager.autoLogin.user = common.username;
-  nixpkgs.config.allowUnfree = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -154,11 +115,6 @@ in
   #   enable = true;
   #   enableSSHSupport = true;
   # };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
 
   systemd.tmpfiles.rules = [
     "d /home/${common.username}/syncthing/obsidian/mindmap/n8n-drop 0755 ${common.username} users -"
@@ -195,28 +151,7 @@ in
     };
   };
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
   networking.firewall.enable = false;
-
-
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = common.stateVersion;
-
-
-  # enable tailscale and use as exit node
-  services.tailscale.enable = true;
-  services.tailscale.useRoutingFeatures = "both";
-  boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
-  boot.kernel.sysctl."net.ipv4.conf.all.forwarding" = 1;
-  boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
 
   systemd.services = {
     # engineer-on-deck = {
@@ -414,7 +349,6 @@ in
     '';
   };
 
-  services.alloy.enable = true;
   services.alloy.lokiUrl = "http://localhost:${toString common.ports.loki}/loki/api/v1/push";
 
   systemd.services.grafana.serviceConfig.EnvironmentFile = config.age.secrets.grafana.path;
@@ -584,14 +518,7 @@ in
     };
   };
 
-  services._3proxy = {
-    enable = true;
-    services = [{
-      type = "socks";
-      bindPort = 1080;
-      auth = [ "none" ];
-    }];
-  };
+  services._3proxy.enable = true;
 
   services.github-runners = {
     nix-repo = {

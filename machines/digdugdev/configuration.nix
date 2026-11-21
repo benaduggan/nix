@@ -17,27 +17,18 @@ in
     '';
   };
 
-  nix.settings = common.nixSettings;
-
-  programs.nix-ld.enable = true;
-
-  boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
-
-  age = {
-    identityPaths = [ "/home/bduggan/.ssh/id_ed25519" ];
-    secrets = {
-      board = {
-        file = ../../secrets/board.age;
-        owner = "quote-board";
-        group = "quote-board";
-      };
-      caddy = {
-        file = ../../secrets/caddy.age;
-        path = "/etc/default/caddy";
-        owner = "root";
-        group = "root";
-        mode = "644";
-      };
+  age.secrets = {
+    board = {
+      file = ../../secrets/board.age;
+      owner = "quote-board";
+      group = "quote-board";
+    };
+    caddy = {
+      file = ../../secrets/caddy.age;
+      path = "/etc/default/caddy";
+      owner = "root";
+      group = "root";
+      mode = "644";
     };
   };
 
@@ -104,12 +95,7 @@ in
     enable = true;
     memoryPercent = 100;
   };
-  services = {
-    openssh.enable = true;
-    tailscale.enable = true;
-  };
 
-  system.stateVersion = common.stateVersion;
   programs.command-not-found.enable = false;
 
   # set this up after we get loki going.
@@ -250,6 +236,5 @@ in
     };
   };
 
-  services.alloy.enable = true;
   services.alloy.hostLabel = "digdugdev";
 }

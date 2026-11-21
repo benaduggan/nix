@@ -11,13 +11,14 @@
 #   hermes_podman pooka shell
 #   hermes_podman pooka logs -f hermes-agent-pooka
 #   hermes_podman pooka exec -it hermes-agent-pooka hermes chat
-{ common, ... }:
+{ common, inputs, ... }:
 let
   inherit (common) tailnetIp;
   pookaUid = 32001;
 in
 {
   imports = [
+    "${inputs.jacobi}/hosts/modules/servers/hermes-agent.nix"
     ./pooka.nix
     ./webhooks.nix
     ./webui.nix

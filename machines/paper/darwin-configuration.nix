@@ -1,75 +1,17 @@
-{ common, lib, pkgs, ... }:
+{ common, ... }:
 {
-
-  nix.settings = common.nixSettings // {
-    trusted-users = [ "benduggan" ];
-  };
-
-  documentation.enable = true;
-
-  # Use a custom configuration.nix location.
-  # how I currently build and switch the system:
-  # darwin-rebuild switch --flake ~/cfg/machines/paper/
-  environment.darwinConfig = "$HOME/cfg/machines/darwin-configuration.nix";
-
-
-  nix.extraOptions = ''
-    experimental-features = nix-command flakes
-  '' + lib.optionalString (pkgs.stdenv.hostPlatform.system == "aarch64-darwin") ''
-    extra-platforms = x86_64-darwin aarch64-darwin x86_64-linux
-  '';
-
-  programs.zsh.enable = true;
-  programs.bash.enable = true;
-  programs.bash.completion.enable = true;
-  programs.nix-index.enable = true;
-
   users.users.benduggan = {
     name = "benduggan";
     home = "/Users/benduggan";
     openssh.authorizedKeys.keys = common.authorizedKeys;
   };
 
-  # Used for backwards compatibility, please read the changelog before changing.
-  # $ darwin-rebuild changelog
-  system.stateVersion = common.darwinStateVersion;
   ids.gids.nixbld = 30000;
   system = {
     primaryUser = "benduggan";
-    defaults = {
-      NSGlobalDomain = {
-        InitialKeyRepeat = 5;
-        KeyRepeat = 5;
-        NSAutomaticCapitalizationEnabled = false;
-        NSAutomaticDashSubstitutionEnabled = false;
-        NSAutomaticPeriodSubstitutionEnabled = false;
-        NSAutomaticQuoteSubstitutionEnabled = false;
-        NSAutomaticSpellingCorrectionEnabled = false;
-        NSNavPanelExpandedStateForSaveMode = true;
-        NSNavPanelExpandedStateForSaveMode2 = true;
-        _HIHideMenuBar = false;
-
-        "com.apple.keyboard.fnState" = true;
-      };
-
-      screencapture.location = "/tmp";
-      dock = {
-        autohide = true;
-        mru-spaces = false;
-        orientation = "bottom";
-        showhidden = true;
-      };
-
-      finder = {
-        AppleShowAllExtensions = true;
-        QuitMenuItem = true;
-        FXEnableExtensionChangeWarning = false;
-      };
-
-      trackpad = {
-        Clicking = true;
-        TrackpadThreeFingerDrag = true;
-      };
+    defaults.NSGlobalDomain = {
+      InitialKeyRepeat = 5;
+      KeyRepeat = 5;
     };
   };
 

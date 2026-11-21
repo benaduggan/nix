@@ -50,28 +50,11 @@
     nixpkgs-beast.url = "nixpkgs/nixos-unstable";
   };
 
-  # deadnix: skip
-  outputs = inputs@{ self, agenix, nixpkgs, nixpkgs-pascal-cuda, nixpkgs-beast, nix-darwin, home-manager, kwbauson, jacobi, nixos-hardware, vscode-server, nixos-generators, nixos-wsl, ... }:
+  outputs = inputs@{ self, nixpkgs, nixpkgs-beast, nix-darwin, nixos-generators, ... }:
     let
       inherit (nixpkgs) lib;
       inherit (nix-darwin.lib) darwinSystem;
-      inherit (nixpkgs.lib) mapAttrs attrValues optionalAttrs singleton;
-      caBlacklistModule = ./modules/ca-blacklist.nix;
-      vscodeServerFix = import ./modules/vscode-server-fix.nix { inherit vscode-server; };
-      pkgsOverlayModule = { nixpkgs.overlays = [ self.overlays.pkgs ]; };
-
-      # Configuration for `nixpkgs`
-      nixpkgsConfig = {
-        config = { allowUnfree = true; };
-        overlays = attrValues self.overlays ++ singleton (
-          # Sub in x86 version of packages that don't build on Apple Silicon yet
-          # These might get updated, when that happens, just remove them from that list
-          final: prev: (optionalAttrs (prev.stdenv.hostPlatform.system == "aarch64-darwin") {
-            inherit (final.pkgs-x86)
-              purescript;
-          })
-        ) ++ import ./overlays.nix { inherit beastPkgs; };
-      };
+      inherit (nixpkgs.lib) mapAttrs attrValues optionalAttrs;
 
       beastPkgs = import nixpkgs-beast {
         system = "x86_64-linux";
@@ -95,364 +78,171 @@
         ];
       };
 
+      mkDarwinHost = _name:
+        { dir
+        , machineName
+        , user
+        , system ? "aarch64-darwin"
+        , extraModules ? [ ]
+        }:
+        let
+          common = import ./common.nix {
+            inherit machineName inputs;
+            isGraphical = true;
+            isMinimal = false;
+          };
+        in
+        lib.makeOverridable darwinSystem {
+          inherit system;
+          specialArgs = { inherit inputs; };
+          modules = [
+            common
+            ./modules/darwin-base.nix
+            ./machines/${dir}/darwin-configuration.nix
+            {
+              home-manager.users.${user}.imports = [ common ./home ];
+            }
+          ] ++ extraModules;
+        };
+
+      mkNixosHost = _name:
+        { dir
+        , machineName
+        , isGraphical
+        , isMinimal
+        , system ? "x86_64-linux"
+        , user ? "bduggan"
+        , specialArgs ? { }
+        , extraModules ? [ ]
+        }:
+        let
+          common = import ./common.nix { inherit machineName isGraphical isMinimal inputs; };
+        in
+        nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = { inherit inputs; } // specialArgs;
+          modules = [
+            common
+            ./modules/nixos-base.nix
+            ./machines/${dir}/configuration.nix
+            {
+              home-manager.users.${user}.imports = [ common ./home ];
+            }
+          ] ++ extraModules;
+        };
+
     in
     {
       packages = lib.genAttrs lib.systems.flakeExposed (system:
         let
-          pkgs = import nixpkgs (nixpkgsConfig // { inherit system; });
+          pkgs = import nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+            overlays = [ self.overlays.default ];
+          };
+          mkNixosFarm = hosts:
+            pkgs.linkFarmFromDrvs "build" (attrValues (mapAttrs (_: value: value.config.system.build.toplevel) hosts));
         in
         pkgs // {
           default = {
-            x86_64-linux = pkgs.linkFarmFromDrvs "build" (attrValues (mapAttrs (_: value: value.config.system.build.toplevel) self.nixosConfigurations));
+            x86_64-linux = mkNixosFarm self.nixosConfigurations;
             aarch64-darwin = self.darwinConfigurations.us-mbp-benduggan.system;
           }.${system};
           # Everything except `beast`, for the general CI build job.
           general = {
-            x86_64-linux = pkgs.linkFarmFromDrvs "build" (attrValues (mapAttrs (_: value: value.config.system.build.toplevel) (builtins.removeAttrs self.nixosConfigurations [ "beast" ])));
+            x86_64-linux = mkNixosFarm (builtins.removeAttrs self.nixosConfigurations [ "beast" ]);
             aarch64-darwin = self.darwinConfigurations.us-mbp-benduggan.system;
           }.${system};
         } // optionalAttrs (system == "x86_64-linux") {
           beast = self.nixosConfigurations.beast.config.system.build.toplevel;
+          requiredSubstitutes = {
+            inherit (pkgs) firefox-unwrapped ffmpeg-full;
+            chromium = pkgs.chromium.browser;
+          };
+          requiredSubstitutes-beast = {
+            inherit (beastPkgs) sunshine strata-engine;
+            inherit (beastPkgs.cudaPackages) cudatoolkit cudnn cuda_cudart;
+          };
         }
       );
 
-      darwinConfigurations =
-        let
-          commonMbp = import ./common.nix { machineName = "paper"; isGraphical = true; isMinimal = false; inherit inputs; };
-          commonMagic = import ./common.nix { machineName = "magicMbp"; isGraphical = true; isMinimal = false; inherit inputs; };
-        in
-        {
-          us-mbp-benduggan = lib.makeOverridable darwinSystem {
-            system = "aarch64-darwin";
-            modules = [
-              commonMbp
-              caBlacklistModule
-              ./modules/openssh-darwin.nix
-              "${self.inputs.jacobi}/hosts/modules/darwin/llama-server.nix"
-              ./machines/paper/darwin-configuration.nix
-              home-manager.darwinModules.home-manager
-              {
-                nixpkgs = nixpkgsConfig;
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.users.benduggan = { imports = [ commonMbp ./home ]; };
-              }
-            ];
-          };
-
-          magic-mbp = lib.makeOverridable darwinSystem {
-            system = "aarch64-darwin";
-            modules = [
-              commonMagic
-              caBlacklistModule
-              ./modules/openssh-darwin.nix
-              "${self.inputs.jacobi}/hosts/modules/darwin/llama-server.nix"
-              ./machines/magic-mbp/darwin-configuration.nix
-              home-manager.darwinModules.home-manager
-              {
-                nixpkgs = nixpkgsConfig;
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.users.bduggan = { imports = [ commonMagic ./home ]; };
-              }
-            ];
-          };
+      darwinConfigurations = mapAttrs mkDarwinHost {
+        us-mbp-benduggan = {
+          dir = "paper";
+          machineName = "paper";
+          user = "benduggan";
         };
-
-      nixosConfigurations.bduggan-framework =
-        let
-          common = import ./common.nix { machineName = "framework"; isGraphical = true; isMinimal = false; inherit inputs; };
-        in
-        nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            common
-            caBlacklistModule
-            pkgsOverlayModule
-            ./modules/alloy.nix
-            ./modules/node-exporter.nix
-            ./modules/openssh.nix
-            ./machines/framework/configuration.nix
-            nixos-hardware.nixosModules.framework-11th-gen-intel
-            vscode-server.nixosModule
-            vscodeServerFix
-            (_: {
-              services.vscode-server.enable = true;
-            })
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useUserPackages = true;
-              home-manager.useGlobalPkgs = true;
-              home-manager.users.bduggan = {
-                imports = [
-                  common
-                  ./home
-                ];
-              };
-            }
-          ];
+        magic-mbp = {
+          dir = "magic-mbp";
+          machineName = "magicMbp";
+          user = "bduggan";
         };
+      };
 
-      nixosConfigurations.beast =
-        let
-          common = import ./common.nix { machineName = "beast"; isGraphical = true; isMinimal = false; inherit inputs; };
-        in
-        nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
+      nixosConfigurations = mapAttrs mkNixosHost {
+        bduggan-framework = {
+          dir = "framework";
+          machineName = "framework";
+          isGraphical = true;
+          isMinimal = false;
+        };
+        beast = {
+          dir = "beast";
+          machineName = "beast";
+          isGraphical = true;
+          isMinimal = false;
           specialArgs = { nixpkgs-beast-pkgs = beastPkgs; };
-          modules = [
-            common
-            caBlacklistModule
-            pkgsOverlayModule
-            ./modules/alloy.nix
-            ./modules/node-exporter.nix
-            ./modules/openssh.nix
-            ./machines/beast/configuration.nix
-            vscode-server.nixosModule
-            vscodeServerFix
-            (_: {
-              services.vscode-server.enable = true;
-            })
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useUserPackages = true;
-              home-manager.useGlobalPkgs = true;
-              home-manager.users.bduggan = {
-                imports = [
-                  common
-                  ./home
-                ];
-              };
-            }
-          ];
         };
-
-
-      nixosConfigurations.home-server =
-        let
-          common = import ./common.nix { machineName = "homeServer"; isGraphical = false; isMinimal = false;  inherit inputs; };
-        in
-        nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            common
-            caBlacklistModule
-            pkgsOverlayModule
-            agenix.nixosModules.default
-            "${self.inputs.jacobi}/hosts/modules/servers/hermes-agent.nix"
-            ./modules/alloy.nix
-            ./modules/node-exporter.nix
-            ./modules/openssh.nix
-            ./machines/home-server/configuration.nix
-            vscode-server.nixosModule
-            vscodeServerFix
-            (_: {
-              services.vscode-server.enable = true;
-            })
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useUserPackages = true;
-              home-manager.useGlobalPkgs = true;
-              home-manager.users.bduggan = {
-                imports = [
-                  common
-                  ./home
-                ];
-              };
-            }
-          ];
+        home-server = {
+          dir = "home-server";
+          machineName = "homeServer";
+          isGraphical = false;
+          isMinimal = false;
         };
-
-      nixosConfigurations.bduggan-desktop =
-        let
-          common = import ./common.nix { machineName = "lake"; isGraphical = false; isMinimal = false;  inherit inputs; };
-          nixpkgs-pascal-cuda-meme = import nixpkgs-pascal-cuda {
-            system = "x86_64-linux";
-            config = {
-              allowUnfree = true;
-              cudaCapabilities = [ "6.1" ];
-            };
-          };
-        in
-        nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit nixpkgs-pascal-cuda-meme; };
-          modules = [
-            common
-            caBlacklistModule
-            pkgsOverlayModule
-            agenix.nixosModules.default
-            ./modules/alloy.nix
-            ./modules/node-exporter.nix
-            ./modules/openssh.nix
-            ./machines/desktop/configuration.nix
-            vscode-server.nixosModule
-            vscodeServerFix
-            (_: {
-              services.vscode-server.enable = true;
-            })
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useUserPackages = true;
-              home-manager.useGlobalPkgs = true;
-              home-manager.users.bduggan = {
-                imports = [
-                  common
-                  ./home
-                ];
-              };
-            }
-          ];
+        bduggan-desktop = {
+          dir = "desktop";
+          machineName = "lake";
+          isGraphical = false;
+          isMinimal = false;
         };
-
-      nixosConfigurations.arden =
-        let
-          common = import ./common.nix { machineName = "arden"; isGraphical = false; isMinimal = false;  inherit inputs; };
-        in
-        nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            common
-            caBlacklistModule
-            pkgsOverlayModule
-            agenix.nixosModules.default
-            ./modules/alloy.nix
-            ./modules/node-exporter.nix
-            ./modules/openssh.nix
-            ./machines/arden/configuration.nix
-            vscode-server.nixosModule
-            vscodeServerFix
-            (_: {
-              services.vscode-server.enable = true;
-            })
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useUserPackages = true;
-              home-manager.useGlobalPkgs = true;
-              home-manager.users.bduggan = {
-                imports = [
-                  common
-                  ./home
-                ];
-              };
-            }
-          ];
+        arden = {
+          dir = "arden";
+          machineName = "arden";
+          isGraphical = false;
+          isMinimal = false;
         };
-
-      nixosConfigurations.springfield =
-        let
-          common = import ./common.nix { machineName = "springfield"; isGraphical = false; isMinimal = false;  inherit inputs; };
-        in
-        nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            common
-            caBlacklistModule
-            pkgsOverlayModule
-            agenix.nixosModules.default
-            ./modules/alloy.nix
-            ./modules/node-exporter.nix
-            ./modules/openssh.nix
-            ./machines/springfield/configuration.nix
-            vscode-server.nixosModule
-            vscodeServerFix
-            (_: {
-              services.vscode-server.enable = true;
-            })
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useUserPackages = true;
-              home-manager.useGlobalPkgs = true;
-              home-manager.users.bduggan = {
-                imports = [
-                  common
-                  ./home
-                ];
-              };
-            }
-          ];
+        springfield = {
+          dir = "springfield";
+          machineName = "springfield";
+          isGraphical = false;
+          isMinimal = false;
         };
-
-      # nixosConfigurations.wsl =
-      #   let
-      #     common = import ./common.nix { machineName = "wsl"; isGraphical = false; isMinimal = true;  inherit inputs; };
-      #   in
-      #   nixpkgs.lib.nixosSystem {
-      #     system = "x86_64-linux";
-      #     specialArgs = { inherit inputs; };
-      #     modules = [
-      #       common
-      #       caBlacklistModule
-      #       nixos-wsl.nixosModules.wsl
-      #       ./machines/wsl/configuration.nix
-      #       home-manager.nixosModules.home-manager
-      #       {
-      #         home-manager.useUserPackages = true;
-      #         home-manager.useGlobalPkgs = true;
-      #         home-manager.users.nixos = {
-      #           imports = [
-      #             common
-      #             ./home
-      #           ];
-      #         };
-      #       }
-      #     ];
-      #   };
-
-      nixosConfigurations.digdugdev =
-        let
-          common = import ./common.nix { machineName = "digdugdev"; isGraphical = false; isMinimal = true;  inherit inputs; };
-        in
-        nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit inputs; };
-          modules = [
-            common
-            caBlacklistModule
-            pkgsOverlayModule
-            agenix.nixosModules.default
-            ./modules/alloy.nix
-            ./modules/node-exporter.nix
-            ./modules/openssh.nix
-            ./machines/digdugdev/configuration.nix
-            home-manager.nixosModules.home-manager
-            vscode-server.nixosModule
-            vscodeServerFix
-            (_: {
-              services.vscode-server.enable = true;
-            })
-            {
-              home-manager.useUserPackages = true;
-              home-manager.useGlobalPkgs = true;
-              home-manager.users.bduggan = {
-                imports = [
-                  common
-                  ./home
-                ];
-              };
-            }
-          ];
+        digdugdev = {
+          dir = "digdugdev";
+          machineName = "digdugdev";
+          isGraphical = false;
+          isMinimal = true;
         };
+        # wsl = {
+        #   dir = "wsl";
+        #   machineName = "wsl";
+        #   isGraphical = false;
+        #   isMinimal = true;
+        #   user = "nixos";
+        #   extraModules = [ inputs.nixos-wsl.nixosModules.wsl ];
+        # };
+      };
 
       do-builder = nixos-generators.nixosGenerate {
         system = "x86_64-linux";
         format = "do";
         modules = [
-          caBlacklistModule
           ./generators/do-builder/configuration.nix
         ];
       };
 
       overlays = {
-        pkgs = import ./pkgs;
-        apple-silicon = _final: prev: optionalAttrs (prev.stdenv.hostPlatform.system == "aarch64-darwin") {
-          # Useful on Macs with Apple Silicon
-          # Adds access to x86 packages system is running Apple Silicon
-          pkgs-x86 = import nixpkgs {
-            system = "x86_64-darwin";
-            inherit (nixpkgsConfig) config;
-          };
-        };
+        default = import ./pkgs;
       };
     };
 }
