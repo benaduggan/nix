@@ -235,6 +235,7 @@
             caBlacklistModule
             pkgsOverlayModule
             agenix.nixosModules.default
+            "${self.inputs.jacobi}/hosts/modules/servers/hermes-agent.nix"
             ./modules/alloy.nix
             ./modules/node-exporter.nix
             ./machines/home-server/configuration.nix

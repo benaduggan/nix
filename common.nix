@@ -6,7 +6,8 @@ let
 in
 {
   _module.args.common = {
-    inherit (constants) authorizedKeys authorizedKeysRec cacheSubstituters digdugdevKey trustedPublicKeys communitySubstituters communityTrustedPublicKeys;
+    inherit (constants) authorizedKeys authorizedKeysRec cacheSubstituters digdugdevKey tailscaleIp trustedPublicKeys communitySubstituters communityTrustedPublicKeys;
+    tailnetIp = constants.tailscaleIp.${machineName} or null;
     inherit (pkgs.stdenv.hostPlatform) isLinux isDarwin;
     inherit isGraphical;
     inherit isMinimal;

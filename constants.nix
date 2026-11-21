@@ -14,13 +14,24 @@ let
 
   authorizedKeys = builtins.attrValues authorizedKeysRec;
 
+  tailscaleIp = {
+    homeServer = "100.89.0.69";
+    arden = "100.105.21.57";
+    desktop = "100.108.141.38";
+    framework = "100.75.49.80";
+    beast = "100.82.226.111";
+    paper = "100.100.101.100";
+    magicMbp = "100.84.51.19";
+    digdugdev = "100.113.75.95";
+  };
+
   homeServerVaultwardenArchiveDir = "/etc/vault/backups";
   desktopVaultwardenArchiveDir = "/home/bduggan/standby-vault-backups";
   ardenVaultwardenArchiveDir = "/home/bduggan/vault-backups";
   frameworkVaultwardenArchiveDir = "/home/bduggan/vault-backups";
 in
 {
-  inherit authorizedKeys authorizedKeysRec;
+  inherit authorizedKeys authorizedKeysRec tailscaleIp;
   inherit homeServerVaultwardenArchiveDir desktopVaultwardenArchiveDir ardenVaultwardenArchiveDir frameworkVaultwardenArchiveDir;
 
   digdugdevKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMBXiUz//dlW7zcblPxQZqgcmZ5KziuhDnnIbuFmOvOw";

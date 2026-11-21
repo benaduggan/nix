@@ -18,6 +18,7 @@ in
       # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ../../modules/vaultwarden-replication.nix
+      ./hermes
       ./pebble-shim.nix
       ./terminus.nix
     ];
@@ -134,7 +135,7 @@ in
   users.users."${common.username}" = {
     isNormalUser = true;
     description = "Benjamin Duggan";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "podman" ];
     openssh.authorizedKeys.keys = common.authorizedKeys;
     packages = with pkgs; [
       #  firefox
@@ -272,11 +273,17 @@ in
     };
   };
 
-  # docker stuff
-  virtualisation.docker.enable = true;
-  users.extraGroups.docker.members = [ common.username ];
+  virtualisation.containers.registries.settings = {
+    unqualified-search-registries = [ "docker.io" ];
+  };
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
+    defaultNetwork.settings.dns_enabled = true;
+    dockerSocket.enable = true;
+  };
   virtualisation.oci-containers = {
-    backend = "docker";
+    backend = "podman";
 
     containers.homeassistant = {
       # https://github.com/home-assistant/core
@@ -314,7 +321,6 @@ in
         "n8n_data:/home/node/.n8n"
         "/home/${common.username}/syncthing/obsidian/mindmap/n8n-drop:/n8n-drop"
       ];
-      ports = [ "5678:5678" ];
       environment = {
         GENERIC_TIMEZONE = "America/Denver";
         N8N_EDITOR_BASE_URL = "https://n8n.digdug.dev";
@@ -334,7 +340,6 @@ in
       volumes = [
         "executor-data:/data"
       ];
-      ports = [ "4788:4788" ];
       environment = { };
       environmentFiles = [ config.age.secrets.executor.path ];
       extraOptions = [
@@ -419,7 +424,7 @@ in
       security.allow_embedding = true;
       smtp.enabled = true;
       server = {
-        domain = "grafana.digdug.dev";
+        domain = "grafana.ts.digdug.dev";
         http_port = common.ports.grafana;
         http_addr = "0.0.0.0";
       };

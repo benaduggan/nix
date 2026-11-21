@@ -28,5 +28,8 @@ in
   "pebble-webhook-secret.age".publicKeys = constants.authorizedKeys;
   "hermes-webhook-secret.age".publicKeys = constants.authorizedKeys;
 
+  # hermes-webui container login password & pooka sandbox env secrets
+  "hermes-webui.age".publicKeys = constants.authorizedKeys;
+  "hermes-pooka.age".publicKeys = constants.authorizedKeys;
   "terminus.age".publicKeys = constants.authorizedKeys;
 }
