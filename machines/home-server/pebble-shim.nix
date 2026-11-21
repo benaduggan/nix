@@ -17,8 +17,8 @@ in
   };
   age.secrets.hermesWebhookSecret = {
     file = ../../secrets/hermes-webhook-secret.age;
-    mode = "0400";
-    owner = "bduggan";
+    mode = "0440";
+    owner = "hermes-pooka";
     group = "users";
   };
 

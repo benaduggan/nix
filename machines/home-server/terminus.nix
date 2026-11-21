@@ -28,6 +28,7 @@ in
   virtualisation.oci-containers.containers = {
     terminus = {
       image = terminusImage;
+      dependsOn = [ "terminus-db" "terminus-kv" ];
       # APP_SETUP=true makes the entrypoint run migrations/asset setup (same as compose.yml's web service)
       environment = appEnv // { APP_SETUP = "true"; };
       # APP_SECRET, POSTGRES_PASSWORD, DATABASE_URL, KEYVALUE_URL come from the agenix env file
@@ -38,6 +39,7 @@ in
 
     terminus-worker = {
       image = terminusImage;
+      dependsOn = [ "terminus-db" "terminus-kv" ];
       cmd = [ "bundle" "exec" "sidekiq" "-r" "./config/sidekiq.rb" ];
       environment = appEnv;
       environmentFiles = [ config.age.secrets.terminus.path ];
@@ -46,7 +48,7 @@ in
     };
 
     terminus-db = {
-      image = "postgres:18.7-alpine";
+      image = "docker.io/library/postgres:18.7-alpine";
       environment = {
         POSTGRES_USER = "terminus";
         POSTGRES_DB = "terminus";
@@ -60,7 +62,7 @@ in
     };
 
     terminus-kv = {
-      image = "valkey/valkey:9.1-alpine";
+      image = "docker.io/valkey/valkey:9.1-alpine";
       cmd = [
         "valkey-server"
         "--port"
