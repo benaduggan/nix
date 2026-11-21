@@ -124,7 +124,7 @@
 
   # List services that you want to enable:
 
-  # Enable the OpenSSH daemon.
+  # Enable the OpenSSH daemon (Tailscale-only via modules/openssh.nix).
   services.openssh.enable = true;
   services.fprintd.enable = true;
 
