@@ -16,7 +16,8 @@ jobs:
             trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= benaduggan.cachix.org-1:BY2tmi++VqJD6My4kB/dXGfxT7nJqrOtRVNn9UhgrHE= cache.g7c.us:dSWpE2B5zK/Fahd7npIQWM4izRnVL+a4LiCAnrjdoFY= kwbauson.cachix.org-1:a6RuFyeJKSShV8LAUw3Jx8z48luiCU755DkweAAkwX0=
             substituters = https://cache.nixos.org/ https://benaduggan.cachix.org https://cache.g7c.us https://kwbauson.cachix.org
       - if: matrix.system.os != 'macOS'
-        run: nix -v -L build --no-link --max-jobs 0 -f . requiredSubstitutes
+        run: |
+          nix -v -L build --no-link --max-jobs 0 $(nix eval --raw .#requiredSubstitutes --apply 'a: builtins.concatStringsSep " " (map (k: ".#requiredSubstitutes." + k) (builtins.attrNames a))')
       - run: nix -L --show-trace build .#general
       # figure this out in the future
       # - run: nix -L build .#checks.default
@@ -28,7 +29,7 @@ jobs:
           cachix push benaduggan ./result
   build-beast:
     name: "Linux X64 (beast)"
-    runs-on: [nix, Linux, X64]
+    runs-on: [nix-beast, Linux, X64]
     steps:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
@@ -36,8 +37,10 @@ jobs:
           extra_nix_config: |
             trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= benaduggan.cachix.org-1:BY2tmi++VqJD6My4kB/dXGfxT7nJqrOtRVNn9UhgrHE= cache.g7c.us:dSWpE2B5zK/Fahd7npIQWM4izRnVL+a4LiCAnrjdoFY= kwbauson.cachix.org-1:a6RuFyeJKSShV8LAUw3Jx8z48luiCU755DkweAAkwX0=
             substituters = https://cache.nixos.org/ https://benaduggan.cachix.org https://cache.g7c.us https://kwbauson.cachix.org
-      - run: nix -v -L build --no-link --max-jobs 0 -f . requiredSubstitutes
-      - run: nix -v -L build --no-link --max-jobs 0 -f . requiredSubstitutes-beast
+      - run: |
+          nix -v -L build --no-link --max-jobs 0 $(nix eval --raw .#requiredSubstitutes --apply 'a: builtins.concatStringsSep " " (map (k: ".#requiredSubstitutes." + k) (builtins.attrNames a))')
+      - run: |
+          nix -v -L build --no-link --max-jobs 0 $(nix eval --raw .#requiredSubstitutes-beast --apply 'a: builtins.concatStringsSep " " (map (k: ".#requiredSubstitutes-beast." + k) (builtins.attrNames a))')
       - run: nix -L --show-trace build .#beast
       - name: "cachix only on main and updates-beast branches"
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/updates-beast'

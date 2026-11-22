@@ -28,13 +28,6 @@ in
     inherit tailnetIp pookaUid;
   };
 
-  # Expose `hermes-agent` and `pog` from inputs.jacobi for hermes-agent.nix.
-  nixpkgs.overlays = [
-    (_final: _prev: {
-      inherit (common.jacobiLegacy.pkgs) hermes-agent pog;
-    })
-  ];
-
   # Pin the hermes-pooka group GID to match pookaUid so hermes-webui can run
   # with the exact same UID/GID and share /var/lib/hermes-agent/pooka/hermes.
   users.groups.hermes-pooka.gid = pookaUid;

@@ -2,24 +2,25 @@
 {
   imports = [
     inputs.home-manager.darwinModules.home-manager
+    inputs.ncro.darwinModules.default
     "${inputs.jacobi}/hosts/modules/darwin/llama-server.nix"
     ./ca-blacklist.nix
+    ./ncro.nix
     ./openssh-darwin.nix
   ];
 
-  nixpkgs = {
-    config.allowUnfree = true;
-    overlays = [ inputs.self.overlays.default ];
+  nix = {
+    settings = common.nixSettings // {
+      trusted-users = [ config.system.primaryUser ];
+    };
+    gc.automatic = lib.mkDefault true;
+    optimise.automatic = lib.mkDefault true;
+    extraOptions = lib.mkDefault (''
+      experimental-features = nix-command flakes
+    '' + lib.optionalString (pkgs.stdenv.hostPlatform.system == "aarch64-darwin") ''
+      extra-platforms = x86_64-darwin aarch64-darwin x86_64-linux
+    '');
   };
-
-  nix.settings = common.nixSettings // {
-    trusted-users = [ config.system.primaryUser ];
-  };
-  nix.extraOptions = lib.mkDefault (''
-    experimental-features = nix-command flakes
-  '' + lib.optionalString (pkgs.stdenv.hostPlatform.system == "aarch64-darwin") ''
-    extra-platforms = x86_64-darwin aarch64-darwin x86_64-linux
-  '');
 
   documentation.enable = lib.mkDefault true;
   environment.darwinConfig = lib.mkDefault "$HOME/cfg/machines/darwin-configuration.nix";

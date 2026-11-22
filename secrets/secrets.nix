@@ -4,9 +4,11 @@ in
 {
   # home server
   "grafana.age".publicKeys = constants.authorizedKeys;
+  "harmonia.age".publicKeys = constants.authorizedKeys;
   "vaultwarden.age".publicKeys = constants.authorizedKeys;
   "ondeck-vars.age".publicKeys = constants.authorizedKeys;
   "home-self-runner.age".publicKeys = constants.authorizedKeys;
+  "beast-self-runner.age".publicKeys = constants.authorizedKeys;
 
   # litellm
   "litellm.age".publicKeys = constants.authorizedKeys;

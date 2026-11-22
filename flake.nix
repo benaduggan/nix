@@ -1,7 +1,10 @@
 {
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable-small";
-    nixos-hardware.flake = true;
+    nixos-hardware = {
+      flake = true;
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     kwbauson = {
@@ -38,6 +41,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    ncro = {
+      url = "github:manic-systems/ncro";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -55,6 +63,20 @@
       inherit (nixpkgs) lib;
       inherit (nix-darwin.lib) darwinSystem;
       inherit (nixpkgs.lib) mapAttrs attrValues optionalAttrs;
+
+      pkgsFor = lib.genAttrs lib.systems.flakeExposed (system:
+        import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+          overlays = [
+            self.overlays.default
+            (_final: _prev:
+              optionalAttrs (inputs.jacobi.legacyPackages ? ${system}) {
+                inherit (inputs.jacobi.legacyPackages.${system}.pkgs) hermes-agent pog;
+              })
+          ];
+        }
+      );
 
       beastPkgs = import nixpkgs-beast {
         system = "x86_64-linux";
@@ -93,9 +115,9 @@
           };
         in
         lib.makeOverridable darwinSystem {
-          inherit system;
           specialArgs = { inherit inputs; };
           modules = [
+            { nixpkgs.pkgs = pkgsFor.${system}; }
             common
             ./modules/darwin-base.nix
             ./machines/${dir}/darwin-configuration.nix
@@ -119,9 +141,9 @@
           common = import ./common.nix { inherit machineName isGraphical isMinimal inputs; };
         in
         nixpkgs.lib.nixosSystem {
-          inherit system;
           specialArgs = { inherit inputs; } // specialArgs;
           modules = [
+            { nixpkgs.pkgs = pkgsFor.${system}; }
             common
             ./modules/nixos-base.nix
             ./machines/${dir}/configuration.nix
@@ -135,11 +157,7 @@
     {
       packages = lib.genAttrs lib.systems.flakeExposed (system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            config.allowUnfree = true;
-            overlays = [ self.overlays.default ];
-          };
+          pkgs = pkgsFor.${system};
           mkNixosFarm = hosts:
             pkgs.linkFarmFromDrvs "build" (attrValues (mapAttrs (_: value: value.config.system.build.toplevel) hosts));
         in
@@ -156,8 +174,7 @@
         } // optionalAttrs (system == "x86_64-linux") {
           beast = self.nixosConfigurations.beast.config.system.build.toplevel;
           requiredSubstitutes = {
-            inherit (pkgs) firefox-unwrapped ffmpeg-full;
-            chromium = pkgs.chromium.browser;
+            inherit (pkgs) firefox-unwrapped ungoogled-chromium ffmpeg;
           };
           requiredSubstitutes-beast = {
             inherit (beastPkgs) sunshine strata-engine;

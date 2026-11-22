@@ -61,6 +61,12 @@ in
       file = ../../secrets/home-self-runner.age;
       mode = "644";
     };
+    harmonia = {
+      file = ../../secrets/harmonia.age;
+      mode = "400";
+      owner = "root";
+      group = "root";
+    };
   };
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -520,12 +526,25 @@ in
 
   services._3proxy.enable = true;
 
+  services.harmonia.cache = {
+    enable = true;
+    signKeyPaths = [ config.age.secrets.harmonia.path ];
+    settings = {
+      bind = "[::]:${toString common.ports.harmonia}";
+      enable_compression = true;
+      priority = 30;
+      workers = 8;
+    };
+  };
+
   services.github-runners = {
     nix-repo = {
       enable = true;
       nodeRuntimes = [ "node24" ];
       extraLabels = [ "nix" ];
       extraPackages = with pkgs; [ gh cachix ];
+      extraEnvironment.XDG_CACHE_HOME = "/var/cache/github-runner/nix-repo";
+      serviceOverrides.CacheDirectory = [ "github-runner/nix-repo" ];
       replace = true;
       tokenFile = config.age.secrets.homeRunnerToken.path;
       url = "https://github.com/benaduggan/nix";
