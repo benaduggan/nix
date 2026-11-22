@@ -66,6 +66,7 @@ in
       ".direnv/"
       ".local-docs"
       ".scratch"
+      "**/.claude/"
     ];
   };
 
