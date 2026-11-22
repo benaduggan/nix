@@ -35,6 +35,9 @@
   system.stateVersion = lib.mkDefault common.darwinStateVersion;
   system.defaults = {
     NSGlobalDomain = {
+      ApplePressAndHoldEnabled = lib.mkDefault false;
+      InitialKeyRepeat = lib.mkDefault 10;
+      KeyRepeat = lib.mkDefault 5;
       NSAutomaticCapitalizationEnabled = lib.mkDefault false;
       NSAutomaticDashSubstitutionEnabled = lib.mkDefault false;
       NSAutomaticPeriodSubstitutionEnabled = lib.mkDefault false;
@@ -50,21 +53,71 @@
 
     dock = {
       autohide = lib.mkDefault true;
+      autohide-delay = lib.mkDefault 0.0;
+      autohide-time-modifier = lib.mkDefault 0.2;
       mru-spaces = lib.mkDefault false;
       orientation = lib.mkDefault "bottom";
+      show-recents = lib.mkDefault false;
       showhidden = lib.mkDefault true;
     };
 
     finder = {
       AppleShowAllExtensions = lib.mkDefault true;
-      QuitMenuItem = lib.mkDefault true;
+      AppleShowAllFiles = lib.mkDefault true;
+      FXDefaultSearchScope = lib.mkDefault "SCcf";
       FXEnableExtensionChangeWarning = lib.mkDefault false;
+      FXPreferredViewStyle = lib.mkDefault "Nlsv";
+      QuitMenuItem = lib.mkDefault true;
+      ShowPathbar = lib.mkDefault true;
+      ShowStatusBar = lib.mkDefault true;
+      _FXShowPosixPathInTitle = lib.mkDefault true;
     };
 
     trackpad = {
       Clicking = lib.mkDefault true;
       TrackpadThreeFingerDrag = lib.mkDefault true;
     };
+
+    CustomUserPreferences."com.apple.desktopservices" = {
+      DSDontWriteNetworkStores = true;
+      DSDontWriteUSBStores = true;
+    };
+  };
+
+  security.pam.services.sudo_local = {
+    enable = lib.mkDefault true;
+    touchIdAuth = lib.mkDefault true;
+    reattach = lib.mkDefault true;
+  };
+
+  fonts.packages = [
+    pkgs.nerd-fonts.fira-code
+  ];
+
+  homebrew = {
+    enable = lib.mkDefault true;
+    global.autoUpdate = lib.mkDefault false;
+    onActivation = {
+      autoUpdate = lib.mkDefault true;
+      cleanup = lib.mkDefault "uninstall";
+      upgrade = lib.mkDefault true;
+    };
+
+    casks = [
+      "discord"
+      "firefox"
+      "google-chrome"
+      "karabiner-elements"
+      "notion"
+      "raycast"
+      "rectangle"
+      "slack"
+      "tabby"
+      "visual-studio-code"
+      "vlc"
+      "windows-app"
+    ];
+    # should install directly -> tailscale, docker, spotify, bruno
   };
 
   home-manager = {
