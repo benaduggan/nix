@@ -6,7 +6,7 @@ let
 in
 {
   _module.args.common = {
-    inherit (constants) authorizedKeys authorizedKeysRec cacheSubstituters digdugdevKey tailscaleIp trustedPublicKeys communitySubstituters communityTrustedPublicKeys;
+    inherit (constants) authorizedKeys authorizedKeysRec digdugdevKey tailscaleIp harmoniaUpstreams cacheUpstreams communityUpstreams;
     tailnetIp = constants.tailscaleIp.${machineName} or null;
     inherit (pkgs.stdenv.hostPlatform) isLinux isDarwin;
     inherit isGraphical;
@@ -26,11 +26,14 @@ in
     kwbauson = inputs.kwbauson.packages.${sys};
     agenix = inputs.agenix.packages.${sys}.default;
 
-    nixSettings = with constants; {
-      extra-substituters = cacheSubstituters ++ pkgs.lib.optionals (machineName == "homeServer") communitySubstituters;
-      extra-trusted-public-keys = trustedPublicKeys ++ pkgs.lib.optionals (machineName == "homeServer") communityTrustedPublicKeys;
+    nixSettings = {
       trusted-users = [ "bduggan" ];
-      narinfo-cache-negative-ttl = 10;
+      narinfo-cache-negative-ttl = 300;
+      http-connections = 64;
+      max-substitution-jobs = 32;
+      download-buffer-size = 134217728; # 128 MiB
+      connect-timeout = 5;
+      fallback = true;
       experimental-features = [ "nix-command" "flakes" ];
     };
 
@@ -43,6 +46,8 @@ in
       grafana = 2342;
       prometheus = 2343;
       loki = 3100;
+      harmonia = 5000;
+      ncro = 9180;
       home-assistant = 8123;
       terminus = 2300;
       prometheus_node_exporter = 9002;

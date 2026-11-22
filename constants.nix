@@ -36,23 +36,42 @@ in
 
   digdugdevKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMBXiUz//dlW7zcblPxQZqgcmZ5KziuhDnnIbuFmOvOw";
 
-  cacheSubstituters = [
-    "https://benaduggan.cachix.org"
-    "https://cache.g7c.us"
-    "https://kwbauson.cachix.org"
+  harmoniaUpstreams = [
+    {
+      url = "http://${tailscaleIp.homeServer}:5000";
+      public_key = "home-server-cache-1:7YC6SEsTfQDD97tsYURuFIBDORxnfO0bcbt52V7olzE=";
+      priority = 5;
+    }
   ];
 
-  trustedPublicKeys = [
-    "benaduggan.cachix.org-1:BY2tmi++VqJD6My4kB/dXGfxT7nJqrOtRVNn9UhgrHE="
-    "cache.g7c.us:dSWpE2B5zK/Fahd7npIQWM4izRnVL+a4LiCAnrjdoFY="
-    "kwbauson.cachix.org-1:a6RuFyeJKSShV8LAUw3Jx8z48luiCU755DkweAAkwX0="
+  cacheUpstreams = [
+    {
+      url = "https://cache.nixos.org";
+      public_key = "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=";
+      priority = 10;
+    }
+    {
+      url = "https://benaduggan.cachix.org";
+      public_key = "benaduggan.cachix.org-1:BY2tmi++VqJD6My4kB/dXGfxT7nJqrOtRVNn9UhgrHE=";
+      priority = 20;
+    }
+    {
+      url = "https://cache.g7c.us";
+      public_key = "cache.g7c.us:dSWpE2B5zK/Fahd7npIQWM4izRnVL+a4LiCAnrjdoFY=";
+      priority = 30;
+    }
+    {
+      url = "https://kwbauson.cachix.org";
+      public_key = "kwbauson.cachix.org-1:a6RuFyeJKSShV8LAUw3Jx8z48luiCU755DkweAAkwX0=";
+      priority = 40;
+    }
   ];
 
-  communitySubstituters = [
-    "https://nix-community.cachix.org"
-  ];
-
-  communityTrustedPublicKeys = [
-    "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+  communityUpstreams = [
+    {
+      url = "https://nix-community.cachix.org";
+      public_key = "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=";
+      priority = 25;
+    }
   ];
 }

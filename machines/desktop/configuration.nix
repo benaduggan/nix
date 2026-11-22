@@ -217,8 +217,6 @@ in
   #   };
   # };
 
-  nixpkgs.config.cudaCapabilities = [ "6.1" ];
-
   services.llama-cpp = {
     enable = true;
     package =

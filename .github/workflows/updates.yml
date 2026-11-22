@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       source: { type: string }
-  schedule: [cron: "0 0 * * 0"]
+  schedule: [cron: "0 9 * * 0"]
 jobs:
   updates:
     runs-on: [nix, Linux, X64]

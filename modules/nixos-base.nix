@@ -3,8 +3,10 @@
   imports = [
     inputs.agenix.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
+    inputs.ncro.nixosModules.default
     ./alloy.nix
     ./ca-blacklist.nix
+    ./ncro.nix
     ./node-exporter.nix
     ./openssh.nix
     ./pipewire.nix
@@ -13,12 +15,21 @@
     ./vscode-server.nix
   ];
 
-  nixpkgs = {
-    config.allowUnfree = true;
-    overlays = [ inputs.self.overlays.default ];
+  nix = {
+    settings = common.nixSettings;
+    registry = lib.mkIf common.isMinimal (lib.mkForce { });
+    gc = {
+      automatic = lib.mkDefault true;
+      dates = lib.mkDefault "weekly";
+      options = lib.mkDefault "--delete-older-than 30d";
+    };
+    optimise = {
+      automatic = lib.mkDefault true;
+      dates = lib.mkDefault [ "weekly" ];
+    };
   };
 
-  nix.settings = common.nixSettings;
+  documentation.nixos.enable = lib.mkDefault (!common.isMinimal);
 
   programs.nix-ld.enable = lib.mkDefault true;
   services.openssh.enable = lib.mkDefault true;

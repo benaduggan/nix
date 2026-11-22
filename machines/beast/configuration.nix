@@ -92,7 +92,6 @@ in
 
   # Install firefox.
   programs.firefox.enable = true;
-  nixpkgs.config.cudaCapabilities = [ "8.6" ];
 
   programs.steam.enable = true;
 
@@ -253,5 +252,32 @@ in
     dockerCompat = true;
     defaultNetwork.settings.dns_enabled = true;
     dockerSocket.enable = true;
+  };
+
+  age.secrets.beastRunnerToken = {
+    file = ../../secrets/beast-self-runner.age;
+    mode = "400";
+    owner = "root";
+    group = "root";
+  };
+
+  # Yield CPU/IO to Strata inference and desktop workloads, and cap memory
+  # pressure so heavy builds never push Strata's pinned weights into swap.
+  nix = {
+    daemonCPUSchedPolicy = "idle";
+    daemonIOSchedClass = "idle";
+  };
+  systemd.services.nix-daemon.serviceConfig.MemoryHigh = "48G";
+
+  services.github-runners.nix-repo-beast = {
+    enable = true;
+    nodeRuntimes = [ "node24" ];
+    extraLabels = [ "nix-beast" ];
+    extraPackages = with pkgs; [ gh cachix ];
+    extraEnvironment.XDG_CACHE_HOME = "/var/cache/github-runner/nix-repo-beast";
+    serviceOverrides.CacheDirectory = [ "github-runner/nix-repo-beast" ];
+    replace = true;
+    tokenFile = config.age.secrets.beastRunnerToken.path;
+    url = "https://github.com/benaduggan/nix";
   };
 }
