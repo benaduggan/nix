@@ -34,7 +34,6 @@ in
 
   environment.systemPackages = with pkgs; [
     bashInteractive
-    bash-completion
     coreutils-full
     curl
     jq

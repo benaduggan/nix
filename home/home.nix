@@ -25,7 +25,6 @@ in
         # myPogScripts.spelltree
         common.agenix
         bashInteractive
-        bash-completion
         coreutils-full
         curl
         jetmux
