@@ -288,6 +288,18 @@ in
       ];
     };
 
+    containers.couchwave = {
+      # https://github.com/Hoyle95/couchwave — self-hosted YouTube watch party.
+      # Mirrors upstream compose.yml (prebuilt image, data volume). The room
+      # password is auto-generated into couchwave-data/config.json on first run;
+      # change it there or with `node server.js --set-password` inside the container.
+      image = "ghcr.io/hoyle95/couchwave:0.4.0-beta";
+      volumes = [ "couchwave-data:/app/data" ];
+      extraOptions = [
+        "--network=host"
+      ];
+    };
+
     # Two separate MCP integrations for the Obsidian vault. Point Executor at
     # http://127.0.0.1:8787/mcp for the read-only integration and
     # http://127.0.0.1:8788/mcp for the authoring integration.
