@@ -11,22 +11,7 @@
   };
 
   ids.gids.nixbld = 350;
-  system = {
-    primaryUser = common.username;
-    defaults.NSGlobalDomain = {
-      ApplePressAndHoldEnabled = false;
-      InitialKeyRepeat = 10;
-      KeyRepeat = 1;
-    };
-  };
-
-  # security.pam.enableSudoTouchIdAuth = true;
-  # services.mlx-vlm-api.servers = {
-  #   qwen2-vl-2b-Instruct-4bit = {
-  #     enable = true;
-  #     model = "mlx-community/Qwen2.5-VL-7B-Instruct-8bit";
-  #   };
-  # };
+  system.primaryUser = common.username;
 
   services.llama-server =
     let
@@ -34,111 +19,14 @@
     in
     {
       servers = {
-        # deepscaler-1-5b = {
-        #   inherit package;
-        #   enable = true;
-        #   port = 8014;
-        #   model = "/opt/box/models/agentica-org_DeepScaleR-1.5B-Preview-Q8_0.gguf";
-        #   ngl = 99;
-        # };
-        # qwen-coder-14 = {
-        #   inherit package;
-        #   enable = true;
-        #   port = 8020;
-        #   model = "/opt/box/models/qwen25coder14.gguf";
-        #   ngl = 99;
-        # };
-        # qwen-coder-32 = {
-        #   inherit package;
-        #   enable = true;
-        #   port = 8020;
-        #   model = "/opt/box/models/Qwen2.5-Coder-32B-Instruct-Q4_0.gguf";
-        #   ngl = 99;
-        # };
-        # qwen-coder = {
-        #   inherit package;
-        #   enable = true;
-        #   port = 8015;
-        #   model = "/opt/box/models/Qwen2.5.1-Coder-7B-Instruct-Q6_K_L.gguf";
-        #   ngl = 99;
-        # };
-        # qwen-r1-distill = {
-        #   inherit package;
-        #   enable = false;
-        #   port = 8016;
-        #   model = "/opt/box/models/DeepSeek-R1-Distill-Qwen-14B-Q8_0.gguf";
-        #   ngl = 99;
-        #   extraFlags = "-c 16384";
-        # };
-
-
-        # mutually exclusive:
-        # gemma-3-12b = {
-        #   inherit package;
-        #   enable = true;
-        #   port = 8017;
-        #   model = "/opt/box/models/gemma-3-12b.gguf";
-        #   ngl = 99;
-        #   extraFlags = "-c 16384 --temp 1.0 --top-k 64 --min-p 0 --top-p 0.95";
-        # };
-        # qwen-3-30-a3b-ud = {
-        #   inherit package;
-        #   enable = true;
-        #   port = 8017;
-        #   model = "/opt/box/models/qwen-3-30-ud-q4.gguf";
-        #   ngl = 99;
-        #   extraFlags = "-c 16384 --temp 0.6 --top-k 20 --min-p 0 --top-p 0.95";
-        # };
-        qwen-3-vl-30b-ud = {
+        qwen-38-27b = {
           inherit package;
           enable = true;
           port = 8017;
-          model = "/opt/box/models/Qwen3-VL-30B-A3B-Instruct-UD-Q4_K_XL.gguf";
+          model = "/opt/box/models/qwen3.8-27B-UD-Q4_K_XL.gguf";
           ngl = 99;
-          extraFlags = "--mmproj /opt/box/models/mmproj-F16.gguf --n-gpu-layers 99 --jinja --top-p 0.8 --top-k 20 --temp 0.7 --min-p 0.0 --flash-attn on --presence-penalty 1.5 --ctx-size 32768";
+          extraFlags = "--jinja --flash-attn on --ctx-size 32768 --parallel 1 --ctx-checkpoints 32 --checkpoint-min-step 0 --cache-type-k q8_0 --cache-type-v q8_0 --spec-type draft-mtp --spec-draft-n-max 3 --reasoning-effort medium --temp 1.0 --top-p 0.95 --top-k 20 --min-p 0.0 --presence-penalty 0.0 --repeat-penalty 1.0";
         };
       };
     };
-
-  homebrew = {
-    global.autoUpdate = false;
-    enable = true;
-    onActivation = {
-      autoUpdate = true;
-      # cleanup = "zap";
-      upgrade = true;
-    };
-
-    brews = [ "readline" "qemu" ];
-
-    taps = [
-    ];
-
-    casks = map (name: { inherit name; greedy = true; }) [
-      "font-fira-code-nerd-font"
-      # "spotify"
-      "discord"
-      # "slack"
-      "karabiner-elements"
-      "microsoft-remote-desktop"
-      "quicklook-video"
-      "raycast"
-      "rectangle"
-      "chromium"
-      "google-chrome"
-      "visual-studio-code"
-      "vlc"
-      "insomnia"
-      "tabby"
-    ];
-
-    # should install directly -> tailscale, notion, docker
-
-    # These appear to be gated by having "purchased" the thing
-    # even if it's free per apple id
-    # masApps = {
-    #   Wireguard = 1451685025;
-    #   # Xcode = 497799835;
-    # };
-  };
 }
