@@ -2,7 +2,8 @@
 # using jacobi's `strata.ampere` package (cached in https://cache.g7c.us for sm_86 / RTX 3090).
 #
 # strata-prepare regenerates <stateDir>/strata-<tag>.json on start, and preStart layers
-# extraEngineArgs, sampling, mcpServers, and apiKeyFile into <stateDir>/config.json.
+# extraEngineArgs, sampling, reasoning controls, mcpServers, extraConfig, and apiKeyFile into
+# <stateDir>/config.json.
 { pkgs, config, lib, nixpkgs-beast-pkgs, ... }:
 let
   cfg = config.services.strata;
@@ -74,9 +75,32 @@ let
     if sampling:
         cfg["sampling"] = sampling
 
+    reasoning_effort = ${builtins.toJSON cfg.reasoningEffort}
+    if reasoning_effort is not None:
+        cfg["reasoning_effort"] = reasoning_effort
+
+    reasoning_budget_tokens = ${builtins.toJSON cfg.reasoningBudgetTokens}
+    if reasoning_budget_tokens is not None:
+        cfg["reasoning_budget_tokens"] = reasoning_budget_tokens
+
+    if ${if cfg.reasoningCloseRetry then "True" else "False"}:
+        cfg["reasoning_close_retry"] = True
+
+    reasoning_loop_recovery = ${builtins.toJSON cfg.reasoningLoopRecovery}
+    if reasoning_loop_recovery is not None:
+        cfg["reasoning_loop_recovery"] = reasoning_loop_recovery
+
+    effort_position = ${builtins.toJSON cfg.effortPosition}
+    if effort_position is not None:
+        cfg["effort_position"] = effort_position
+
     mcp_servers = ${builtins.toJSON cfg.mcpServers}
     if mcp_servers:
         cfg["mcp_servers"] = mcp_servers
+
+    extra_config = ${builtins.toJSON cfg.extraConfig}
+    if extra_config:
+        cfg.update(extra_config)
 
     api_key_cred = Path("/run/credentials/strata.service/api-key")
     if ${if cfg.apiKeyFile != null then "True" else "False"} and api_key_cred.is_file():
@@ -170,8 +194,60 @@ in
         Sampling defaults for requests that leave the fields out. Copied into config.json
         verbatim and checked by the server when it starts, so a typo here shows up in the
         journal rather than at eval time.
-        eg { temperature = 0.8; top_p = 0.95; top_k = 20; reasoning_effort = "low"; }
+        eg { temperature = 0.8; top_p = 0.95; top_k = 20; }
       '';
+    };
+
+    reasoningEffort = lib.mkOption {
+      type = lib.types.nullOr (lib.types.enum [ "none" "low" "medium" "high" ]);
+      default = null;
+      description = ''
+        Default thinking level (`reasoning_effort` in config.json) for requests that do not
+        specify one. Requests that send their own `reasoning_effort` override this.
+      '';
+    };
+
+    reasoningBudgetTokens = lib.mkOption {
+      type = lib.types.nullOr lib.types.ints.unsigned;
+      default = null;
+      description = ''
+        Default cap on thinking tokens per request (`reasoning_budget_tokens` in config.json).
+        When reached, Strata injects a short wrap-up and closes `</think>` so the model answers.
+        `0` disables any family default; `null` leaves it unset.
+      '';
+    };
+
+    reasoningCloseRetry = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Enable Strata's `reasoning_close_retry`: if a reply stops while still inside `<think>`
+        with no visible answer or tool call, close `</think>` once and continue generation.
+      '';
+    };
+
+    reasoningLoopRecovery = lib.mkOption {
+      type = lib.types.nullOr (lib.types.enum [ "stop" "recover" ]);
+      default = null;
+      description = ''
+        Enable Strata's `reasoning_loop_recovery`: `"stop"` ends repetitive thinking as length;
+        `"recover"` resumes with the low-effort instruction and raised temperature/presence penalty.
+      '';
+    };
+
+    effortPosition = lib.mkOption {
+      type = lib.types.nullOr (lib.types.enum [ "start" "end" ]);
+      default = null;
+      description = ''
+        Where a non-default reasoning effort instruction is placed (`"start"` default, or `"end"`
+        to keep the prompt KV cache warm when reasoning effort changes between turns).
+      '';
+    };
+
+    extraConfig = lib.mkOption {
+      type = lib.types.attrsOf lib.types.anything;
+      default = { };
+      description = "Additional top-level keys merged into Strata's generated config.json.";
     };
 
     mcpServers = lib.mkOption {

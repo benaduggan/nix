@@ -232,6 +232,11 @@ in
     stateDir = "/mnt/massive/strata"; # ~70 GB of weights on the data partition, not /
     host = "0.0.0.0";
     port = 8015;
+    reasoningEffort = "low";
+    reasoningBudgetTokens = 8192;
+    reasoningCloseRetry = true;
+    reasoningLoopRecovery = "recover";
+    effortPosition = "end";
     extraEngineArgs = [
       # INT8 keys + Q4_0 values: saves ~550 MB VRAM in --kv-resident 32768 for expert cache.
       # Note: conversation snapshots cannot restore across different KV formats.

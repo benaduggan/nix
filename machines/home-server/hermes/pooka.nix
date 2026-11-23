@@ -1,11 +1,30 @@
-{ config, pkgs, hermesCfg, ... }:
+{ config, lib, pkgs, hermesCfg, ... }:
 let
   inherit (hermesCfg) tailnetIp pookaUid;
+
+  firecrawlPythonPath = lib.makeSearchPath pkgs.python314.sitePackages [
+    pkgs.python314Packages.firecrawl-py
+    pkgs.python314Packages.nest-asyncio
+  ];
+
+  hermesWithExtras = pkgs.symlinkJoin {
+    name = "hermes-agent-with-extras";
+    paths = [ pkgs.hermes-agent ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      for bin in hermes hermes-agent; do
+        rm "$out/bin/$bin"
+        makeWrapper "${pkgs.hermes-agent}/bin/$bin" "$out/bin/$bin" \
+          --suffix PYTHONPATH : "${firecrawlPythonPath}"
+      done
+    '';
+  };
 in
 {
   services.hermes-agent = {
     enable = true;
     instances.pooka = {
+      package = hermesWithExtras;
       uid = pookaUid;
       enableNix = true;
       pidsLimit = 2048;
@@ -30,31 +49,42 @@ in
       packages = with pkgs; [
         atool
         bun
+        bzip2
         claude-code
         codex
         curl
         diffutils
         fd
         ffmpeg
+        file
         gh
         git
         gnumake
+        gnutar
+        gzip
         jq
+        less
         nano
         netcat-gnu
+        nodejs_22
         openssh
         p7zip
         patch
+        procps
         python3
         ripgrep
         socat
         sqlite
+        tree
         ungoogled-chromium
         unzip
         uv
         wget
+        which
+        xz
         yq-go
         zip
+        zstd
       ];
 
       # WEBHOOK_SECRET comes from hermesWebhookSecret (shared with
@@ -70,15 +100,42 @@ in
       # Unmanaged keys in /var/lib/hermes/config.yaml remain writable.
       settings = {
         model = {
-          default = "Qwen3.8-27B-UD-Q4_K_XL";
+          default = "qwen3.8-flash-next-iq3_s";
           provider = "custom";
           base_url = "http://beast:8015/v1";
           api_key = "\${env:BEAST_API_KEY}";
+          context_length = 131072;
         };
 
         agent = {
           max_turns = 150;
           gateway_timeout = 1800;
+          reasoning_effort = "low";
+          tool_use_enforcement = [ "qwen" ];
+          intent_ack_continuation = true;
+          environment_hint = lib.concatStringsSep " " [
+            "You run inside an isolated rootless Podman/Nix container with no host filesystem mounts."
+            "Obsidian notes are ONLY accessible through the `executor` MCP tools — never via local `/home/bduggan/...` paths."
+            "Pre-installed CLI tools already on PATH include: ffmpeg, ffprobe, chromium, python3, uv, uvx, node, npm, npx, bun, bunx, git, gh, rg, fd, jq, yq, sqlite3, curl, wget, which, file, tar, ps, and nix."
+            "You can install/use additional tools on demand via `nix-shell -p <pkg>`, `uvx`, or `bunx`."
+          ];
+        };
+
+        # Keep MCP tools eager instead of wrapping `executor` inside the
+        # `tool_search`/`tool_call` JSON-in-JSON bridge (which causes nested
+        # JSON escaping errors on local quantized models).
+        tools.tool_search.enabled = "off";
+
+        tool_loop_guardrails.hard_stop_enabled = true;
+
+        # Keep background compaction/title calls fast and non-thinking so they
+        # don't stall Strata's single inference slot.
+        auxiliary = {
+          compression = {
+            reasoning_effort = "none";
+            timeout = 300;
+          };
+          title_generation.reasoning_effort = "none";
         };
 
         terminal = {
@@ -101,15 +158,21 @@ in
           command_timeout = 30;
         };
 
-        # Interactive sessions (WebUI / Discord / CLI) prompt via smart
-        # approvals; unattended Pebble ring webhooks auto-approve inside this
-        # isolated rootless Podman sandbox.
+        # Auto-approve commands inside this isolated rootless Podman sandbox
+        # (read-only rootfs, no host mounts, no capabilities) so pooka can work
+        # autonomously without stalling on interactive prompts or burning extra
+        # smart-approval guardian calls on beast.
         approvals = {
-          mode = "smart";
+          mode = "off";
           unattended_mode = "approve";
-          cron_mode = "deny";
+          cron_mode = "approve";
+          single_query_mode = "approve";
+          deny = [
+            "git push --force*"
+            "git push -f*"
+          ];
           timeout = 300;
-          mcp_reload_confirm = true;
+          mcp_reload_confirm = false;
           destructive_slash_confirm = true;
         };
 
