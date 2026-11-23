@@ -1,11 +1,9 @@
-{ config, common, lib, ... }:
+{ config, common, lib, pkgs, ... }:
 let
   inherit (common) jacobiLegacy;
-  inherit (common) machineName;
-  perUser = if machineName == "paper" then "benduggan" else "bduggan";
 in
 {
-  programs. bash = {
+  programs.bash = {
     enable = true;
     inherit (config.home) sessionVariables;
     historyFileSize = -1;
@@ -49,13 +47,12 @@ in
       # mkdir -p $HOME/.completions
       # source $HOME/.completions/*
 
-      # source ~/.nix-profile/etc/profile.d/bash_completion.sh
-      source /etc/profiles/per-user/${perUser}/share/bash-completion/completions/git
-      source /etc/profiles/per-user/${perUser}/share/bash-completion/completions/ssh
-      complete -o bashdefault -o default -o nospace -F __git_wrap__git_main g
-      complete -F __start_kubectl k
-      source /etc/profiles/per-user/${perUser}/share/bash-completion/completions/docker
-      complete -F _docker d
+      if (( BASH_VERSINFO[0] >= 4 )) && [ -n "''${BASH_COMPLETION_VERSINFO:-}" ]; then
+        source ${pkgs.complete-alias}/bin/complete_alias
+        if (( ''${#BASH_ALIASES[@]} > 0 )); then
+          complete -F _complete_alias "''${!BASH_ALIASES[@]}"
+        fi
+      fi
 
       # jet terminal OSC 7 (cwd) & OSC 1337 status bar variables
       source ${./scripts/jet-status.bash}
