@@ -22,6 +22,8 @@ let
     litellm = "home-server-1:4000";
     mcp = "home-server-1:4788";
     trmnl = "home-server-1:2300";
+    # Couchwave (YouTube watch party) — gated by its own room password, not google_auth
+    couchwave = "home-server-1:3000";
 
     # Content Hosting
     audio = "beast:8000";

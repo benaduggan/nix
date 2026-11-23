@@ -50,6 +50,7 @@ in
       ncro = 9180;
       home-assistant = 8123;
       terminus = 2300;
+      couchwave = 3000;
       prometheus_node_exporter = 9002;
       alloy = 12345;
     };
