@@ -9,7 +9,7 @@ jobs:
     runs-on: [nix, Linux, X64]
     steps:
       - uses: actions/checkout@v7
-      - uses: cachix/install-nix-action@v31
+      - uses: cachix/install-nix-action@v32
       - run: nix flake update $(nix flake metadata --json 2>/dev/null | nix run nixpkgs#jq -- -r '.locks.nodes.root.inputs | keys[] | select(. != "nixpkgs-beast" and . != "nixpkgs-pascal-cuda")')
       - uses: peter-evans/create-pull-request@v8.1.3
         id: cpr
@@ -29,7 +29,7 @@ jobs:
     runs-on: [nix, Linux, X64]
     steps:
       - uses: actions/checkout@v7
-      - uses: cachix/install-nix-action@v31
+      - uses: cachix/install-nix-action@v32
       - run: nix flake update nixpkgs-beast
       - run: nix eval --raw .#nixosConfigurations.beast.config.systemd.services.strata.serviceConfig.ExecStart > /dev/null
       - uses: peter-evans/create-pull-request@v8.1.3
