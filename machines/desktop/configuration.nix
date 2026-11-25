@@ -187,6 +187,8 @@ in
 
   services._3proxy.enable = true;
 
+  services.systemWatchdog.enable = true;
+
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ 1080 ];
   # networking.firewall.allowedUDPPorts = [ ... ];

@@ -31,7 +31,6 @@ let
 
     # Home Assistants
     "arden.ha" = "arden:8123";
-    "springfield.ha" = "springfield:8123";
     "lake.ha" = "bduggan-desktop:8123";
     "fishers.ha" = "home-server-1:8123";
   };

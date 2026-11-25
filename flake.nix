@@ -228,12 +228,6 @@
           isGraphical = false;
           isMinimal = false;
         };
-        springfield = {
-          dir = "springfield";
-          machineName = "springfield";
-          isGraphical = false;
-          isMinimal = false;
-        };
         digdugdev = {
           dir = "digdugdev";
           machineName = "digdugdev";
