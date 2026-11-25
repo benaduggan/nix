@@ -7,7 +7,6 @@ let
     paper = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINkINDS7fVFidAiIRM4AL821sbsJ7nmF9/KV+UuQ1Gtf";
     magicMbp = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINnka7McfWZS/nPAXqvZN2mRtHab9+hVo3bWUMGsXQXe";
     homeServer = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINVM1Pr/o+daMn1ElHm/A0gCyR6t85ZuP3LRkhIJFiF1";
-    springfield = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFulKxPMuKmSevjxb6rhhcxKP1tmbqD6tlS0eXE99JwU";
     beast = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOoAXeYNb3LC5nyu3yfheXHH/jvxCbKH7V7UVhdGKosk";
     # digdugdev is not added here cause it doesn't need to decrypt most of the secrets;
   };

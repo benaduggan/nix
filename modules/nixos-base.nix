@@ -13,6 +13,7 @@
     ./socks-proxy.nix
     ./tailscale.nix
     ./vscode-server.nix
+    ./watchdog.nix
   ];
 
   nix = {

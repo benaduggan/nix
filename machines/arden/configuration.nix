@@ -94,5 +94,10 @@ in
 
   services._3proxy.enable = true;
 
+  services.systemWatchdog = {
+    enable = true;
+    disableNvmeApst = true;
+  };
+
   networking.firewall.enable = false;
 }

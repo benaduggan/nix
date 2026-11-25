@@ -419,7 +419,6 @@ in
           targets = [
             "home-server:${toString common.ports.prometheus_node_exporter}"
             "arden:${toString common.ports.prometheus_node_exporter}"
-            "springfield:${toString common.ports.prometheus_node_exporter}"
             "bduggan-desktop:${toString common.ports.prometheus_node_exporter}"
             "bduggan-framework:${toString common.ports.prometheus_node_exporter}"
             "beast:${toString common.ports.prometheus_node_exporter}"
@@ -525,6 +524,8 @@ in
   };
 
   services._3proxy.enable = true;
+
+  services.systemWatchdog.enable = true;
 
   services.harmonia.cache = {
     enable = true;
