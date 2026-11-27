@@ -1,13 +1,13 @@
 {
   "artifacts": {
     "aarch64-darwin": {
-      "name": "jet-0.1.7-macos-arm64.zip",
-      "sha256": "sha256-o3QWOiPL1EVe1xUJTuPbIY1P8E9vt8PusW7cLWanW8Y="
+      "name": "jet-0.1.8-macos-arm64.zip",
+      "sha256": "sha256-Bk9+9L9muy0nBWxyd/2ueyWVNmrocZJIrGC6jsNGTW8="
     },
     "x86_64-linux": {
-      "name": "jet-0.1.7-linux-x86_64.tar.gz",
-      "sha256": "sha256-mjbBVFZmFI1OHb2JFI+r25VAxx6U5cmAOh4RL9Hdp2A="
+      "name": "jet-0.1.8-linux-x86_64.tar.gz",
+      "sha256": "sha256-2SaNeJVUdeAMNLZDyEz+99KRcQQCHWyFUUQ/vdQyj/U="
     }
   },
-  "version": "0.1.7"
+  "version": "0.1.8"
 }
