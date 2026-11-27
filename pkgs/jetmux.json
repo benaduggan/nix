@@ -1,17 +1,17 @@
 {
   "artifacts": {
     "aarch64-darwin": {
-      "name": "jetmux-0.1.7-macos-arm64.tar.gz",
-      "sha256": "sha256-vgxPFrj0vndGEagcu9Kru/IMuc8Z+bXcI5asaaafs0s="
+      "name": "jetmux-0.1.8-macos-arm64.tar.gz",
+      "sha256": "sha256-dyYuV/ESbeowTgYsG/7kJgd8/t03BaEYCIEi15Mwzp8="
     },
     "aarch64-linux": {
-      "name": "jetmux-0.1.7-linux-aarch64.tar.gz",
-      "sha256": "sha256-K/AlrB4K61zZm828xgW3Neb7NqEVJbZc6uUhNuxLn+o="
+      "name": "jetmux-0.1.8-linux-aarch64.tar.gz",
+      "sha256": "sha256-SgiAFzGhm8But80Awx/0YGINWHkzESg22mFot53xvBQ="
     },
     "x86_64-linux": {
-      "name": "jetmux-0.1.7-linux-x86_64.tar.gz",
-      "sha256": "sha256-iX4XMtge1DmRdZOok31Qe2a8mhcPacptsufPV3PuRgg="
+      "name": "jetmux-0.1.8-linux-x86_64.tar.gz",
+      "sha256": "sha256-BEjx3v6mdRFKyzocsGkhgAm4X4OqdIlEBUE614HOazM="
     }
   },
-  "version": "0.1.7"
+  "version": "0.1.8"
 }
